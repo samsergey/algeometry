@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, LambdaCase, KindSignatures#-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Algeometry.Base
-    ( LinSpace, GeometricAlgebra
+    ( LinSpace (..), GeometricAlgebra
     , e, e_, scalar
     , isScalar, isHomogeneous, isInvertible
     , scalarPart, grade, getGrade
@@ -9,11 +9,12 @@ module Algeometry.Base
     , rev, inv, conj, dual
     , (∧), (∨), (⊢), (⊣), (∙), (•)
     , geom, outer, inner, rcontract, lcontract, reciprocal
-    , meet, join, reflectAt, segmentMeet
+    , meet, join, reflectAt, segmentMeet, projectOn
     , pseudoScalar, algebraElements
     , vec, pvec
-    , MV, VGA, PGA
+    , MV, VGA, PGA (..)
     , point, line, toPoint
+    , isPoint, isLine, isPlane
     ) where
 
 import qualified Data.Map as M
@@ -117,7 +118,7 @@ conj = inv . rev
 -- products
 
 infix 8 ⊣, ⊢, ∙
-infix 9 ∧
+infixr 9 ∧
 (∧),(⊢),(⊣),(∙) :: LinSpace a => a -> a -> a
 (∧) = outer
 (⊢) = lcontract
@@ -158,6 +159,7 @@ rcontract a b = sum $ rmul <$> terms a <*> terms b
 lcontract :: LinSpace a => a -> a -> a
 lcontract a b = rev (rev b `rcontract` rev a)
 
+infix 9 •
 (•) :: LinSpace a => a -> a -> Double
 a • b = scalarPart (a `inner` b)
 
@@ -184,9 +186,19 @@ isInvertible m
 
 class LinSpace a => GeometricAlgebra a where
   basis :: [a]
+  dim :: a -> Int
   point :: [Double] -> a
 
   point = dual . vec
+
+isPoint :: GeometricAlgebra a => a -> Bool
+isPoint x = dim x == 0
+
+isLine :: GeometricAlgebra a => a -> Bool
+isLine x = dim x == 1
+
+isPlane :: GeometricAlgebra a => a -> Bool
+isPlane x = dim x == 2
 
 ------------------------------
 -- constructors
@@ -213,6 +225,7 @@ dual = productWith diff pseudoScalar . rev
 ------------------------------
 -- geometry
 
+infixr 9 ∨
 (∨) :: GeometricAlgebra a => a -> a -> a
 a ∨ b = dual (dual a ∧ dual b)
 
@@ -224,6 +237,9 @@ join a b = normalize $ a ∨ b
 
 reflectAt :: GeometricAlgebra a => a -> a -> a
 reflectAt a b = - b * a * reciprocal b
+
+projectOn :: LinSpace a => a -> a -> a
+projectOn p l = (p ⊣ l)*l
 
 vec :: GeometricAlgebra a => [Double] -> a
 vec xs = let es = filter ((== 1).grade) algebraElements
@@ -307,6 +323,7 @@ instance LinSpace MV where
   
 instance GeometricAlgebra MV where
   basis = e <$> [-8..8]
+  dim = grade
 
 instance Num MV where
   fromInteger = scalar . fromInteger
@@ -334,7 +351,7 @@ instance KnownNat n => GeometricAlgebra (VGA n) where
     where
       res = e <$> [1 .. fromIntegral n]
       n = natVal (head res)
-
+  dim x = fromIntegral (natVal x) - grade x - 1
 ------------------------------------------------------------
 
 newtype PGA (n :: Nat) = PGA MV
@@ -348,5 +365,5 @@ instance KnownNat n => GeometricAlgebra (PGA n) where
     where
       res = e <$> [0 .. fromIntegral n]
       n = natVal (head res)
-
+  dim x = fromIntegral (natVal x) - grade x
   point x = dual $ vec (1:x)

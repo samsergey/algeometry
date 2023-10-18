@@ -25,16 +25,22 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      Algeometry.Base
+      Algeometry.SVG
   other-modules:
       Paths_algeometry
   autogen-modules:
       Paths_algeometry
   hs-source-dirs:
       src
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Wname-shadowing
   build-depends:
-      base >=4.7 && <5
+      base >=4.15 && <5
+    , containers
+    , lucid
+    , lucid-svg
+    , process
+    , text
   default-language: Haskell2010
 
 executable algeometry-exe
@@ -45,10 +51,15 @@ executable algeometry-exe
       Paths_algeometry
   hs-source-dirs:
       app
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Wname-shadowing -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       algeometry
-    , base >=4.7 && <5
+    , base >=4.15 && <5
+    , containers
+    , lucid
+    , lucid-svg
+    , process
+    , text
   default-language: Haskell2010
 
 test-suite algeometry-test
@@ -60,8 +71,13 @@ test-suite algeometry-test
       Paths_algeometry
   hs-source-dirs:
       test
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Wname-shadowing -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       algeometry
-    , base >=4.7 && <5
+    , base >=4.15 && <5
+    , containers
+    , lucid
+    , lucid-svg
+    , process
+    , text
   default-language: Haskell2010

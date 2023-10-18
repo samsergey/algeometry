@@ -17,7 +17,7 @@
 #
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
-resolver: ghc-9.4
+resolver: lts-21.0
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -39,9 +39,10 @@ packages:
 # - git: https://github.com/commercialhaskell/stack.git
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
 #
-# extra-deps: []
+extra-deps:
+- lucid-svg-0.7.1.1@sha256:52f3842a4fdec8a0f2661b437305fbedae480568428daef93aead58a91ef2c67,1107
 
-# Override default flag values for local packages and extra-deps
+
 # flags: {}
 
 # Extra package databases containing global packages

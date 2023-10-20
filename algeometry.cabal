@@ -25,21 +25,29 @@ source-repository head
 
 library
   exposed-modules:
-      Algeometry.Base
+      Algeometry
+      Algeometry.Arbitrary
+      Algeometry.GeometricAlgebra
+      Algeometry.LinSpace
+      Algeometry.PGA
       Algeometry.SVG
+      Algeometry.VGA
   other-modules:
       Paths_algeometry
   autogen-modules:
       Paths_algeometry
   hs-source-dirs:
       src
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Wname-shadowing
+  ghc-options: -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports
   build-depends:
-      base >=4.15 && <5
+      QuickCheck >=2.14.2 && <2.15
+    , base >=4.15 && <5
     , containers
     , lucid
     , lucid-svg
     , process
+    , tasty >=1.4.2 && <1.5
+    , tasty-quickcheck >=0.10 && <0.12
     , text
   default-language: Haskell2010
 
@@ -51,14 +59,17 @@ executable algeometry-exe
       Paths_algeometry
   hs-source-dirs:
       app
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Wname-shadowing -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      algeometry
+      QuickCheck >=2.14.2 && <2.15
+    , algeometry
     , base >=4.15 && <5
     , containers
     , lucid
     , lucid-svg
     , process
+    , tasty >=1.4.2 && <1.5
+    , tasty-quickcheck >=0.10 && <0.12
     , text
   default-language: Haskell2010
 
@@ -66,18 +77,23 @@ test-suite algeometry-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Test.Base
       Paths_algeometry
   autogen-modules:
       Paths_algeometry
   hs-source-dirs:
       test
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Wname-shadowing -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      algeometry
+      QuickCheck >=2.14.2 && <2.15
+    , algeometry
     , base >=4.15 && <5
     , containers
     , lucid
     , lucid-svg
     , process
+    , tasty >=1.4.2 && <1.5
+    , tasty-hunit >=0.10 && <0.12
+    , tasty-quickcheck >=0.10 && <0.12
     , text
   default-language: Haskell2010

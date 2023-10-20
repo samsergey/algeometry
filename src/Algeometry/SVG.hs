@@ -2,11 +2,12 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Algeometry.SVG
-  ( Fig (..), svg , writeSVG, writePNG, (@)
-  , figure, polygon, put
+  ( Fig (..), svg , writeSVG, writePNG,animate, (@)
+  , figure, figureWith, viewPoint
+  , polygon, put, plane, plane3, orthoPlane
   ) where
 
-import Algeometry.Base
+import Algeometry.PGA
 import Control.Monad hiding (join)
 import Data.List (sort, nub)
 import Data.Maybe
@@ -30,35 +31,17 @@ toXY mv = case toPoint mv of
 
 ------------------------------------------------------------
 
-data Fig a = Point   [Attribute] XY
-           | Line    [Attribute] XY XY
-           | Polygon [Attribute] [XY]
+data Fig = Point   [Attribute] XY
+         | Line    [Attribute] XY XY
+         | Polygon [Attribute] [XY]
   deriving (Show, Eq)
 
-instance Ord (Fig a) where
+instance Ord Fig where
   compare (Point _ _) _ = GT
   compare _ (Point _ _) = LT
   compare _ _ = EQ
 
 ------------------------------------------------------------
-
-class GeometricAlgebra a => Figure a where
-  draw :: a -> [Attribute] -> [Fig a]
-  drawMany :: [a] -> [Attribute] -> [Fig a]
-
-instance Figure (PGA 2) where
-  draw mv attr 
-    | isPoint mv = [Point attr $ toXY mv]
-    | isLine mv = case nub (toXY <$> clip mv) of
-        [] -> []
-        [p] -> [Point attr p]
-        p1:p2:_ -> [Line attr p1 p2]
-    | otherwise = []
-
-  drawMany mvs attr =
-    if length mvs > 1 && all isPoint mvs
-    then [Polygon attr $ toXY <$> mvs]
-    else mvs >>= \v -> draw v attr
 
 clip :: GeometricAlgebra b => b -> [b]
 clip mv = let
@@ -66,34 +49,76 @@ clip mv = let
   frame = zip vs (tail vs)
   in mapMaybe (segmentMeet mv) frame
 
-projectPGA :: PGA 3 -> PGA 2
-projectPGA (PGA mv) = case grade mv of
-  3 -> PGA $ projectOn mv (e 3) * (-e 3)
-  2 -> PGA $ ((mv ∨ dual (e 3)) ∧ e 3) * (-e 3)
-  _ -> zero
-
-instance Figure (PGA 3) where
-  draw = coerce . draw . projectPGA
-  drawMany = coerce . drawMany . map projectPGA
-
 ------------------------------------------------------------
 
-put :: Figure a => a -> [Attribute] -> ([Fig a], ())
-put x attr = (draw x attr, ())
+type Record a b = ([([a], [Attribute])], b)
 
-polygon :: Figure a => [a] -> [Attribute] -> ([Fig a], ())
-polygon pts attr = (drawMany pts attr, ())
+put :: a -> [Attribute] -> Record a ()
+put x attr = ([([x], attr)], ())
+
+polygon :: [a] -> [Attribute] -> Record a ()
+polygon pts attr = ([(pts, attr)], ())
+
+plane
+  :: PGA 3 -> PGA 3 -> (Double, Double)
+  -> [Attribute] -> Record (PGA 3) ()
+plane p l (a, b) =
+  polygon [ shiftAlong l' (-b) $ shiftAlong l (a) p
+          , shiftAlong l' (-b) $ shiftAlong l (-a) p 
+          , shiftAlong l' (b) $ shiftAlong l (-a) p'
+          , shiftAlong l' (b) $ shiftAlong l (a) p' ]
+  where
+    p' = (l `inner` p)*l
+    l' = p `join` p'
+
+orthoPlane
+  :: PGA 3 -> PGA 3 -> (Double, Double)
+  -> [Attribute] -> Record (PGA 3) ()
+orthoPlane p o = plane p l
+  where
+    p' = (o `inner` p)*o
+    l = p' `inner` (p `join` o)
+
+plane3
+  :: PGA 3 -> PGA 3 -> PGA 3 -> (Double, Double)
+  -> [Attribute]  -> Record (PGA 3) ()
+plane3 p1 p2 p3 = plane p1 (p2 `join` p3)
+
+------------------------------------------------------------
 
 infix 1 @
-(@) :: Figure a => a -> [Attribute] -> ([Fig a], a)
+(@) :: a -> [Attribute] -> Record a a
 mv @ attr = const mv <$> put mv attr
 
-figure :: ([Fig a], a) -> [Fig a]
-figure = fst
+figure :: Record (PGA 2) b -> [Fig]
+figure = foldMap draw . fst
+  where
+    draw (mvs, attr) = case mvs of
+      [mv] | isPoint mv -> [Point attr $ toXY mv]
+           | isLine mv -> case nub (toXY <$> clip mv) of
+               [] -> []
+               [p] -> [Point attr p]
+               p1:p2:_ -> [Line attr p1 p2]
+           | otherwise -> []
+      _ | all isPoint mvs -> [Polygon attr $ toXY <$> mvs]
+        | otherwise -> mvs >>= \v -> draw ([v], attr)
+
+figureWith :: (a -> PGA 2) -> Record a b -> [Fig]
+figureWith f = figure . mapFst (mapFst f)
+  where
+    mapFst g (a,b) = (map g a, b)
+
+viewPoint :: [Double] -> PGA 3 -> PGA 2
+viewPoint vp = coerce . project
+  where
+    project x
+      | isPoint x = -((x `join` point vp) `meet` e 3 ) * e 3
+      | isLine x = -((x `join` point vp) `meet` e 3 ) * e 3
+      | otherwise = zero
 
 ------------------------------------------------------------
 
-renderFig :: Monad m => Fig a -> HtmlT m ()
+renderFig :: Monad m => Fig -> HtmlT m ()
 renderFig f = case f of
   Point attr (x, y) -> do 
     circle_ $ [ cx_ (pack (show x)) , cy_ (pack (show y))
@@ -135,7 +160,7 @@ label s (x, y) = do
         , opacity_ "1"
         , style_ "fontfamily : CMU Serif;"] $ toHtml s
 
-svg :: Monad m => [Fig a] -> HtmlT m ()
+svg :: Monad m => [Fig] -> HtmlT m ()
 svg fig = do
   doctype_
   with (svg11_ content)
@@ -148,17 +173,38 @@ svg fig = do
             , fill_ "white", stroke_ "none", fill_opacity_ "1"]
       foldMap renderFig $ sort fig
 
-writeSVG :: FilePath -> [Fig a] -> IO ()
+writeSVG :: FilePath -> [Fig] -> IO ()
 writeSVG fname figs = do
   h <- openFile fname WriteMode
   hPrint h (svg figs)
   hClose h
 
-writePNG :: String -> [Fig a] -> IO ()
+writePNG :: String -> [Fig] -> IO ()
 writePNG fname figs = do
-  writeSVG "tmp.svg" figs
-  let opts = ["-density", "150", "tmp.svg", fname]
-  (_, Just hout, _, _) <- createProcess (proc "convert" opts){ std_out = CreatePipe }
+  let svgFile = fname <> ".svg"
+      pngFile = fname <> ".png"
+  writeSVG svgFile figs
+  let opts = ["-format", "png", svgFile, pngFile]
+  (_, Just hout, _, _) <- createProcess (proc "mogrify" opts){ std_out = CreatePipe }
   out <- hGetContents hout
   guard (null out)
+  print pngFile
+
+animate
+  :: Fractional a => Int -> (a, a) -> (a -> [Fig]) -> String -> IO ()
+animate n (a, b) mkFrame fname = do
+  forM_ [0..n-1] frame
+  let opts = ["-delay", "0", "-loop", "0", "figs/an/*.png", fname]
+  (_, Just hout1, _, _) <- createProcess (proc "convert" opts){ std_out = CreatePipe }
+  out <- hGetContents hout1
+  guard (null out)
+  print fname
   return ()
+  where
+    frame i = let
+      x = a + fromIntegral i * (b-a)/fromIntegral (n)
+      si = show i
+      fnum = replicate (3-length si) '0' <> si
+      fname = "figs/an/p" <> fnum
+      in writePNG fname (mkFrame x)
+  

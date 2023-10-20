@@ -26,18 +26,23 @@ dependencies:
 - lucid-svg
 - process
 - text
-
+- tasty >= 1.4.2 && < 1.5
+- tasty-quickcheck >= 0.10 && < 0.12
+- QuickCheck >= 2.14.2 && < 2.15
+    
 ghc-options:
-- -Wall
-- -Wcompat
-- -Widentities
-- -Wincomplete-record-updates
-- -Wincomplete-uni-patterns
-- -Wmissing-export-lists
-- -Wmissing-home-modules
-- -Wpartial-fields
-- -Wredundant-constraints
-- -Wname-shadowing
+  - -Wdefault
+  - -Wincomplete-uni-patterns
+  - -Wredundant-constraints
+  - -Wunused-imports
+# - -Wcompat
+# - -Widentities
+# - -Wincomplete-record-updates
+# - -Wmissing-export-lists
+# - -Wmissing-home-modules
+# - -Wpartial-fields
+# - -Wname-shadowing
+
 
 library:
   source-dirs: src
@@ -63,3 +68,7 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - algeometry
+    - tasty >= 1.4.2 && < 1.5
+    - tasty-hunit >= 0.10 && < 0.12
+    - tasty-quickcheck >= 0.10 && < 0.12
+    - QuickCheck >= 2.14.2 && < 2.15

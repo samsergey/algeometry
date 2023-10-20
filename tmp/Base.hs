@@ -1,19 +1,19 @@
 {-# LANGUAGE DataKinds, LambdaCase, KindSignatures#-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Algeometry.Base
-    ( LinSpace (..), GeometricAlgebra
-    , e, e_, scalar
+module Algeometry.LinSpace
+    ( LinSpace (..), GeometricAlgebra (..)
+    , MV, VGA (..), PGA (..)
+    , e, e_, scalar, vec, pvec
+    , pseudoScalar, algebraElements
     , isScalar, isHomogeneous, isInvertible
-    , scalarPart, grade, getGrade
+    , scalarPart, grade, getGrade, components, weight, bulk
     , norm, norm2, normalize
     , rev, inv, conj, dual
     , (∧), (∨), (⊢), (⊣), (∙), (•)
     , geom, outer, inner, rcontract, lcontract, reciprocal
-    , meet, join, reflectAt, segmentMeet, projectOn
-    , pseudoScalar, algebraElements
-    , vec, pvec
-    , MV, VGA, PGA (..)
-    , point, line, toPoint
+    , meet, join, segmentMeet
+    , reflectAt, rotateAt, projectOn, shiftAlong
+    , line, angle, bisectrissa
     , isPoint, isLine, isPlane
     ) where
 
@@ -34,8 +34,9 @@ type Component = Int
 type Blade = S.Set Component
 type Term = (Blade, Double)
 
-class (Eq a, Num a, Show a) => LinSpace a where
+class (Show a, Num a) => LinSpace a where
   zero :: a
+  isZero :: a -> Bool
   monom :: Foldable t => t Component -> a
   isMonom :: a -> Bool
   blades :: a -> [Blade]
@@ -83,6 +84,9 @@ getGrade :: LinSpace a => Int -> a -> a
 getGrade k = mapTerms $
   \(b,c) -> guard (S.size b == k) >> [(b, c)]
 
+components :: LinSpace a => a -> [a]
+components mv = e <$> S.elems (S.unions (blades mv))
+
 ------------------------------
 -- norm
 
@@ -114,15 +118,44 @@ inv = mapTerms $
 conj :: LinSpace a => a -> a
 conj = inv . rev
 
+------------------------------------------------------------
+-- GeometricAlgebra
+------------------------------------------------------------
+
+class LinSpace a => GeometricAlgebra a where
+  basis :: [a]
+  dim :: a -> Int
+  point :: [Double] -> a
+  toPoint :: a -> [Double]
+
+  point = dual . vec
+
+isPoint :: GeometricAlgebra a => a -> Bool
+isPoint x = dim x == 0
+
+isLine :: GeometricAlgebra a => a -> Bool
+isLine x = dim x == 1
+
+isPlane :: GeometricAlgebra a => a -> Bool
+isPlane x = dim x == 2
+
+weight :: GeometricAlgebra a => a -> a
+weight mv =
+  sum $ filter (\x -> isZero $ x * x) $ terms mv
+
+bulk :: GeometricAlgebra a => a -> a
+bulk mv =
+  sum $ filter (\x -> not $ isZero $ x * x) $ terms mv
+  
 ------------------------------
 -- products
 
 infix 8 ⊣, ⊢, ∙
 infixr 9 ∧
-(∧),(⊢),(⊣),(∙) :: LinSpace a => a -> a -> a
+(∧),(⊢),(⊣),(∙) :: GeometricAlgebra a => a -> a -> a
 (∧) = outer
-(⊢) = lcontract
-(⊣) = rcontract
+(⊣) = lcontract
+(⊢) = rcontract
 (∙) = inner
 
 mulBlades :: ((Bool, Component) -> [Term]) -> Term -> Term -> [Term]
@@ -135,70 +168,50 @@ insertWith mul (z, p) i = do
   (k, s) <- mul (c, i)
   return (l <> k <> r, p*s*(-1)^S.size l)
 
-geom :: LinSpace a => a -> a -> a
+geom :: GeometricAlgebra a => a -> a -> a
 geom = productWith $ \case  
   (True,  0) -> []
   (True,  i) -> [(mempty, signum (fromIntegral i))]
   (False, i) -> [(S.singleton i, 1)]
 
-outer :: LinSpace a => a -> a -> a
+outer :: GeometricAlgebra a => a -> a -> a
 outer = productWith $ \case
   (True,  _) -> []
   (False, i) -> [(S.singleton i, 1)]
 
-inner :: LinSpace a => a -> a -> a
+inner :: GeometricAlgebra a => a -> a -> a
 inner a b = sum $ imul <$> terms a <*> terms b 
   where
-    imul x y = getGrade (abs (grade x - grade y)) (x * y)
+    imul x y = getGrade (abs (grade x - grade y)) (geom x y)
 
-rcontract :: LinSpace a => a -> a -> a
+rcontract :: GeometricAlgebra a => a -> a -> a
 rcontract a b = sum $ rmul <$> terms a <*> terms b 
   where
-    rmul x y = getGrade (grade x - grade y) (x * y)
+    rmul x y = getGrade (grade x - grade y) (geom x y)
 
-lcontract :: LinSpace a => a -> a -> a
+lcontract :: GeometricAlgebra a => a -> a -> a
 lcontract a b = rev (rev b `rcontract` rev a)
 
 infix 9 •
-(•) :: LinSpace a => a -> a -> Double
+(•) :: GeometricAlgebra a => a -> a -> Double
 a • b = scalarPart (a `inner` b)
 
 ------------------------------
 -- reversing
 
-reciprocal :: LinSpace a => a -> a
+reciprocal :: GeometricAlgebra a => a -> a
 reciprocal m
     | not (isInvertible m) = error $ "Multivector is non-invertible: " <> show m
     | isScalar m = scalar $ recip $ scalarPart m
     | isHomogeneous m = scale (1 / norm2 m) $ rev m
     | otherwise = error $ "Don't know yet how to invert" <> show m
 
-isInvertible :: LinSpace a => a -> Bool
+isInvertible :: GeometricAlgebra a => a -> Bool
 isInvertible m
-    | m == zero = False
-    | isMonom m = m * m /= zero
-    | otherwise = let m' = m * conj m
+    | isZero m = False
+    | isMonom m = not $ isZero $ geom m m
+    | otherwise = let m' = geom m (conj m)
                   in grade m' <= 2 && isInvertible m'
-   
-------------------------------------------------------------
--- GeometricAlgebra
-------------------------------------------------------------
-
-class LinSpace a => GeometricAlgebra a where
-  basis :: [a]
-  dim :: a -> Int
-  point :: [Double] -> a
-
-  point = dual . vec
-
-isPoint :: GeometricAlgebra a => a -> Bool
-isPoint x = dim x == 0
-
-isLine :: GeometricAlgebra a => a -> Bool
-isLine x = dim x == 1
-
-isPlane :: GeometricAlgebra a => a -> Bool
-isPlane x = dim x == 2
 
 ------------------------------
 -- constructors
@@ -223,23 +236,7 @@ dual = productWith diff pseudoScalar . rev
       (False, i) -> [(S.singleton i, 1)]
 
 ------------------------------
--- geometry
-
-infixr 9 ∨
-(∨) :: GeometricAlgebra a => a -> a -> a
-a ∨ b = dual (dual a ∧ dual b)
-
-meet :: GeometricAlgebra a => a -> a -> a
-meet a b = normalize $ a ∧ b
-
-join :: GeometricAlgebra a => a -> a -> a
-join a b = normalize $ a ∨ b
-
-reflectAt :: GeometricAlgebra a => a -> a -> a
-reflectAt a b = - b * a * reciprocal b
-
-projectOn :: LinSpace a => a -> a -> a
-projectOn p l = (p ⊣ l)*l
+-- geometric objects
 
 vec :: GeometricAlgebra a => [Double] -> a
 vec xs = let es = filter ((== 1).grade) algebraElements
@@ -251,13 +248,21 @@ pvec = dual . vec
 line :: GeometricAlgebra a => [Double] -> [Double] -> a
 line a b = point a `join` point b
 
-toPoint :: KnownNat n => PGA n -> [Double]
-toPoint mv =
-  if h == 0 then [] else [coefficient [k] mv' / h | k <- [1..n] ]
-  where
-    n = fromIntegral $ natVal mv
-    mv' = dual mv
-    h = coefficient [0] mv'
+angle :: GeometricAlgebra a => a -> a -> Double
+angle l1 l2 = acos (l1 • l2)
+
+------------------------------
+-- geometric combibators
+
+infixr 9 ∨
+(∨) :: GeometricAlgebra a => a -> a -> a
+a ∨ b = dual (dual a ∧ dual b)
+
+meet :: GeometricAlgebra a => a -> a -> a
+meet a b = normalize $ a ∧ b
+
+join :: GeometricAlgebra a => a -> a -> a
+join a b = normalize $ a ∨ b
 
 segmentMeet :: GeometricAlgebra a => a -> (a, a) -> Maybe a
 segmentMeet x (a, b) = let
@@ -265,7 +270,29 @@ segmentMeet x (a, b) = let
   s = (p ∨ a)•(p ∨ b)
   in if s <= 0 then Just (normalize p) else Nothing
 
+bisectrissa :: GeometricAlgebra a => a -> a -> a
+bisectrissa l1 l2 = normalize (normalize l1 + normalize l2)
 
+------------------------------------------------------------
+-- transformations
+------------------------------------------------------------
+
+reflectAt :: GeometricAlgebra a => a -> a -> a
+reflectAt a b = - b * a * reciprocal b
+
+projectOn :: GeometricAlgebra a => a -> a -> a
+projectOn p l = (p ⊣ l)*l
+
+rotateAt :: GeometricAlgebra a => a -> Double -> a -> a
+rotateAt p ang x = r * x * rev r
+  where
+    r = scalar (cos (ang/2)) + scalar (sin (ang/2)) * p
+
+shiftAlong :: GeometricAlgebra a => a -> Double -> a -> a
+shiftAlong l d p = t * p * rev t
+  where
+    t = dual (pseudoScalar + scale d (bulk l))
+    
 ------------------------------------------------------------
 -- instances
 ------------------------------------------------------------
@@ -297,6 +324,8 @@ instance Show MV where
 instance LinSpace MV where
   zero = MV mempty
 
+  isZero (MV m) = M.null m
+
   monom xs = MV $ M.singleton (foldMap S.singleton xs) 1
 
   isMonom (MV m) = M.size m == 1
@@ -320,11 +349,12 @@ instance LinSpace MV where
   productWith f (MV a) (MV b) =
     MV $ M.filter ((> 1e-10).abs) $ M.fromListWith (+) $
     CM.join $ mulBlades f <$> M.toList a <*> M.toList b 
-  
-instance GeometricAlgebra MV where
-  basis = e <$> [-8..8]
-  dim = grade
 
+instance GeometricAlgebra MV where
+  basis = e <$> [-3..3]
+  dim = grade
+  toPoint = undefined
+  
 instance Num MV where
   fromInteger = scalar . fromInteger
   MV a + MV b =
@@ -352,6 +382,11 @@ instance KnownNat n => GeometricAlgebra (VGA n) where
       res = e <$> [1 .. fromIntegral n]
       n = natVal (head res)
   dim x = fromIntegral (natVal x) - grade x - 1
+  toPoint mv = [coefficient [k] mv' | k <- [1..n] ]
+    where
+      n = fromIntegral $ natVal mv
+      mv' = dual mv
+
 ------------------------------------------------------------
 
 newtype PGA (n :: Nat) = PGA MV
@@ -367,3 +402,9 @@ instance KnownNat n => GeometricAlgebra (PGA n) where
       n = natVal (head res)
   dim x = fromIntegral (natVal x) - grade x
   point x = dual $ vec (1:x)
+  toPoint mv =
+    if h == 0 then [] else [coefficient [k] mv' / h | k <- [1..n] ]
+    where
+      n = fromIntegral $ natVal mv
+      mv' = dual mv
+      h = coefficient [0] mv'

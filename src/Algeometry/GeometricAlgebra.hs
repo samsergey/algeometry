@@ -13,7 +13,7 @@ module Algeometry.GeometricAlgebra
     , (∧), (∨), (⊢), (⊣), (∙), (•)
     , geom, outer, inner, rcontract, lcontract, reciprocal
     , meet, join, segmentMeet
-    , reflectAt, rotateAt, projectOn, shiftAlong
+    , reflectAt, rotateAt, projectionOf, on, shiftAlong
     , line, angle, bisectrissa
     , isPoint, isLine, isPlane
     ) where
@@ -221,8 +221,11 @@ bisectrissa l1 l2 = normalize (normalize l1 + normalize l2)
 reflectAt :: GeometricAlgebra a => a -> a -> a
 reflectAt a b = - b * a * reciprocal b
 
-projectOn :: GeometricAlgebra a => a -> a -> a
-projectOn p l = (p ⊣ l)*l
+projectionOf :: GeometricAlgebra a => a -> a -> a
+projectionOf p l = (p `inner` l)*l
+
+on :: (a -> b) -> a -> b
+on = ($)
 
 rotateAt :: GeometricAlgebra a => a -> Double -> a -> a
 rotateAt p ang x = r * x * rev r
@@ -308,5 +311,3 @@ instance Num MV where
 instance Fractional MV where
   fromRational = scalar . fromRational 
   recip  = reciprocal
-
-

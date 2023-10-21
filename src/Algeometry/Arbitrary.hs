@@ -81,10 +81,8 @@ newtype Homogeneous = Homogeneous MV
            , LinSpace, GeometricAlgebra)
 
 instance Arbitrary Homogeneous where
-  arbitrary = res `suchThat` (not.isZero)
-    where
-      res = do
-        k <- choose (1,5)
-        abitraryMV $ filter (\x -> grade x == k)
+  arbitrary = do
+    k <- choose (1,5)
+    abitraryMV $ filter (\x -> grade x == k)
         
   shrink  = shrinkMV

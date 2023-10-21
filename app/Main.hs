@@ -43,13 +43,18 @@ fig3 a = figureWith (viewPoint [0,0,500] . rotateAt ox a) (f, ())
       (_A + _B + _C)/3                   @ [id_ "O''"]
       return (line [150,150,0] [150,151,0])
 
-test = figureWith (viewPoint [0,0,500]) $ do
-  p <- point [120, 100,100]          @ [id_ "p"]
-  l <- line [50,150,20] [200,200,50] @ [id_ "l"]
-  plane p l (30, 10)                   [fill_ "wheat", stroke_ "none"]
-  orthoPlane p l (30,10)               [fill_ "lightgreen", stroke_ "none"]
- 
+test = rotateAbout o (viewPoint [0,0,2000]) (fig, ())
+  where
+    (fig, o) = do
+      p <- point [120, 100,100]          @ [id_ "p"]
+      l <- line [50,150,20] [200,200,50] @ [id_ "l"]
+      plane p l (30, 10)                   [fill_ "wheat", stroke_ "none"]
+      orthoPlane p l (30,10)               [fill_ "lightgreen", stroke_ "none"]
+      return $ p `join` (projectionOf p `on` l)
+
+--    o = line [150,150,0] [150,151,0]
+  
 main :: IO ()
 main = do
-  writeSVG "test1.svg" (fig3 0)
-  --animate 40 (0, 2*pi) fig3 "an.gif" 
+  --writeSVG "test1.svg" (fig3 0)
+  animate 40 (0, 2*pi) test "an.gif" 

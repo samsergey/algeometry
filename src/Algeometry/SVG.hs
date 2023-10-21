@@ -3,7 +3,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Algeometry.SVG
   ( Fig (..), svg , writeSVG, writePNG,animate, (@)
-  , figure, figureWith, viewPoint
+  , figure, figureWith, viewPoint, rotateAbout
   , polygon, put, plane, plane3, orthoPlane
   ) where
 
@@ -68,7 +68,7 @@ plane p l (a, b) =
           , shiftAlong l' (b) $ shiftAlong l (-a) p'
           , shiftAlong l' (b) $ shiftAlong l (a) p' ]
   where
-    p' = (l `inner` p)*l
+    p' = projectionOf p `on` l 
     l' = p `join` p'
 
 orthoPlane
@@ -76,7 +76,7 @@ orthoPlane
   -> [Attribute] -> Record (PGA 3) ()
 orthoPlane p o = plane p l
   where
-    p' = (o `inner` p)*o
+    p' = projectionOf p `on` o 
     l = p' `inner` (p `join` o)
 
 plane3
@@ -208,3 +208,6 @@ animate n (a, b) mkFrame fname = do
       fname = "figs/an/p" <> fnum
       in writePNG fname (mkFrame x)
   
+rotateAbout ::
+  PGA 3 -> (PGA 3 -> PGA 2) -> Record (PGA 3) a -> Double -> [Fig]
+rotateAbout o f fig a = figureWith (f . rotateAt o a) fig

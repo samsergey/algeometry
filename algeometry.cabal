@@ -27,6 +27,7 @@ library
   exposed-modules:
       Algeometry
       Algeometry.Arbitrary
+      Algeometry.Experiment.GeometricAlgebra
       Algeometry.GeometricAlgebra
       Algeometry.LinSpace
       Algeometry.PGA
@@ -40,7 +41,8 @@ library
       src
   ghc-options: -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports
   build-depends:
-      QuickCheck >=2.14.2 && <2.15
+      MemoTrie >=0.6.7
+    , QuickCheck >=2.14.2 && <2.15
     , base >=4.15 && <5
     , containers
     , lucid
@@ -61,7 +63,8 @@ executable algeometry-exe
       app
   ghc-options: -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      QuickCheck >=2.14.2 && <2.15
+      MemoTrie >=0.6.7
+    , QuickCheck >=2.14.2 && <2.15
     , algeometry
     , base >=4.15 && <5
     , containers
@@ -85,7 +88,8 @@ test-suite algeometry-test
       test
   ghc-options: -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      QuickCheck >=2.14.2 && <2.15
+      MemoTrie >=0.6.7
+    , QuickCheck >=2.14.2 && <2.15
     , algeometry
     , base >=4.15 && <5
     , containers

@@ -1,14 +1,20 @@
-{-# LANGUAGE GeneralisedNewtypeDeriving #-}
+{-# LANGUAGE DerivingVia
+, StandaloneDeriving
+, FlexibleInstances
+, GeneralisedNewtypeDeriving
+, MultiParamTypeClasses
+#-}
+
 module Algeometry.Arbitrary where
   
 import Test.QuickCheck hiding (scale)
-import Algeometry.GeometricAlgebra
+import Algeometry.Experiment.GeometricAlgebra
 import Data.List (delete)
 import Data.Foldable
 
 ------------------------------------------------------------
 
-abitraryMV :: GeometricAlgebra a => ([a] -> [a]) -> Gen a
+abitraryMV :: (Num a, FiniteGeomAlgebra e a) => ([a] -> [a]) -> Gen a
 abitraryMV f = res `suchThat` (not . isScalar)
   where
     res = do
@@ -18,37 +24,49 @@ abitraryMV f = res `suchThat` (not . isScalar)
       cs <- traverse (const coeff) vs
       return $ sum $ zipWith scale cs vs
 
-shrinkMV :: GeometricAlgebra a => a -> [a]
+shrinkMV :: (Num a, FiniteGeomAlgebra e a) => a -> [a]
 shrinkMV v | isScalar v = []
-           | isMonom v && norm2 v == 1 = []
-           | isMonom v = [normalize v]
+           | isMonom v = []
            | otherwise = (v -) <$> terms v
 
+------------------------------------------------------------
+
 newtype Monom = Monom MV
-  deriving ( Show, Eq, Num, Fractional
-           , LinSpace, GeometricAlgebra)
-  
+  deriving ( Show, Eq, Num, Fractional)
+
+deriving via MV instance LinSpace [Int] Monom
+deriving via MV instance GeomAlgebra Int Monom
+deriving via MV instance FiniteGeomAlgebra Int Monom
+
 instance Arbitrary Monom where
   arbitrary = elements algebraElements
   shrink mv = e_ . (`delete` ix) <$> ix
     where
-      ix = foldMap toList (blades mv)
+      ix = foldMap toList (elems mv)
 
 ------------------------------------------------------------
 
 newtype Vector = Vector MV
-  deriving ( Show, Eq, Num, Fractional
-           , LinSpace, GeometricAlgebra)
+  deriving ( Show, Eq, Num, Fractional)
+
+deriving via MV instance LinSpace [Int] Vector
+deriving via MV instance GeomAlgebra Int Vector
+deriving via MV instance FiniteGeomAlgebra Int Vector
 
 instance Arbitrary Vector where
   arbitrary = abitraryMV $ filter (\x -> grade x == 1)
   shrink  = shrinkMV
 
+tst = \(Vector a) (Vector b) -> (a*b == a `inner` b + a ∧ b)
+
 ------------------------------------------------------------
 
 newtype Bivector = Bivector MV
-  deriving ( Show, Eq, Num, Fractional
-           , LinSpace, GeometricAlgebra)
+  deriving ( Show, Eq, Num, Fractional)
+
+deriving via MV instance LinSpace [Int] Bivector
+deriving via MV instance GeomAlgebra Int Bivector
+deriving via MV instance FiniteGeomAlgebra Int Bivector
 
 instance Arbitrary Bivector where
   arbitrary = abitraryMV $ filter (\x -> grade x == 2)
@@ -57,8 +75,11 @@ instance Arbitrary Bivector where
 ------------------------------------------------------------
 
 newtype Trivector = Trivector MV
-  deriving ( Show, Eq, Num, Fractional
-           , LinSpace, GeometricAlgebra)
+  deriving ( Show, Eq, Num, Fractional)
+
+deriving via MV instance LinSpace [Int] Trivector
+deriving via MV instance GeomAlgebra Int Trivector
+deriving via MV instance FiniteGeomAlgebra Int Trivector
 
 instance Arbitrary Trivector where
   arbitrary = abitraryMV $ filter (\x -> grade x == 3)
@@ -67,8 +88,11 @@ instance Arbitrary Trivector where
 ------------------------------------------------------------
 
 newtype Multivector = Multivector MV
-  deriving ( Show, Eq, Num, Fractional
-           , LinSpace, GeometricAlgebra)
+  deriving ( Show, Eq, Num, Fractional)
+
+deriving via MV instance LinSpace [Int] Multivector
+deriving via MV instance GeomAlgebra Int Multivector
+deriving via MV instance FiniteGeomAlgebra Int Multivector
 
 instance Arbitrary Multivector where
   arbitrary = abitraryMV id
@@ -77,8 +101,11 @@ instance Arbitrary Multivector where
 ------------------------------------------------------------
 
 newtype Homogeneous = Homogeneous MV
-  deriving ( Show, Eq, Num, Fractional
-           , LinSpace, GeometricAlgebra)
+  deriving ( Show, Eq, Num, Fractional)
+
+deriving via MV instance LinSpace [Int] Homogeneous
+deriving via MV instance GeomAlgebra Int Homogeneous
+deriving via MV instance FiniteGeomAlgebra Int Homogeneous
 
 instance Arbitrary Homogeneous where
   arbitrary = do
@@ -86,3 +113,4 @@ instance Arbitrary Homogeneous where
     abitraryMV $ filter (\x -> grade x == k)
         
   shrink  = shrinkMV
+

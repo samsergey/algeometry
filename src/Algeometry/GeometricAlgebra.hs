@@ -10,7 +10,7 @@ module Algeometry.GeometricAlgebra
     , weight, bulk
     , norm, norm2, normalize
     , rev, inv, conj, dual
-    , (∧), (∨), (⊢), (⊣), (∙), (•)
+    , (∧), (∨), (|-), (-|), (∙), (•)
     , geom, outer, inner, rcontract, lcontract, reciprocal
     , meet, join, segmentMeet
     , reflectAt, rotateAt, projectionOf, on, shiftAlong
@@ -60,12 +60,12 @@ bulk mv =
 ------------------------------
 -- products
 
-infix 8 ⊣, ⊢, ∙
+infix 8 -|, |-, ∙
 infixr 9 ∧
-(∧),(⊢),(⊣),(∙) :: GeometricAlgebra a => a -> a -> a
+(∧),(|-),(-|),(∙) :: GeometricAlgebra a => a -> a -> a
 (∧) = outer
-(⊣) = lcontract
-(⊢) = rcontract
+(-|) = lcontract
+(|-) = rcontract
 (∙) = inner
 
 mulBlades :: ((Bool, Component) -> [Term]) -> Term -> Term -> [Term]

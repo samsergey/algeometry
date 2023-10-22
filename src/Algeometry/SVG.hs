@@ -1,6 +1,13 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE LambdaCase
+, DerivingVia
+, StandaloneDeriving
+, DataKinds
+, KindSignatures
+, GeneralizedNewtypeDeriving
+, MultiParamTypeClasses
+, FlexibleInstances
+, OverloadedStrings #-}
+
 module Algeometry.SVG
   ( Fig (..), svg , writeSVG, writePNG,animate, (@)
   , figure, figureWith, viewPoint, rotateAbout
@@ -43,7 +50,7 @@ instance Ord Fig where
 
 ------------------------------------------------------------
 
-clip :: GeometricAlgebra b => b -> [b]
+clip :: PGA 2 -> [PGA 2]
 clip mv = let
   vs = point <$> [[0,0],[0,300],[300,300],[300,0],[0,0]]
   frame = zip vs (tail vs)

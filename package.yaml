@@ -29,6 +29,7 @@ dependencies:
 - tasty >= 1.4.2 && < 1.5
 - tasty-quickcheck >= 0.10 && < 0.12
 - QuickCheck >= 2.14.2 && < 2.15
+- MemoTrie >= 0.6.7
     
 ghc-options:
   - -Wdefault

@@ -2,7 +2,7 @@ module Test.Base (testSuite) where
 
 import Test.Tasty
 import Test.Tasty.QuickCheck
-import Algeometry.GeometricAlgebra
+import Algeometry.Experiment.GeometricAlgebra
 import Algeometry.Arbitrary
 
 bladeTests = testGroup "Blades tests"
@@ -76,15 +76,15 @@ bladeTests = testGroup "Blades tests"
 
     , testProperty "left contraction" $ 
       \(Monom a) (Monom b) (Monom c) ->
-        (a ∧ b) • c == a • (b ⊣ c)
+        (a ∧ b) • c == a • (b -| c)
 
     , testProperty "right contraction" $ 
       \(Monom a) (Monom b) (Monom c) ->
-        c • (b ∧ a) == (c ⊢ b) • a
+        c • (b ∧ a) == (c |- b) • a
 
     , testProperty "left and right contraction" $ 
       \(Monom a) (Monom b) ->
-        rev (a ⊢ b) == rev b ⊣ rev a
+        rev (a |- b) == rev b -| rev a
     ]
   ]
 
@@ -147,10 +147,10 @@ multivectorTests = testGroup "Miltivector tests"
       \(Vector a) (Vector b) -> a*b == a ∙ b + a ∧ b
 
     , testProperty "geometric product decomposition for vector and bivector" $ 
-      \(Vector a) (Multivector b) -> a*b == a ⊣ b + a ∧ b
+      \(Vector a) (Multivector b) -> a*b == a -| b + a ∧ b
 
     , testProperty "geometric product decomposition for bivector and vector" $ 
-      \(Multivector a) (Vector b) -> a*b == a ⊢ b + a ∧ b
+      \(Multivector a) (Vector b) -> a*b == a |- b + a ∧ b
     ]
   ]
 

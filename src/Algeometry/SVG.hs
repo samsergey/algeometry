@@ -164,15 +164,15 @@ label s (x, y) = do
         , y_ (pack $ show $ y)
         , stroke_ "none", fill_ "black"
         , text_anchor_ "middle"
-        , opacity_ "1"
-        , style_ "fontfamily : CMU Serif;"] $ toHtml s
+        , opacity_ "1" ] $ toHtml s
 
 svg :: Monad m => [Fig] -> HtmlT m ()
 svg fig = do
   doctype_
   with (svg11_ content)
     [width_ "300" , height_ "300"
-    , stroke_ "black", fill_ "none" , fill_opacity_ "0.75"]
+    , stroke_ "black", fill_ "none" , fill_opacity_ "0.75"
+    , font_style_ "italic", font_family_ "CMU Serif, sans-serif"]
   where
     content = do
       filter_ [id_ "blur"] $ feGaussianBlur_ [stdDeviation_ "2"]
@@ -191,8 +191,8 @@ writePNG fname figs = do
   let svgFile = fname <> ".svg"
       pngFile = fname <> ".png"
   writeSVG svgFile figs
-  let opts = ["-format", "png", svgFile, pngFile]
-  (_, Just hout, _, _) <- createProcess (proc "mogrify" opts){ std_out = CreatePipe }
+  let opts = ["-density", "150", svgFile, pngFile]
+  (_, Just hout, _, _) <- createProcess (proc "convert" opts){ std_out = CreatePipe }
   out <- hGetContents hout
   guard (null out)
   print pngFile

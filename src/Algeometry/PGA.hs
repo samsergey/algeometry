@@ -7,10 +7,10 @@
 , FlexibleInstances #-}
 
 module Algeometry.PGA
-  ( module Algeometry.Experiment.GeometricAlgebra
+  ( module Algeometry.GeometricAlgebra
   , PGA (..)) where
 
-import Algeometry.Experiment.GeometricAlgebra
+import Algeometry.GeometricAlgebra
 import GHC.TypeLits (Nat, KnownNat, natVal)
 
 newtype PGA (n :: Nat) = PGA MV

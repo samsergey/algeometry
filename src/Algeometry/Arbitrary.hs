@@ -8,7 +8,7 @@
 module Algeometry.Arbitrary where
   
 import Test.QuickCheck hiding (scale)
-import Algeometry.Experiment.GeometricAlgebra
+import Algeometry.GeometricAlgebra
 import Data.List (delete)
 import Data.Foldable
 

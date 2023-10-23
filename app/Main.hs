@@ -53,6 +53,38 @@ test = rotateAbout o (viewPoint [0,0,2000]) (fig, ())
       return $ p `join` (projectionOf p `on` l)
 
 --    o = line [150,150,0] [150,151,0]
+
+--fig2 :: [Fig]
+fig2 =
+  --figure $
+  do
+  _A <- (point [40, 100] :: PGA 2)      @ []
+  _B <- point [250, 50]        @ []
+  _C <- point [150, 200]      @ []
+  a  <- _B `join` _C   @ [id_ "a"]
+  b  <- _C `join` _A   @ [id_ "b"]
+  c  <- _A `join` _B   @ [id_ "c"]
+  a' <- c - b                    @ [id_ "a'"]
+  b' <- c - a                    @ [id_ "b'"]
+  c' <- a - b                    @ [id_ "c'"]
+--  (c - b) ∧ (c - a)                     @ [id_ "O"]
+  --_O <- b∧a - c∧a - b∧c                      @ [id_ "O"]
+  b∧a                     @ [id_ "C"]
+  c∧a                     @ [id_ "B"]
+  b∧c                     @ [id_ "A"]
+  o <- (_C - _B - _A)      @ [id_ "O"]
+  return (o)
+
+fig4 = figure $ do
+  _A <- point [40, 100]   @ [id_ "A"]
+  _B <- point [250, 50]   @ [id_ "B"]
+  _C <- point [200, 220]  @ [id_ "C"]
+  polygon [_A, _B, _C]      [fill_ "wheat"]
+  a <- _A ∨ (_B + _C)/2  @ [id_ "A∨(B+C)/2"]
+  b <- _B ∨ (_C + _A)/2  @ [id_ "B∨(C+A)/2"]
+  c <- _C ∨ (_A + _B)/2  @ [id_ "C∨(A+B)/2"]
+  _A + _B + _C            @ [id_ "M"]
+
   
 main :: IO ()
 main = do

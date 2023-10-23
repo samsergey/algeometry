@@ -27,9 +27,7 @@ library
   exposed-modules:
       Algeometry
       Algeometry.Arbitrary
-      Algeometry.Experiment.GeometricAlgebra
       Algeometry.GeometricAlgebra
-      Algeometry.LinSpace
       Algeometry.PGA
       Algeometry.SVG
       Algeometry.VGA

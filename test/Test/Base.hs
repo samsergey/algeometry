@@ -2,7 +2,7 @@ module Test.Base (testSuite) where
 
 import Test.Tasty
 import Test.Tasty.QuickCheck
-import Algeometry.Experiment.GeometricAlgebra
+import Algeometry.GeometricAlgebra
 import Algeometry.Arbitrary
 
 bladeTests = testGroup "Blades tests"

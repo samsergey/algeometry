@@ -1,255 +1,327 @@
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Algeometry.GeometricAlgebra
-    ( module Algeometry.LinSpace
-    , GeometricAlgebra (..)
-    , MV
-    , vec, pvec
-    , pseudoScalar, algebraElements
-    , isInvertible
-    , weight, bulk
-    , norm, norm2, normalize
-    , rev, inv, conj, dual
-    , (∧), (∨), (|-), (-|), (∙), (•)
-    , geom, outer, inner, rcontract, lcontract, reciprocal
-    , meet, join, segmentMeet
-    , reflectAt, rotateAt, projectionOf, on, shiftAlong
-    , line, angle, bisectrissa
-    , isPoint, isLine, isPlane
-    ) where
+{-# LANGUAGE UndecidableInstances
+  , FlexibleInstances
+  , FlexibleContexts
+  , StandaloneDeriving
+  , DerivingVia
+  , GeneralizedNewtypeDeriving
+  , FunctionalDependencies #-}
 
-import Algeometry.LinSpace
+module Algeometry.GeometricAlgebra
+  ( LinSpace (..)
+  , GeomAlgebra (..), FiniteGeomAlgebra (..)
+  , e, e_, scalar, scale, vec, pvec
+  , elems, coefs, terms
+  , isScalar, isHomogeneous
+  , scalarPart, getGrade, components
+  , pseudoScalar, algebraElements
+  , isInvertible, reciprocal
+  , weight, bulk
+  , norm, norm2, normalize
+  , conj, dual
+  , (∧), (∨), (|-), (-|), (∙), (•)
+  , meet, join, segmentMeet
+  , reflectAt, rotateAt, projectionOf, on, shiftAlong
+  , line, angle, bisectrissa
+  , isPoint, isLine, isPlane
+  , MV, GeometricNum
+  )
+where
 
 import qualified Data.Map as M
-import qualified Data.Set as S
-import qualified Control.Monad as CM
-import Data.Maybe (fromMaybe)
-import Data.List (sortOn, stripPrefix)
+import Data.Maybe
+import Data.List
+import Data.Ord
 import Control.Monad hiding (join)
 
+------------------------------------------------------------
+-- LinSpace
+------------------------------------------------------------
+
+class Eq e => LinSpace e a | a -> e where
+  zero :: a
+  isZero :: a -> Bool
+  monom :: e  -> Double -> a
+  isMonom :: a -> Bool
+  add :: a -> a -> a
+  lmap :: (e -> Maybe (e, Double)) -> a -> a
+  lapp :: (e -> e -> Maybe (e, Double)) -> a -> a -> a
+  lfilter :: (e -> Double -> Bool) -> a -> a
+  coeff :: e -> a -> Double
+  assoc :: a -> [(e, Double)]
+
+  isMonom m = length (assoc m) == 1
+  coeff x mv = fromMaybe 0 $ lookup x (assoc mv)
+
+scale :: LinSpace e a => Double -> a -> a
+scale a m | a == 0 = zero
+          | otherwise = lmap (\k -> Just (k, a)) m
+
+elems :: LinSpace e a => a -> [e]
+elems = fmap fst . assoc
+
+coefs :: LinSpace e a => a -> [Double]
+coefs = fmap snd . assoc
+
+terms :: LinSpace e a => a -> [a]
+terms m = uncurry monom <$> assoc m
 
 ------------------------------------------------------------
--- GeometricAlgebra
+-- GeomAlgebra
 ------------------------------------------------------------
 
-class LinSpace a => GeometricAlgebra a where
-  basis :: [a]
-  dim :: a -> Int
-  point :: [Double] -> a
-  toPoint :: a -> [Double]
+class (Ord b, LinSpace [b] a) => GeomAlgebra b a  where
+  square :: a -> b -> Double
+  grade :: a -> Int
+  geom :: a -> a -> a
+  outer :: a -> a -> a
+  rcontract :: a -> a -> a
+  lcontract :: a -> a -> a
+  inner :: a -> a -> a
+  rev :: a -> a
+  inv :: a -> a
 
-  point = dual . vec
+  geom m1 = lapp (composeBlades (square m1) (const 1)) m1
+  outer = lapp (composeBlades (const 0) (const 1))
+  lcontract m1 = lapp (composeBlades (square m1) (const 0)) m1
+  rcontract a b = rev (rev b `lcontract` rev a)
 
-isPoint :: GeometricAlgebra a => a -> Bool
-isPoint x = dim x == 0
+  inner a b =
+    if grade a <= grade b
+    then lcontract a b
+    else rcontract a b
 
-isLine :: GeometricAlgebra a => a -> Bool
-isLine x = dim x == 1
+  rev = lmap $ \b -> Just (b, (-1)^(length b `div` 2))
+  inv = lmap $ \b -> Just (b, (-1)^length b)
 
-isPlane :: GeometricAlgebra a => a -> Bool
-isPlane x = dim x == 2
-
-weight :: GeometricAlgebra a => a -> a
-weight mv =
-  sum $ filter (\x -> isZero $ x * x) $ terms mv
-
-bulk :: GeometricAlgebra a => a -> a
-bulk mv =
-  sum $ filter (\x -> not $ isZero $ x * x) $ terms mv
-  
-------------------------------
--- products
+composeBlades
+  :: Ord b =>
+  (b -> Double) -> (b -> Double) -> [b] -> [b] -> Maybe ([b], Double)
+composeBlades g h x y = foldM f (y, (-1)^(length x `div` 2)) x
+  where
+    f (b, p) i = case span (< i) b of
+      (l, k:r) | i == k ->
+        if g i == 0
+        then Nothing
+        else Just (l <> r, p*(-1)^length l * g i)
+      (l, r) ->
+        if h i == 0
+        then Nothing
+        else Just (l <> (i:r), p*(-1)^length l * h i)
 
 infix 8 -|, |-, ∙
 infixr 9 ∧
-(∧),(|-),(-|),(∙) :: GeometricAlgebra a => a -> a -> a
+(∧),(|-),(-|),(∙) :: GeomAlgebra b a => a -> a -> a
 (∧) = outer
 (-|) = lcontract
 (|-) = rcontract
 (∙) = inner
 
-mulBlades :: ((Bool, Component) -> [Term]) -> Term -> Term -> [Term]
-mulBlades mul (a, sa) (b, sb) =
-  foldM (insertWith mul) (b, sa*sb*(-1)^(S.size a `div` 2)) a
-
-insertWith :: ((Bool, Component) -> [Term]) -> Term -> Component -> [Term]
-insertWith mul (z, p) i = do
-  let (l,c,r) = S.splitMember i z
-  (k, s) <- mul (c, i)
-  return (l <> k <> r, p*s*(-1)^S.size l)
-
-geom :: GeometricAlgebra a => a -> a -> a
-geom = productWith $ \case  
-  (True,  0) -> []
-  (True,  i) -> [(mempty, signum (fromIntegral i))]
-  (False, i) -> [(S.singleton i, 1)]
-
-outer :: GeometricAlgebra a => a -> a -> a
-outer = productWith $ \case
-  (True,  _) -> []
-  (False, i) -> [(S.singleton i, 1)]
-
-inner :: GeometricAlgebra a => a -> a -> a
-inner a b = sum $ imul <$> terms a <*> terms b 
-  where
-    imul x y = getGrade (abs (grade x - grade y)) (geom x y)
-
-rcontract :: GeometricAlgebra a => a -> a -> a
-rcontract a b = sum $ rmul <$> terms a <*> terms b 
-  where
-    rmul x y = getGrade (grade x - grade y) (geom x y)
-
-lcontract :: GeometricAlgebra a => a -> a -> a
-lcontract a b = rev (rev b `rcontract` rev a)
-
 infix 9 •
-(•) :: GeometricAlgebra a => a -> a -> Double
-a • b = scalarPart (a `inner` b)
+(•) :: GeomAlgebra e a => a -> a -> Double
+a • b = scalarPart (inner a b)
+
+getGrade :: GeomAlgebra b a => Int -> a -> a
+getGrade n = lfilter (\b _ -> length b == n)
+
+scalarPart :: GeomAlgebra b a => a -> Double
+scalarPart = coeff []
+
+weight :: GeomAlgebra b a => a -> a
+weight a = lfilter (const . any ((0 ==) . square a)) a
+
+bulk :: GeomAlgebra b a => a -> a
+bulk a = lfilter (const . all ((0 /=) . square a)) a
+
+------------------------------
+-- constructors
+
+e :: GeomAlgebra e a => e -> a
+e k = monom [k] 1
+
+e_ :: GeomAlgebra e a => [e] -> a
+e_ ks  = monom ks 1
+
+scalar :: GeomAlgebra e a => Double -> a
+scalar 0 = zero
+scalar a = monom [] a
+
+components :: GeomAlgebra e a => a -> [a]
+components mv = e <$> sort (foldr union [] (elems mv))
+
+------------------------------
+-- involutions
+
+conj :: GeomAlgebra b a => a -> a
+conj = inv . rev
+   
+------------------------------
+-- predicates
+
+isScalar :: GeomAlgebra b a => a -> Bool
+isScalar x = grade x == 0
+
+isHomogeneous :: GeomAlgebra b a => a -> Bool
+isHomogeneous m = length (nub (length <$> elems m)) <= 1
 
 ------------------------------
 -- norm
 
-normalize :: GeometricAlgebra a => a -> a
+normalize :: GeomAlgebra b a => a -> a
 normalize m = scale (1 / norm m) m
 
-norm :: GeometricAlgebra a => a -> Double
+norm :: GeomAlgebra b a => a -> Double
 norm m | isScalar m = scalarPart m
-       | isMonom m = head (coefficients m)
        | otherwise = sqrt $ abs $ norm2 m 
 
-norm2 :: GeometricAlgebra a => a -> Double
+norm2 :: GeomAlgebra b a => a -> Double
 norm2 m
   | isScalar m = scalarPart m ** 2
-  | isMonom m = head (coefficients m) ** 2
-  | otherwise = scalarPart (rev m * m)
-
-------------------------------
--- involutions and duality
-
-rev :: GeometricAlgebra a => a -> a
-rev = mapTerms $
-  \(b, c) -> [(b, c * (-1)^(S.size b `div` 2))]
-
-inv :: GeometricAlgebra a => a -> a  
-inv = mapTerms $
-  \(b, c) -> [(b, c * (-1)^S.size b)]
-
-conj :: GeometricAlgebra a => a -> a
-conj = inv . rev
+  | otherwise = scalarPart (rev m `geom` m)
 
 ------------------------------
 -- reversing
 
-reciprocal :: GeometricAlgebra a => a -> a
+reciprocal :: GeomAlgebra b a => a -> a
 reciprocal m
-    | not (isInvertible m) = error $ "Multivector is non-invertible: " <> show m
+    | not (isInvertible m) = error "Multivector is non-invertible!"
     | isScalar m = scalar $ recip $ scalarPart m
-    | isHomogeneous m = scale (1 / scalarPart (m * rev m)) $ rev m
-    | otherwise = error $ "Don't know yet how to invert" <> show m
+    | isHomogeneous m = scale (1 / scalarPart (m `geom` rev m)) $ rev m
+    | otherwise = error "Don't know yet how to invert!"
 
-isInvertible :: GeometricAlgebra a => a -> Bool
+isInvertible :: GeomAlgebra b a => a -> Bool
 isInvertible m
     | isZero m = False
     | isMonom m = not $ isZero $ geom m m
     | otherwise = let m' = geom m (conj m)
                   in grade m' <= 2 && isInvertible m'
 
-------------------------------
--- constructors
+------------------------------------------------------------
+-- FiniteGeomAlgebra
+------------------------------------------------------------
 
-pseudoScalar :: GeometricAlgebra a => a
-pseudoScalar = product basis
+class GeomAlgebra b a => FiniteGeomAlgebra b a  where
+  basis :: [a]
+  point :: [Double] -> a
+  toPoint :: a -> [Double]
+  dim :: a -> Int
+  
+  dim m = length (m:basis) - grade m - 1
+  point = undefined
+  toPoint = undefined
 
-algebraElements :: GeometricAlgebra a => [a]
+algebraElements :: FiniteGeomAlgebra e a => [a]
 algebraElements =
-  map product $
+  map (foldr outer (scalar 1)) $
   sortOn length $
   filterM (const [True, False]) basis
 
-------------------------------
--- involutions and duality  
-
-dual :: GeometricAlgebra a => a -> a
-dual = productWith diff pseudoScalar . rev
+dual :: FiniteGeomAlgebra b a => a -> a
+dual a = lmap (\b -> Just (ps \\ b, 1)) a
   where
-    diff = \case
-      (True,  _) -> [(mempty, 1)]
-      (False, i) -> [(S.singleton i, 1)]
+    ps = head $ head $ elems <$> [pseudoScalar, a]
+
+pseudoScalar :: FiniteGeomAlgebra e a => a
+pseudoScalar = foldr1 outer basis
 
 ------------------------------
 -- geometric objects
 
-vec :: GeometricAlgebra a => [Double] -> a
+vec :: FiniteGeomAlgebra b a => [Double] -> a
 vec xs = let es = filter ((== 1).grade) algebraElements
-  in sum $ zipWith scale xs es
+  in foldr add zero $ zipWith scale xs es
 
-pvec :: GeometricAlgebra a => [Double] -> a
+pvec :: FiniteGeomAlgebra b a => [Double] -> a
 pvec = dual . vec
 
-line :: GeometricAlgebra a => [Double] -> [Double] -> a
+line :: FiniteGeomAlgebra b a => [Double] -> [Double] -> a
 line a b = point a `join` point b
 
-angle :: GeometricAlgebra a => a -> a -> Double
+angle :: FiniteGeomAlgebra b a => a -> a -> Double
 angle l1 l2 = acos (l1 • l2)
+
+isPoint :: FiniteGeomAlgebra b a => a -> Bool
+isPoint x = dim x == 0
+
+isLine :: FiniteGeomAlgebra b a => a -> Bool
+isLine x = dim x == 1
+
+isPlane :: FiniteGeomAlgebra b a => a -> Bool
+isPlane x = dim x == 2
 
 ------------------------------
 -- geometric combibators
 
 infixr 9 ∨
-(∨) :: GeometricAlgebra a => a -> a -> a
+(∨) :: FiniteGeomAlgebra b a => a -> a -> a
 a ∨ b = dual (dual a ∧ dual b)
 
-meet :: GeometricAlgebra a => a -> a -> a
+meet :: FiniteGeomAlgebra b a => a -> a -> a
 meet a b = normalize $ a ∧ b
 
-join :: GeometricAlgebra a => a -> a -> a
+join :: FiniteGeomAlgebra b a => a -> a -> a
 join a b = normalize $ a ∨ b
 
-segmentMeet :: GeometricAlgebra a => a -> (a, a) -> Maybe a
+segmentMeet :: FiniteGeomAlgebra b a => a -> (a, a) -> Maybe a
 segmentMeet x (a, b) = let
   p = (a ∨ b) ∧ x
   s = (p ∨ a)•(p ∨ b)
   in if s <= 0 then Just (normalize p) else Nothing
 
-bisectrissa :: GeometricAlgebra a => a -> a -> a
+bisectrissa :: (Num a, FiniteGeomAlgebra b a) => a -> a -> a
 bisectrissa l1 l2 = normalize (normalize l1 + normalize l2)
 
 ------------------------------------------------------------
 -- transformations
 ------------------------------------------------------------
 
-reflectAt :: GeometricAlgebra a => a -> a -> a
+reflectAt :: (Num a, FiniteGeomAlgebra b a) => a -> a -> a
 reflectAt a b = - b * a * reciprocal b
 
-projectionOf :: GeometricAlgebra a => a -> a -> a
+projectionOf :: (Num a, FiniteGeomAlgebra b a) => a -> a -> a
 projectionOf p l = (p `inner` l)*l
 
 on :: (a -> b) -> a -> b
 on = ($)
 
-rotateAt :: GeometricAlgebra a => a -> Double -> a -> a
+rotateAt :: (Num a, FiniteGeomAlgebra b a) => a -> Double -> a -> a
 rotateAt p ang x = r * x * rev r
   where
     r = scalar (cos (ang/2)) + scalar (sin (ang/2)) * p
 
-shiftAlong :: GeometricAlgebra a => a -> Double -> a -> a
+shiftAlong :: (Num a, FiniteGeomAlgebra b a) => a -> Double -> a -> a
 shiftAlong l d p = t * p * rev t
   where
     t = dual (pseudoScalar + scale d (bulk l))
     
 ------------------------------------------------------------
--- instances
+-- geometric numbers
 ------------------------------------------------------------
 
-newtype MV = MV (M.Map Blade Double)
+newtype GeometricNum a = GeometricNum a
 
-instance Eq MV where
-  a == b = all (< 1e-8) $ abs <$> coefficients (a - b) 
+deriving instance LinSpace e a => LinSpace e (GeometricNum a)
+deriving instance GeomAlgebra b a => GeomAlgebra b (GeometricNum a)
+
+instance GeomAlgebra b a => Eq (GeometricNum a) where
+  a == b = isZero (a - b)
   
-instance Show MV where
-  show m = if m == 0 then "0" else strip $ sscal <> svecs
+instance GeomAlgebra b a => Num (GeometricNum a) where
+  fromInteger 0 = zero
+  fromInteger n = scalar (fromInteger n)
+  (+) = add
+  (*) = geom
+  negate = scale (-1)
+  abs = undefined
+  signum = undefined
+
+instance GeomAlgebra b a => Fractional (GeometricNum a) where
+  fromRational = scalar . fromRational 
+  recip  = reciprocal
+
+instance GeomAlgebra Int a => Show (GeometricNum a) where
+  show m = if isZero m then "0" else strip $ sscal <> svecs
     where
-      trms (MV mv) = sortOn (S.size . fst) $ M.toList mv
+      trms mv = sortOn (length . fst) $ assoc mv
       strip x = tail $ fromMaybe x $ stripPrefix " +" x
       scal = getGrade 0 m
       sscal = let c = scalarPart scal
@@ -264,50 +336,45 @@ instance Show MV where
           showIx k | k < 0 = '₋' : index (-k)
                    | otherwise = index k
           index k = ["₀₁₂₃₄₅₆₇₈₉" !! k]
+          
+------------------------------------------------------------
+-- map-based instance
+------------------------------------------------------------
 
-instance LinSpace MV where
-  zero = MV mempty
+instance Ord e => LinSpace e (M.Map e Double) where
+  zero = mempty
+  isZero m = M.null $ clean m
+  monom = M.singleton
+  add m1 = clean . M.unionWith (+) m1
+  coeff k = fromMaybe 0 . M.lookup k
+  assoc = M.toList
+  lfilter = M.filterWithKey
 
-  isZero (MV m) = M.null m
+  lmap f m = clean $ M.fromListWith (+) $ do
+    (x, a) <- M.toList m
+    maybeToList (fmap (a *) <$> f x)
 
-  monom xs = MV $ M.singleton (foldMap S.singleton xs) 1
+  lapp f m1 m2 = clean $ M.fromListWith (+) $ do
+    (x, a) <- M.toList m1
+    (y, b) <- M.toList m2
+    maybeToList (fmap ((a * b) *) <$> f x y)
 
-  isMonom (MV m) = M.size m == 1
+clean :: M.Map k Double -> M.Map k Double
+clean = M.filter (\x -> abs x >= 1e-10)
 
-  blades (MV m) = M.keys m
+newtype MV = MV (M.Map [Int] Double)
 
-  coefficients (MV m) = M.elems m
+instance GeomAlgebra Int MV where
+  square _ i = fromIntegral (signum i)
+  grade m
+    | isZero m = 0
+    | otherwise = length $ maximumBy (comparing length) (elems m)
 
-  coefficient b (MV m) =
-    fromMaybe 0 $ M.lookup (foldMap S.singleton b) m
-
-  terms (MV m) =
-    MV . uncurry M.singleton <$> M.toList m
-
-  scale 0 _ = zero
-  scale a (MV m) = MV $ (a *) <$> m
-
-  mapTerms f (MV a) =
-    MV $ M.fromListWith (+) $ M.toList a >>= f
-
-  productWith f (MV a) (MV b) =
-    MV $ M.filter ((> 1e-10).abs) $ M.fromListWith (+) $
-    CM.join $ mulBlades f <$> M.toList a <*> M.toList b 
-
-instance GeometricAlgebra MV where
+instance FiniteGeomAlgebra Int MV where
   basis = e <$> [-3..3]
-  dim = grade
-  toPoint = undefined
-  
-instance Num MV where
-  fromInteger = scalar . fromInteger
-  MV a + MV b =
-    MV $ M.filter ((> 1e-10).abs) $ M.unionWith (+) a b  
-  (*) = geom
-  negate (MV m) = MV $ negate <$> m
-  abs = undefined
-  signum = undefined
 
-instance Fractional MV where
-  fromRational = scalar . fromRational 
-  recip  = reciprocal
+deriving via GeometricNum MV instance Eq MV
+deriving via GeometricNum MV instance Show MV
+deriving via GeometricNum MV instance Num MV
+deriving via GeometricNum MV instance Fractional MV
+deriving via M.Map [Int] Double instance LinSpace [Int] MV

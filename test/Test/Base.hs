@@ -1,7 +1,8 @@
 module Test.Base (testSuite) where
 
 import Test.Tasty
-import Test.Tasty.QuickCheck
+import Test.QuickCheck hiding (scale)
+import Test.Tasty.QuickCheck hiding (scale)
 import Algeometry.GeometricAlgebra
 import Algeometry.Arbitrary
 
@@ -118,10 +119,18 @@ multivectorTests = testGroup "Miltivector tests"
     [ testProperty "commutative for scalars" $ 
       \(Multivector x) s -> fromInteger s * x == x * fromInteger s
 
+    , testProperty "left linearity" $ 
+      \(Multivector x) (Multivector y) (Multivector z) a b
+      -> (scale a x + scale b y) * z == scale a (x * z) + scale b (y * z)
+
+    , testProperty "right linearity" $ 
+      \(Multivector x) (Multivector y) (Multivector z) a b
+      -> z * (scale a x + scale b y) == scale a (z * x) + scale b (z * y)
+
     , testProperty "associative" $ 
       \(Multivector x) (Multivector y) (Multivector z)
       -> x * (y * z) == (x * y) * z
-
+    
     , testProperty "reverse commutative for vectors" $ 
       \(Vector x) (Vector y) -> x * y == rev (y * x)
     
@@ -130,7 +139,7 @@ multivectorTests = testGroup "Miltivector tests"
 
     , testProperty "reverse commutative for vectors and bivectors" $ 
       \(Vector x) (Bivector y) -> x * y == - rev (y * x)
-
+    
     , testProperty "vector squares to scalar" $ 
       \(Vector x) -> isScalar (x*x)
 
@@ -157,3 +166,5 @@ multivectorTests = testGroup "Miltivector tests"
 testSuite = testGroup "Base"
   [ bladeTests
   , multivectorTests ]
+
+

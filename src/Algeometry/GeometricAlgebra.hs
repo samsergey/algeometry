@@ -13,21 +13,21 @@ module Algeometry.GeometricAlgebra
   , elems, coefs, terms
   , isScalar, isHomogeneous
   , scalarPart, getGrade, components
-  , pseudoScalar, algebraElements
+  , pseudoScalar, basis
   , isInvertible, reciprocal
   , weight, bulk
   , norm, norm2, normalize
-  , conj, dual
   , (∧), (∨), (|-), (-|), (∙), (•)
   , meet, join, segmentMeet
-  , reflectAt, rotateAt, projectionOf, on, shiftAlong
-  , line, angle, bisectrissa
+  , reflectAt, rotateAt, projectionOf, on, shiftAlong, shiftAlong'
+  , line, vector, angle, bisectrissa
   , isPoint, isLine, isPlane
   , MV, GeometricNum
+--  , Prim (..)
   )
 where
 
-import qualified Data.Map as M
+import qualified Data.Map.Strict as M
 import Data.Maybe
 import Data.List
 import Data.Ord
@@ -79,6 +79,7 @@ class (Ord b, LinSpace [b] a) => GeomAlgebra b a  where
   inner :: a -> a -> a
   rev :: a -> a
   inv :: a -> a
+  conj :: a -> a
 
   geom m1 = lapp (composeBlades (square m1) (const 1)) m1
   outer = lapp (composeBlades (const 0) (const 1))
@@ -92,6 +93,8 @@ class (Ord b, LinSpace [b] a) => GeomAlgebra b a  where
 
   rev = lmap $ \b -> Just (b, (-1)^(length b `div` 2))
   inv = lmap $ \b -> Just (b, (-1)^length b)
+  conj = inv . rev
+
 
 composeBlades
   :: Ord b =>
@@ -148,12 +151,7 @@ scalar a = monom [] a
 components :: GeomAlgebra e a => a -> [a]
 components mv = e <$> sort (foldr union [] (elems mv))
 
-------------------------------
--- involutions
-
-conj :: GeomAlgebra b a => a -> a
-conj = inv . rev
-   
+  
 ------------------------------
 -- predicates
 
@@ -199,35 +197,35 @@ isInvertible m
 -- FiniteGeomAlgebra
 ------------------------------------------------------------
 
-class GeomAlgebra b a => FiniteGeomAlgebra b a  where
-  basis :: [a]
+class GeomAlgebra b a => FiniteGeomAlgebra b a where
+  generators :: [a]
   point :: [Double] -> a
   toPoint :: a -> [Double]
   dim :: a -> Int
+  dual :: a -> a
   
-  dim m = length (m:basis) - grade m - 1
+  dim m = length (m:generators) - grade m - 1
   point = undefined
   toPoint = undefined
 
-algebraElements :: FiniteGeomAlgebra e a => [a]
-algebraElements =
+  dual a = lmap (\b -> Just (ps \\ b, 1)) a
+    where
+      ps = head $ head $ elems <$> [pseudoScalar, a]
+
+basis :: FiniteGeomAlgebra e a => [a]
+basis =
   map (foldr outer (scalar 1)) $
   sortOn length $
-  filterM (const [True, False]) basis
-
-dual :: FiniteGeomAlgebra b a => a -> a
-dual a = lmap (\b -> Just (ps \\ b, 1)) a
-  where
-    ps = head $ head $ elems <$> [pseudoScalar, a]
+  filterM (const [True, False]) generators
 
 pseudoScalar :: FiniteGeomAlgebra e a => a
-pseudoScalar = foldr1 outer basis
+pseudoScalar = foldr1 outer generators
 
 ------------------------------
 -- geometric objects
 
 vec :: FiniteGeomAlgebra b a => [Double] -> a
-vec xs = let es = filter ((== 1).grade) algebraElements
+vec xs = let es = filter ((== 1).grade) basis
   in foldr add zero $ zipWith scale xs es
 
 pvec :: FiniteGeomAlgebra b a => [Double] -> a
@@ -235,6 +233,9 @@ pvec = dual . vec
 
 line :: FiniteGeomAlgebra b a => [Double] -> [Double] -> a
 line a b = point a `join` point b
+
+vector :: FiniteGeomAlgebra b a => [Double] -> [Double] -> a
+vector p1 p2 = point p1 ∨ point p2
 
 angle :: FiniteGeomAlgebra b a => a -> a -> Double
 angle l1 l2 = acos (l1 • l2)
@@ -284,14 +285,21 @@ on :: (a -> b) -> a -> b
 on = ($)
 
 rotateAt :: (Num a, FiniteGeomAlgebra b a) => a -> Double -> a -> a
-rotateAt p ang x = r * x * rev r
+rotateAt p ang x
+  | sin ang == 0 && cos ang == 1 = x
+  | otherwise = r * x * rev r
   where
     r = scalar (cos (ang/2)) + scalar (sin (ang/2)) * p
 
-shiftAlong :: (Num a, FiniteGeomAlgebra b a) => a -> Double -> a -> a
-shiftAlong l d p = t * p * rev t
+shiftAlong' :: (Num a, FiniteGeomAlgebra b a) => a -> Double -> a -> a
+shiftAlong' l d p = t * p * rev t
   where
-    t = dual (pseudoScalar + scale d (bulk l))
+    t = (pseudoScalar + scale (4/(d*norm2 l)) l)^2
+
+shiftAlong :: (Num a, FiniteGeomAlgebra b a) => a -> a -> a
+shiftAlong l p = t * p * rev t
+  where
+    t = (pseudoScalar + scale (4/norm2 l) l)^2
     
 ------------------------------------------------------------
 -- geometric numbers
@@ -371,10 +379,20 @@ instance GeomAlgebra Int MV where
     | otherwise = length $ maximumBy (comparing length) (elems m)
 
 instance FiniteGeomAlgebra Int MV where
-  basis = e <$> [-3..3]
+  generators = e <$> [-3..3]
 
 deriving via GeometricNum MV instance Eq MV
 deriving via GeometricNum MV instance Show MV
 deriving via GeometricNum MV instance Num MV
 deriving via GeometricNum MV instance Fractional MV
 deriving via M.Map [Int] Double instance LinSpace [Int] MV
+
+------------------------------------------------------------
+
+-- data Prim a  = Point ag
+--              | Line a
+--              | Arrow a
+--              | Polygon a
+--              | Plane a
+--              | Hyperplane a
+--   deriving Show

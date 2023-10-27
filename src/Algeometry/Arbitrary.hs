@@ -18,7 +18,7 @@ abitraryMV :: (Num a, FiniteGeomAlgebra e a) => ([a] -> [a]) -> Gen a
 abitraryMV f = res `suchThat` (not . isScalar)
   where
     res = do
-      let els = take 5 $ f algebraElements
+      let els = take 5 $ f basis
           coeff = fromInteger <$> choose (-3,3)
       vs <- sublistOf els
       cs <- traverse (const coeff) vs
@@ -39,7 +39,7 @@ deriving via MV instance GeomAlgebra Int Monom
 deriving via MV instance FiniteGeomAlgebra Int Monom
 
 instance Arbitrary Monom where
-  arbitrary = elements algebraElements
+  arbitrary = elements basis
   shrink mv = e_ . (`delete` ix) <$> ix
     where
       ix = foldMap toList (elems mv)
@@ -56,8 +56,6 @@ deriving via MV instance FiniteGeomAlgebra Int Vector
 instance Arbitrary Vector where
   arbitrary = abitraryMV $ filter (\x -> grade x == 1)
   shrink  = shrinkMV
-
-tst = \(Vector a) (Vector b) -> (a*b == a `inner` b + a ∧ b)
 
 ------------------------------------------------------------
 

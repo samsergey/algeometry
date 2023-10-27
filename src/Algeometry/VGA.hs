@@ -21,7 +21,7 @@ deriving via MV instance GeomAlgebra Int (VGA n)
 deriving via MV instance Show (VGA n)
 
 instance KnownNat n => FiniteGeomAlgebra Int (VGA n) where
-  basis = res
+  generators = res
     where
       res = e <$> [1 .. fromIntegral n]
       n = natVal (head res)

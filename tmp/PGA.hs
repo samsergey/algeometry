@@ -17,16 +17,16 @@ import Data.Coerce
 
 ------------------------------------------------------------
   
-newtype PGA (n :: Nat) = PGA (Cl n 1 0)
+newtype PGA (n :: Nat) = PGA (CA n 1 0)
   deriving (Num, Eq, Fractional)
 
-deriving via Cl n 1 0
+deriving via CA n 1 0
   instance LinSpace [Int] (PGA n)
 
-deriving via Cl n 1 0
+deriving via CA n 1 0
   instance KnownNat n => CliffAlgebra Int (PGA n)
 
-deriving via Cl n 1 0
+deriving via CA n 1 0
   instance KnownNat n => Show (PGA n)
 
 instance KnownNat n => GeomAlgebra Int (PGA n) where
@@ -41,7 +41,7 @@ instance KnownNat n => GeomAlgebra Int (PGA n) where
 
 ------------------------------------------------------------
 
-newtype PGA2 = PGA2 (Cl 2 1 0)
+newtype PGA2 = PGA2 (CA 2 1 0)
   deriving (Eq, Num, Fractional)
 
 deriving via PGA 2 instance Show PGA2
@@ -65,7 +65,7 @@ instance Tabulated Int PGA2 where
 
 ------------------------------------------------------------
 
-newtype PGA3 = PGA3 (Cl 3 1 0)
+newtype PGA3 = PGA3 (CA 3 1 0)
   deriving (Eq, Num, Fractional)
 
 deriving via PGA 3 instance Show PGA3

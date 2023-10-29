@@ -9,7 +9,7 @@
 module Algeometry.Arbitrary where
   
 import Test.QuickCheck hiding (scale)
-import Algeometry.PGA
+import Algeometry.GeometricAlgebra
 import Data.List (delete)
 import Data.Foldable
 

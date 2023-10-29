@@ -28,9 +28,7 @@ library
       Algeometry
       Algeometry.Arbitrary
       Algeometry.GeometricAlgebra
-      Algeometry.PGA
       Algeometry.SVG
-      Algeometry.VGA
   other-modules:
       Paths_algeometry
   autogen-modules:

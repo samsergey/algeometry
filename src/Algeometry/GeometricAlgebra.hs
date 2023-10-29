@@ -17,8 +17,7 @@ module Algeometry.GeometricAlgebra
   , scalarPart, getGrade, components
   , pseudoScalar, basis
   , isInvertible, reciprocal
-  , weight, bulk
-  , norm, norm2, normalize
+  , weight, bulk, norm, norm2, normalize
   , (∧), (∨), (|-), (-|), (∙), (•)
   , meet, join, segmentMeet
   , reflectAt, rotateAt, projectionOf, on, shiftAlong, shiftAlong'
@@ -413,6 +412,8 @@ deriving via GeometricNum (Cl p q r)
 deriving via GeometricNum (Cl p q r)
   instance (KnownNat p, KnownNat q, KnownNat r) => Fractional (Cl p q r)
 
+------------------------------------------------------------
+-- tabulated instance
 ------------------------------------------------------------
 
 newtype Table e a i = Table (A.Array i (Maybe ([e], Double)))

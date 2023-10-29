@@ -1,6 +1,7 @@
 {-# LANGUAGE UndecidableInstances
   , FlexibleInstances
   , FlexibleContexts
+  , KindSignatures
   , StandaloneDeriving
   , DerivingVia
   , GeneralizedNewtypeDeriving
@@ -8,7 +9,8 @@
 
 module Algeometry.GeometricAlgebra
   ( LinSpace (..)
-  , GeomAlgebra (..), FiniteGeomAlgebra (..)
+  , CliffAlgebra (..)
+  , GeomAlgebra (..)
   , e, e_, scalar, scale, vec, pvec
   , elems, coefs, terms
   , isScalar, isHomogeneous
@@ -22,8 +24,9 @@ module Algeometry.GeometricAlgebra
   , reflectAt, rotateAt, projectionOf, on, shiftAlong, shiftAlong'
   , line, vector, angle, bisectrissa
   , isPoint, isLine, isPlane
-  , MV, GeometricNum
---  , Prim (..)
+  , Cl, GeometricNum
+  , Tabulated (..) , TabulatedGA (..)
+  , mkTable, mkTable2, mkIndexMap
   )
 where
 
@@ -32,6 +35,8 @@ import Data.Maybe
 import Data.List
 import Data.Ord
 import Control.Monad hiding (join)
+import qualified Data.Array as A
+import GHC.TypeLits (Nat, KnownNat, natVal)
 
 ------------------------------------------------------------
 -- LinSpace
@@ -66,11 +71,13 @@ terms :: LinSpace e a => a -> [a]
 terms m = uncurry monom <$> assoc m
 
 ------------------------------------------------------------
--- GeomAlgebra
+-- CliffAlgebra
 ------------------------------------------------------------
 
-class (Ord b, LinSpace [b] a) => GeomAlgebra b a  where
-  square :: a -> b -> Double
+class (Eq a, Ord e, LinSpace [e] a) => CliffAlgebra e a  where
+  algebraSignature :: a -> (Int,Int,Int)
+  square :: a -> e -> Double
+  generators :: [a]
   grade :: a -> Int
   geom :: a -> a -> a
   outer :: a -> a -> a
@@ -80,6 +87,15 @@ class (Ord b, LinSpace [b] a) => GeomAlgebra b a  where
   rev :: a -> a
   inv :: a -> a
   conj :: a -> a
+  dual :: a -> a
+  
+  -- dim m = length (m:generators) - grade m - 1
+  -- point = undefined
+  -- toPoint = undefined
+
+  grade m
+    | isZero m = 0
+    | otherwise = length $ maximumBy (comparing length) (elems m)
 
   geom m1 = lapp (composeBlades (square m1) (const 1)) m1
   outer = lapp (composeBlades (const 0) (const 1))
@@ -94,7 +110,9 @@ class (Ord b, LinSpace [b] a) => GeomAlgebra b a  where
   rev = lmap $ \b -> Just (b, (-1)^(length b `div` 2))
   inv = lmap $ \b -> Just (b, (-1)^length b)
   conj = inv . rev
-
+  dual a = lmap (\b -> Just (ps \\ b, 1)) a
+    where
+      ps = head $ head $ elems <$> [pseudoScalar, a]
 
 composeBlades
   :: Ord b =>
@@ -113,65 +131,77 @@ composeBlades g h x y = foldM f (y, (-1)^(length x `div` 2)) x
 
 infix 8 -|, |-, ∙
 infixr 9 ∧
-(∧),(|-),(-|),(∙) :: GeomAlgebra b a => a -> a -> a
+(∧),(|-),(-|),(∙) :: CliffAlgebra b a => a -> a -> a
 (∧) = outer
 (-|) = lcontract
 (|-) = rcontract
 (∙) = inner
 
 infix 9 •
-(•) :: GeomAlgebra e a => a -> a -> Double
+(•) :: CliffAlgebra e a => a -> a -> Double
 a • b = scalarPart (inner a b)
 
-getGrade :: GeomAlgebra b a => Int -> a -> a
+getGrade :: CliffAlgebra b a => Int -> a -> a
 getGrade n = lfilter (\b _ -> length b == n)
 
-scalarPart :: GeomAlgebra b a => a -> Double
+scalarPart :: CliffAlgebra b a => a -> Double
 scalarPart = coeff []
 
-weight :: GeomAlgebra b a => a -> a
+weight :: CliffAlgebra b a => a -> a
 weight a = lfilter (const . any ((0 ==) . square a)) a
 
-bulk :: GeomAlgebra b a => a -> a
+bulk :: CliffAlgebra b a => a -> a
 bulk a = lfilter (const . all ((0 /=) . square a)) a
 
 ------------------------------
 -- constructors
 
-e :: GeomAlgebra e a => e -> a
-e k = monom [k] 1
+e :: CliffAlgebra e a => e -> a
+e k = if elem res generators
+      then res
+      else zero
+  where res = monom [k] 1
+        
 
-e_ :: GeomAlgebra e a => [e] -> a
+e_ :: CliffAlgebra e a => [e] -> a
 e_ ks  = monom ks 1
 
-scalar :: GeomAlgebra e a => Double -> a
+scalar :: CliffAlgebra e a => Double -> a
 scalar 0 = zero
 scalar a = monom [] a
 
-components :: GeomAlgebra e a => a -> [a]
+components :: CliffAlgebra e a => a -> [a]
 components mv = e <$> sort (foldr union [] (elems mv))
 
-  
+basis :: CliffAlgebra e a => [a]
+basis =
+  map (foldr outer (scalar 1)) $
+  sortOn length $
+  filterM (const [True, False]) generators
+
+pseudoScalar :: CliffAlgebra e a => a
+pseudoScalar = foldr1 outer generators
+
 ------------------------------
 -- predicates
 
-isScalar :: GeomAlgebra b a => a -> Bool
+isScalar :: CliffAlgebra b a => a -> Bool
 isScalar x = grade x == 0
 
-isHomogeneous :: GeomAlgebra b a => a -> Bool
+isHomogeneous :: CliffAlgebra b a => a -> Bool
 isHomogeneous m = length (nub (length <$> elems m)) <= 1
 
 ------------------------------
 -- norm
 
-normalize :: GeomAlgebra b a => a -> a
+normalize :: CliffAlgebra b a => a -> a
 normalize m = scale (1 / norm m) m
 
-norm :: GeomAlgebra b a => a -> Double
+norm :: CliffAlgebra b a => a -> Double
 norm m | isScalar m = scalarPart m
        | otherwise = sqrt $ abs $ norm2 m 
 
-norm2 :: GeomAlgebra b a => a -> Double
+norm2 :: CliffAlgebra b a => a -> Double
 norm2 m
   | isScalar m = scalarPart m ** 2
   | otherwise = scalarPart (rev m `geom` m)
@@ -179,14 +209,14 @@ norm2 m
 ------------------------------
 -- reversing
 
-reciprocal :: GeomAlgebra b a => a -> a
+reciprocal :: CliffAlgebra b a => a -> a
 reciprocal m
     | not (isInvertible m) = error "Multivector is non-invertible!"
     | isScalar m = scalar $ recip $ scalarPart m
     | isHomogeneous m = scale (1 / scalarPart (m `geom` rev m)) $ rev m
     | otherwise = error "Don't know yet how to invert!"
 
-isInvertible :: GeomAlgebra b a => a -> Bool
+isInvertible :: CliffAlgebra b a => a -> Bool
 isInvertible m
     | isZero m = False
     | isMonom m = not $ isZero $ geom m m
@@ -194,113 +224,93 @@ isInvertible m
                   in grade m' <= 2 && isInvertible m'
 
 ------------------------------------------------------------
--- FiniteGeomAlgebra
-------------------------------------------------------------
 
-class GeomAlgebra b a => FiniteGeomAlgebra b a where
-  generators :: [a]
+class CliffAlgebra b a => GeomAlgebra b a where
   point :: [Double] -> a
   toPoint :: a -> [Double]
   dim :: a -> Int
-  dual :: a -> a
-  
-  dim m = length (m:generators) - grade m - 1
-  point = undefined
-  toPoint = undefined
-
-  dual a = lmap (\b -> Just (ps \\ b, 1)) a
-    where
-      ps = head $ head $ elems <$> [pseudoScalar, a]
-
-basis :: FiniteGeomAlgebra e a => [a]
-basis =
-  map (foldr outer (scalar 1)) $
-  sortOn length $
-  filterM (const [True, False]) generators
-
-pseudoScalar :: FiniteGeomAlgebra e a => a
-pseudoScalar = foldr1 outer generators
 
 ------------------------------
 -- geometric objects
 
-vec :: FiniteGeomAlgebra b a => [Double] -> a
+vec :: GeomAlgebra b a => [Double] -> a
 vec xs = let es = filter ((== 1).grade) basis
   in foldr add zero $ zipWith scale xs es
 
-pvec :: FiniteGeomAlgebra b a => [Double] -> a
+pvec :: GeomAlgebra b a => [Double] -> a
 pvec = dual . vec
 
-line :: FiniteGeomAlgebra b a => [Double] -> [Double] -> a
+line :: GeomAlgebra b a => [Double] -> [Double] -> a
 line a b = point a `join` point b
 
-vector :: FiniteGeomAlgebra b a => [Double] -> [Double] -> a
+vector :: GeomAlgebra b a => [Double] -> [Double] -> a
 vector p1 p2 = point p1 ∨ point p2
 
-angle :: FiniteGeomAlgebra b a => a -> a -> Double
+angle :: GeomAlgebra b a => a -> a -> Double
 angle l1 l2 = acos (l1 • l2)
 
-isPoint :: FiniteGeomAlgebra b a => a -> Bool
+isPoint :: GeomAlgebra b a => a -> Bool
 isPoint x = dim x == 0
 
-isLine :: FiniteGeomAlgebra b a => a -> Bool
+isLine :: GeomAlgebra b a => a -> Bool
 isLine x = dim x == 1
 
-isPlane :: FiniteGeomAlgebra b a => a -> Bool
+isPlane :: GeomAlgebra b a => a -> Bool
 isPlane x = dim x == 2
 
 ------------------------------
 -- geometric combibators
 
 infixr 9 ∨
-(∨) :: FiniteGeomAlgebra b a => a -> a -> a
+(∨) :: GeomAlgebra b a => a -> a -> a
 a ∨ b = dual (dual a ∧ dual b)
 
-meet :: FiniteGeomAlgebra b a => a -> a -> a
+meet :: GeomAlgebra b a => a -> a -> a
 meet a b = normalize $ a ∧ b
 
-join :: FiniteGeomAlgebra b a => a -> a -> a
+join :: GeomAlgebra b a => a -> a -> a
 join a b = normalize $ a ∨ b
 
-segmentMeet :: FiniteGeomAlgebra b a => a -> (a, a) -> Maybe a
+segmentMeet :: GeomAlgebra b a => a -> (a, a) -> Maybe a
 segmentMeet x (a, b) = let
   p = (a ∨ b) ∧ x
   s = (p ∨ a)•(p ∨ b)
   in if s <= 0 then Just (normalize p) else Nothing
 
-bisectrissa :: (Num a, FiniteGeomAlgebra b a) => a -> a -> a
+bisectrissa :: (Num a, GeomAlgebra b a) => a -> a -> a
 bisectrissa l1 l2 = normalize (normalize l1 + normalize l2)
 
 ------------------------------------------------------------
 -- transformations
 ------------------------------------------------------------
 
-reflectAt :: (Num a, FiniteGeomAlgebra b a) => a -> a -> a
+reflectAt :: (Num a, GeomAlgebra b a) => a -> a -> a
 reflectAt a b = - b * a * reciprocal b
 
-projectionOf :: (Num a, FiniteGeomAlgebra b a) => a -> a -> a
+projectionOf :: (Num a, GeomAlgebra b a) => a -> a -> a
 projectionOf p l = (p `inner` l)*l
 
 on :: (a -> b) -> a -> b
 on = ($)
 
-rotateAt :: (Num a, FiniteGeomAlgebra b a) => a -> Double -> a -> a
+rotateAt :: (Num a, GeomAlgebra b a) => a -> Double -> a -> a
 rotateAt p ang x
   | sin ang == 0 && cos ang == 1 = x
   | otherwise = r * x * rev r
   where
     r = scalar (cos (ang/2)) + scalar (sin (ang/2)) * p
 
-shiftAlong' :: (Num a, FiniteGeomAlgebra b a) => a -> Double -> a -> a
+shiftAlong' :: (Num a, GeomAlgebra b a) => a -> Double -> a -> a
 shiftAlong' l d p = t * p * rev t
   where
     t = (pseudoScalar + scale (4/(d*norm2 l)) l)^2
 
-shiftAlong :: (Num a, FiniteGeomAlgebra b a) => a -> a -> a
+shiftAlong :: (Num a, GeomAlgebra b a) => a -> a -> a
 shiftAlong l p = t * p * rev t
   where
     t = (pseudoScalar + scale (4/norm2 l) l)^2
-    
+
+   
 ------------------------------------------------------------
 -- geometric numbers
 ------------------------------------------------------------
@@ -308,12 +318,12 @@ shiftAlong l p = t * p * rev t
 newtype GeometricNum a = GeometricNum a
 
 deriving instance LinSpace e a => LinSpace e (GeometricNum a)
-deriving instance GeomAlgebra b a => GeomAlgebra b (GeometricNum a)
+deriving instance CliffAlgebra b a => CliffAlgebra b (GeometricNum a)
 
-instance GeomAlgebra b a => Eq (GeometricNum a) where
+instance CliffAlgebra b a => Eq (GeometricNum a) where
   a == b = isZero (a - b)
   
-instance GeomAlgebra b a => Num (GeometricNum a) where
+instance CliffAlgebra b a => Num (GeometricNum a) where
   fromInteger 0 = zero
   fromInteger n = scalar (fromInteger n)
   (+) = add
@@ -322,11 +332,11 @@ instance GeomAlgebra b a => Num (GeometricNum a) where
   abs = undefined
   signum = undefined
 
-instance GeomAlgebra b a => Fractional (GeometricNum a) where
+instance CliffAlgebra b a => Fractional (GeometricNum a) where
   fromRational = scalar . fromRational 
   recip  = reciprocal
 
-instance GeomAlgebra Int a => Show (GeometricNum a) where
+instance CliffAlgebra Int a => Show (GeometricNum a) where
   show m = if isZero m then "0" else strip $ sscal <> svecs
     where
       trms mv = sortOn (length . fst) $ assoc mv
@@ -370,29 +380,108 @@ instance Ord e => LinSpace e (M.Map e Double) where
 clean :: M.Map k Double -> M.Map k Double
 clean = M.filter (\x -> abs x >= 1e-10)
 
-newtype MV = MV (M.Map [Int] Double)
+newtype Pos a (p :: Nat) = Pos a
+newtype Zero a (q :: Nat) = Zero a
+newtype Neg a (r :: Nat) = Neg a
 
-instance GeomAlgebra Int MV where
+newtype Cl (p :: Nat) (q :: Nat) (r :: Nat)
+  = Cl (Pos (Zero (Neg (M.Map [Int] Double) r) q) p)
+
+instance (KnownNat p, KnownNat q, KnownNat r)
+         => CliffAlgebra Int (Cl p r q) where
+  algebraSignature x = let { Cl p = x; Pos z = p; Zero n = z}
+           in ( fromIntegral $ natVal p
+              , fromIntegral $ natVal z
+              , fromIntegral $ natVal n)
   square _ i = fromIntegral (signum i)
-  grade m
-    | isZero m = 0
-    | otherwise = length $ maximumBy (comparing length) (elems m)
+  generators = res
+    where
+      res = (\x -> monom [x] 1) <$> (negs <> zeros <> pos)
+      (p,q,r) = algebraSignature (head res)
+      pos = if p == 0 then [] else [1 .. p]
+      zeros = if q == 0 then [] else [0]
+      negs = if r == 0 then [] else [-r, -r+1..(-1)]
+      
+deriving via M.Map [Int] Double instance LinSpace [Int] (Cl p q r)
 
-instance FiniteGeomAlgebra Int MV where
-  generators = e <$> [-3..3]
-
-deriving via GeometricNum MV instance Eq MV
-deriving via GeometricNum MV instance Show MV
-deriving via GeometricNum MV instance Num MV
-deriving via GeometricNum MV instance Fractional MV
-deriving via M.Map [Int] Double instance LinSpace [Int] MV
+deriving via GeometricNum (Cl p q r)
+  instance (KnownNat p, KnownNat q, KnownNat r) => Eq (Cl p q r)
+deriving via GeometricNum (Cl p q r)
+  instance (KnownNat p, KnownNat q, KnownNat r) => Show (Cl p q r)
+deriving via GeometricNum (Cl p q r)
+  instance (KnownNat p, KnownNat q, KnownNat r) => Num (Cl p q r)
+deriving via GeometricNum (Cl p q r)
+  instance (KnownNat p, KnownNat q, KnownNat r) => Fractional (Cl p q r)
 
 ------------------------------------------------------------
 
--- data Prim a  = Point ag
---              | Line a
---              | Arrow a
---              | Polygon a
---              | Plane a
---              | Hyperplane a
---   deriving Show
+newtype Table e a i = Table (A.Array i (Maybe ([e], Double)))
+newtype IndexMap e a = IndexMap (M.Map e Int)
+
+class Tabulated e a | a -> e where
+  signatureT :: a -> (Int,Int,Int)
+  generatorsT :: [a]
+  indexT :: IndexMap [e] a
+  geomT :: Table e a (Int,Int)
+  outerT :: Table e a (Int,Int)
+  innerT :: Table e a (Int,Int)
+  lcontractT :: Table e a (Int,Int)
+  rcontractT :: Table e a (Int,Int)
+  revT :: Table e a Int
+  invT :: Table e a Int
+  conjT :: Table e a Int
+  dualT :: Table e a Int
+
+mkTable2 :: CliffAlgebra e a
+         => (a -> a -> a) -> [a] -> Table e b (Int, Int)
+mkTable2 op b = mkArray $ f <$> b <*> b
+  where
+    mkArray = Table . A.listArray ((0,0),(n-1,n-1))
+    f x = listToMaybe . assoc . op x
+    n = length b
+
+mkTable :: CliffAlgebra e a
+        => (a -> a) -> [a] -> Table e b Int
+mkTable op b = mkArray $ f <$> b
+  where
+    mkArray = Table . A.listArray (0,n-1)
+    f = listToMaybe . assoc . op
+    n = length b
+
+mkIndexMap :: (Ord e, LinSpace [e] a) => [a] -> IndexMap [e] a
+mkIndexMap b = IndexMap $ M.fromList $ zip (b >>= elems) [0..]
+
+lookup1 :: CliffAlgebra e a
+        => Table e a Int -> IndexMap [e] a -> a -> a
+lookup1 (Table tbl) (IndexMap ix) =
+  lmap (\x -> tbl A.! (ix M.! x))
+
+lookup2 :: CliffAlgebra e a
+        => Table e a (Int,Int) -> IndexMap [e] a -> a -> a -> a
+lookup2 (Table tbl) (IndexMap ix) =
+  lapp (\a b -> tbl A.! (ix M.! a, ix M.! b))
+
+newtype TabulatedGA a = TabulatedGA a
+  deriving Eq
+
+deriving instance LinSpace e a => LinSpace e (TabulatedGA a)
+ 
+instance ( LinSpace [e] a
+         , CliffAlgebra e a
+         , Tabulated e a
+         ) => CliffAlgebra e (TabulatedGA a) where
+  algebraSignature (TabulatedGA a) = signatureT a
+  square = undefined
+  generators = TabulatedGA <$> generatorsT
+  geom = tab2 $ lookup2 geomT indexT
+  outer = tab2 $ lookup2 outerT indexT
+  inner = tab2 $ lookup2 innerT indexT
+  lcontract = tab2 $ lookup2 lcontractT indexT
+  rcontract = tab2 $ lookup2 rcontractT indexT
+  rev = tab $ lookup1 revT indexT
+  inv = tab $ lookup1 invT indexT
+  conj = tab $ lookup1 conjT indexT
+  dual = tab $ lookup1 dualT indexT
+
+tab f (TabulatedGA a) = TabulatedGA $ f a
+tab2 f (TabulatedGA a) (TabulatedGA b) = TabulatedGA $ f a b

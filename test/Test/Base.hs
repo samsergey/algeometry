@@ -56,17 +56,6 @@ bladeTests = testGroup "Blades tests"
     , testProperty "blade squares to scalar" $ 
       \(Monom x) -> isScalar (x*x)
 
-    , testProperty "U test" $ 
-      \(Monom a) (Monom b) (Monom c) ->
-        a * e 9 * b * e 9 * c == (-1)^(grade b) * a * b * c
-
-    , testProperty "Z test" $ property $
-      \(Monom a) (Monom b) (Monom c) ->
-        a * e 0 * b * e 0 * c == 0
-
-    , testProperty "I test" $ property $
-      \(Monom a) (Monom b) (Monom c) ->
-        a * e (-9) * b * e (-9) * c == - (-1)^(grade b) * a * b * c
     ]
   , testGroup "Inner and scalar products"
     [ testProperty "with scalar" $ 

@@ -3,18 +3,19 @@
 , FlexibleInstances
 , GeneralisedNewtypeDeriving
 , MultiParamTypeClasses
+, DataKinds
 #-}
 
 module Algeometry.Arbitrary where
   
 import Test.QuickCheck hiding (scale)
-import Algeometry.GeometricAlgebra
+import Algeometry.PGA
 import Data.List (delete)
 import Data.Foldable
 
 ------------------------------------------------------------
 
-abitraryMV :: (Num a, FiniteGeomAlgebra e a) => ([a] -> [a]) -> Gen a
+abitraryMV :: (Num a, CliffAlgebra e a) => ([a] -> [a]) -> Gen a
 abitraryMV f = res `suchThat` (not . isScalar)
   where
     res = do
@@ -24,19 +25,20 @@ abitraryMV f = res `suchThat` (not . isScalar)
       cs <- traverse (const coeff) vs
       return $ sum $ zipWith scale cs vs
 
-shrinkMV :: (Num a, FiniteGeomAlgebra e a) => a -> [a]
+shrinkMV :: (Num a, CliffAlgebra e a) => a -> [a]
 shrinkMV v | isScalar v = []
            | isMonom v = []
            | otherwise = (v -) <$> terms v
 
 ------------------------------------------------------------
 
+type MV = Cl 3 1 3
+
 newtype Monom = Monom MV
   deriving ( Show, Eq, Num, Fractional)
 
 deriving via MV instance LinSpace [Int] Monom
-deriving via MV instance GeomAlgebra Int Monom
-deriving via MV instance FiniteGeomAlgebra Int Monom
+deriving via MV instance CliffAlgebra Int Monom
 
 instance Arbitrary Monom where
   arbitrary = elements basis
@@ -50,8 +52,7 @@ newtype Vector = Vector MV
   deriving ( Show, Eq, Num, Fractional)
 
 deriving via MV instance LinSpace [Int] Vector
-deriving via MV instance GeomAlgebra Int Vector
-deriving via MV instance FiniteGeomAlgebra Int Vector
+deriving via MV instance CliffAlgebra Int Vector
 
 instance Arbitrary Vector where
   arbitrary = abitraryMV $ filter (\x -> grade x == 1)
@@ -63,8 +64,7 @@ newtype Bivector = Bivector MV
   deriving ( Show, Eq, Num, Fractional)
 
 deriving via MV instance LinSpace [Int] Bivector
-deriving via MV instance GeomAlgebra Int Bivector
-deriving via MV instance FiniteGeomAlgebra Int Bivector
+deriving via MV instance CliffAlgebra Int Bivector
 
 instance Arbitrary Bivector where
   arbitrary = abitraryMV $ filter (\x -> grade x == 2)
@@ -76,8 +76,7 @@ newtype Trivector = Trivector MV
   deriving ( Show, Eq, Num, Fractional)
 
 deriving via MV instance LinSpace [Int] Trivector
-deriving via MV instance GeomAlgebra Int Trivector
-deriving via MV instance FiniteGeomAlgebra Int Trivector
+deriving via MV instance CliffAlgebra Int Trivector
 
 instance Arbitrary Trivector where
   arbitrary = abitraryMV $ filter (\x -> grade x == 3)
@@ -89,8 +88,7 @@ newtype Multivector = Multivector MV
   deriving ( Show, Eq, Num, Fractional)
 
 deriving via MV instance LinSpace [Int] Multivector
-deriving via MV instance GeomAlgebra Int Multivector
-deriving via MV instance FiniteGeomAlgebra Int Multivector
+deriving via MV instance CliffAlgebra Int Multivector
 
 instance Arbitrary Multivector where
   arbitrary = abitraryMV id
@@ -102,8 +100,7 @@ newtype Homogeneous = Homogeneous MV
   deriving ( Show, Eq, Num, Fractional)
 
 deriving via MV instance LinSpace [Int] Homogeneous
-deriving via MV instance GeomAlgebra Int Homogeneous
-deriving via MV instance FiniteGeomAlgebra Int Homogeneous
+deriving via MV instance CliffAlgebra Int Homogeneous
 
 instance Arbitrary Homogeneous where
   arbitrary = do

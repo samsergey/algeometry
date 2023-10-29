@@ -116,11 +116,11 @@ mov v = (pseudoScalar + scale (4/norm2 v) v)^2
 
 -- лента Мёбиуса, полученная одновременным вращением отрезка
 -- длины 7 вокруг нескольких осей:
-moebius :: (Num a, Num e, FiniteGeomAlgebra e a) => [[a]]
+moebius :: (Num a, Num e, GeomAlgebra e a) => [[a]]
 moebius = [ rot (2*α) (e_[1,3]) $$
             mov (7*e_[2,3]) $$
             rot α (e_[1,2]) $$ vect [7,0,0]
-          | α <- [pi/100, pi/50 .. 2*pi]]
+          | α <- [pi/300, pi/150 .. 2*pi]]
 
 fig β =
   figure $
@@ -133,8 +133,7 @@ fig β =
 infixr $$
 ($$) :: (Num a, GeomAlgebra e a) => a -> [a] -> [a]
 t $$ xs = [t * x * rev t | x <- xs]
-
-      
+  
 main :: IO ()
 main = do
 --  writeSVG "test1.svg" (fig3 0)

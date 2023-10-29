@@ -10,6 +10,7 @@ module Algeometry.Arbitrary where
   
 import Test.QuickCheck hiding (scale)
 import Algeometry.GeometricAlgebra
+import Algeometry.Types
 import Data.List (delete)
 import Data.Foldable
 

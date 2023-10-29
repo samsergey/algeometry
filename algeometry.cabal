@@ -29,6 +29,7 @@ library
       Algeometry.Arbitrary
       Algeometry.GeometricAlgebra
       Algeometry.SVG
+      Algeometry.Types
   other-modules:
       Paths_algeometry
   autogen-modules:

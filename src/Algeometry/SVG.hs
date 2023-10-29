@@ -9,14 +9,14 @@
 , OverloadedStrings #-}
 
 module Algeometry.SVG
-  ( module Algeometry.GeometricAlgebra 
-  , Fig (..), svg , writeSVG, writePNG,animate, (@)
+  ( Fig (..), svg , writeSVG, writePNG,animate, (@)
   , figure, figureWith, viewPoint, rotateAbout
   , axis, vect, viewFrom
   , polygon, segment, put, plane, plane3, orthoPlane
   ) where
 
 import Algeometry.GeometricAlgebra
+import Algeometry.Types
 import Control.Monad hiding (join)
 import Data.List (sort, nub)
 import Data.Maybe

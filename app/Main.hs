@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main (main) where
 
-import Algeometry.SVG
+import Algeometry
 import Lucid.Svg hiding (scale)
 
 -- fig1 :: [Fig]

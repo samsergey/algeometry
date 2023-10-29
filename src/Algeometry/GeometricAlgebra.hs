@@ -23,7 +23,7 @@ module Algeometry.GeometricAlgebra
   , reflectAt, rotateAt, projectionOf, on, shiftAlong, shiftAlong'
   , line, vector, angle, bisectrissa
   , isPoint, isLine, isPlane
-  , Cl, GeometricNum
+  , Cl, GeometricNum, Outer
   , Tabulated (..) , TabulatedGA (..)
   , mkTable, mkTable2, mkIndexMap
   )
@@ -87,15 +87,10 @@ class (Eq a, Ord e, LinSpace [e] a) => CliffAlgebra e a  where
   inv :: a -> a
   conj :: a -> a
   dual :: a -> a
-  
-  -- dim m = length (m:generators) - grade m - 1
-  -- point = undefined
-  -- toPoint = undefined
 
   grade m
     | isZero m = 0
     | otherwise = length $ maximumBy (comparing length) (elems m)
-
   geom m1 = lapp (composeBlades (square m1) (const 1)) m1
   outer = lapp (composeBlades (const 0) (const 1))
   lcontract m1 = lapp (composeBlades (square m1) (const 0)) m1
@@ -383,6 +378,8 @@ newtype Pos a (p :: Nat) = Pos a
 newtype Zero a (q :: Nat) = Zero a
 newtype Neg a (r :: Nat) = Neg a
 
+------------------------------------------------------------
+
 newtype Cl (p :: Nat) (q :: Nat) (r :: Nat)
   = Cl (Pos (Zero (Neg (M.Map [Int] Double) r) q) p)
 
@@ -413,6 +410,29 @@ deriving via GeometricNum (Cl p q r)
   instance (KnownNat p, KnownNat q, KnownNat r) => Fractional (Cl p q r)
 
 ------------------------------------------------------------
+
+newtype Outer (n :: Nat) = Outer (M.Map [Int] Double)
+
+instance KnownNat n => CliffAlgebra Int (Outer n) where
+  algebraSignature x = (0, fromIntegral $ natVal x, 0)
+  square _ _ = 0
+  generators = res
+    where
+      res = (\x -> monom [x] 1) <$> ix
+      ix = [1 .. fromIntegral $ natVal (head res)]
+      
+deriving via M.Map [Int] Double instance LinSpace [Int] (Outer n)
+
+deriving via GeometricNum (Outer n)
+  instance KnownNat n => Eq (Outer n)
+deriving via GeometricNum (Outer n)
+  instance KnownNat n => Show (Outer n)
+deriving via GeometricNum (Outer n)
+  instance KnownNat n => Num (Outer n)
+deriving via GeometricNum (Outer n)
+  instance KnownNat n => Fractional (Outer n)
+
+------------------------------------------------------------
 -- tabulated instance
 ------------------------------------------------------------
 
@@ -420,18 +440,18 @@ newtype Table e a i = Table (A.Array i (Maybe ([e], Double)))
 newtype IndexMap e a = IndexMap (M.Map e Int)
 
 class Tabulated e a | a -> e where
-  signatureT :: a -> (Int,Int,Int)
+  signatureT  :: a -> (Int,Int,Int)
   generatorsT :: [a]
-  indexT :: IndexMap [e] a
-  geomT :: Table e a (Int,Int)
-  outerT :: Table e a (Int,Int)
-  innerT :: Table e a (Int,Int)
-  lcontractT :: Table e a (Int,Int)
-  rcontractT :: Table e a (Int,Int)
-  revT :: Table e a Int
-  invT :: Table e a Int
-  conjT :: Table e a Int
-  dualT :: Table e a Int
+  indexT      :: IndexMap [e] a
+  geomT       :: Table e a (Int,Int)
+  outerT      :: Table e a (Int,Int)
+  innerT      :: Table e a (Int,Int)
+  lcontractT  :: Table e a (Int,Int)
+  rcontractT  :: Table e a (Int,Int)
+  revT        :: Table e a Int
+  invT        :: Table e a Int
+  conjT       :: Table e a Int
+  dualT       :: Table e a Int
 
 mkTable2 :: CliffAlgebra e a
          => (a -> a -> a) -> [a] -> Table e b (Int, Int)
@@ -467,22 +487,20 @@ newtype TabulatedGA a = TabulatedGA a
 
 deriving instance LinSpace e a => LinSpace e (TabulatedGA a)
  
-instance ( LinSpace [e] a
-         , CliffAlgebra e a
-         , Tabulated e a
-         ) => CliffAlgebra e (TabulatedGA a) where
+instance (CliffAlgebra e a, Tabulated e a ) =>
+         CliffAlgebra e (TabulatedGA a) where
   algebraSignature (TabulatedGA a) = signatureT a
-  square = undefined
+  square     = undefined
   generators = TabulatedGA <$> generatorsT
-  geom = tab2 $ lookup2 geomT indexT
-  outer = tab2 $ lookup2 outerT indexT
-  inner = tab2 $ lookup2 innerT indexT
-  lcontract = tab2 $ lookup2 lcontractT indexT
-  rcontract = tab2 $ lookup2 rcontractT indexT
-  rev = tab $ lookup1 revT indexT
-  inv = tab $ lookup1 invT indexT
-  conj = tab $ lookup1 conjT indexT
-  dual = tab $ lookup1 dualT indexT
+  geom       = tab2 $ lookup2 geomT indexT
+  outer      = tab2 $ lookup2 outerT indexT
+  inner      = tab2 $ lookup2 innerT indexT
+  lcontract  = tab2 $ lookup2 lcontractT indexT
+  rcontract  = tab2 $ lookup2 rcontractT indexT
+  rev        = tab  $ lookup1 revT indexT
+  inv        = tab  $ lookup1 invT indexT
+  conj       = tab  $ lookup1 conjT indexT
+  dual       = tab  $ lookup1 dualT indexT
 
 tab f (TabulatedGA a) = TabulatedGA $ f a
 tab2 f (TabulatedGA a) (TabulatedGA b) = TabulatedGA $ f a b

@@ -120,7 +120,7 @@ moebius :: (Num a, Num e, GeomAlgebra e a) => [[a]]
 moebius = [ rot (2*α) (e_[1,3]) $$
             mov (7*e_[2,3]) $$
             rot α (e_[1,2]) $$ vect [7,0,0]
-          | α <- [pi/300, pi/150 .. 2*pi]]
+          | α <- [pi/1000, pi/500 .. 2*pi]]
 
 fig β =
   figure $

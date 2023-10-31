@@ -108,34 +108,91 @@ import Lucid.Svg hiding (scale)
 --   | isPlane b = return b 
 
 
--- поворот на угол θ вокруг p
-rot θ p = scalar (cos (θ/2)) + scalar (sin (θ/2)) * p
+-- -- поворот на угол θ вокруг p
+-- rot θ p = scalar (cos (θ/2)) + scalar (sin (θ/2)) * p
 
--- смещение на вектор v
-mov v = (pseudoScalar + scale (4/norm2 v) v)^2
+-- -- смещение на вектор v
+-- mov v = (pseudoScalar + scale (4/norm2 v) v)^2
 
--- лента Мёбиуса, полученная одновременным вращением отрезка
--- длины 7 вокруг нескольких осей:
-moebius :: (Num a, Num e, GeomAlgebra e a) => [[a]]
-moebius = [ rot (2*α) (e_[1,3]) $$
-            mov (7*e_[2,3]) $$
-            rot α (e_[1,2]) $$ vect [7,0,0]
-          | α <- [pi/1000, pi/500 .. 2*pi]]
+-- -- лента Мёбиуса, полученная одновременным вращением отрезка
+-- -- длины 7 вокруг нескольких осей:
+-- moebius :: (Num a, Num e, GeomAlgebra e a) => [[a]]
+-- moebius = [ rot (2*α) (e_[1,3]) $$
+--             mov (7*e_[2,3]) $$
+--             rot α (e_[1,2]) $$ vect [7,0,0]
+--           | α <- [pi/1000, pi/500 .. 2*pi]]
 
-fig β =
-  figure $
-  mapM_ (`polygon` [opacity_ "0.5", stroke_ "blue"]) $
-  -- проекция из указанной точки на плоскость
-  viewFrom [0,0,50] $
-  -- поворот ленты вокруг оси [1,1,0]
-  [rot β (e_[2,3] + e_[1,3]) $$ s | s <- moebius]
+-- fig β =
+--   figure $
+--   mapM_ (`polygon` [opacity_ "0.5", stroke_ "blue"]) $
+--   -- проекция из указанной точки на плоскость
+--   viewFrom [0,0,50] $
+--   -- поворот ленты вокруг оси [1,1,0]п
+--   [rot β (e_[2,3] + e_[1,3]) $$ s | s <- moebius]
 
 infixr $$
 ($$) :: (Num a, GeomAlgebra e a) => a -> [a] -> [a]
 t $$ xs = [t * x * rev t | x <- xs]
-  
+
+menelaus :: Figure PGA2 PGA2
+
+menelaus = do
+  a <- point [-5, 1]      @ [id_ "A"]
+  b <- point [7, 7]       @ [id_ "B"]
+  c <- point [2, -7]      @ [id_ "C"]
+  d <- line [1,-2] [0,-2] @ [id_ "d"]
+  ab <- a ∨ b            @ [id_ "c"]
+  ac <- a ∨ c            @ [id_ "b"]
+  bc <- b ∨ c            @ [id_ "a"]
+  a' <- bc ∧ d           @ [id_ "A'"]
+  b' <- ac ∧ d           @ [id_ "B'"]
+  c' <- ab ∧ d           @ [id_ "C'"]
+  let r = (a∙b')/(b'∙c)*(c∙a')/(a'∙b)*(b∙c')/(c'∙a)
+  display [10,-10] $ "Result: " <> show r
+
+ceva = mapFig dual menelaus
+
+grid :: Figure PGA2 [PGA2]
+grid = sequence [ point [x,y] @ [ stroke_opacity_ "0.25"
+                                , stroke_ "green" ]
+                | x <- [-n..n] , y <- [-n..n]]
+  where n = 10
+
+desargues :: Figure PGA2 PGA2
+desargues = do
+  o <- point [3,17] @ [id_ "o"]
+  a <- point [-3,6] @ [id_ "a"]
+  b <- point [5,5]  @ [id_ "b"]
+  c <- point [1,9]  @ [id_ "c"]
+  a' <- shiftAlong' (o∨a) 0.4 a @ [id_ "a'"]
+  b' <- shiftAlong' (o∨b) 0.8 b @ [id_ "b'"]
+  c' <- shiftAlong' (o∨c) 1.9 c @ [id_ "c'"]
+  polygon [a,b,c]     [fill_ "pink"]
+  polygon [a',b',c']  [fill_ "lightgreen"]
+  p <- a∨b         @ [id_ "p"]
+  q <- b∨c         @ [id_ "q"]
+  r <- a∨c         @ [id_ "r"]
+  p' <- a'∨b'      @ [id_ "p'"]
+  q' <- b'∨c'      @ [id_ "q'"]
+  r' <- a'∨c'      @ [id_ "r'"]
+  p∧p'             @ [id_ "P"]
+  q∧q'             @ [id_ "Q"]
+  r∧r'             @ [id_ "R"]
+--  display [-15,-15] $ (p ∧ p')∨(q ∧ q')∨(r ∧ r') == 0
+
+fig = do
+  axis
+  l <- line [] [0,1] @ []
+  m <- line [] [-1,1] @ []
+  shiftAlong' l 2 m @ []
+  shiftAlong' m 2 l @ []
+  return l
+
+
+
 main :: IO ()
 main = do
 --  writeSVG "test1.svg" (fig3 0)
-  animate 20 (0, 2*pi) fig "an.gif"
+--  animate 20 (0, 2*pi) (mapFig (rescale 2.1 . dual) . grid2) "an.gif"
   print "Ok"
+

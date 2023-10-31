@@ -14,14 +14,16 @@ module Algeometry.GeometricAlgebra
   , GeomAlgebra (..)
   , e, e_, scalar, scale, vec, pvec
   , elems, coefs, terms
-  , isScalar, isHomogeneous
+  , isScalar, isHomogeneous, isSingular
   , scalarPart, getGrade, components
   , pseudoScalar, basis
   , isInvertible, reciprocal
   , weight, bulk, norm, norm2, normalize
   , (∧), (∨), (|-), (-|), (∙), (•)
   , meet, join, segmentMeet
-  , reflectAt, rotateAt, projectionOf, on, shiftAlong, shiftAlong'
+  , reflectAt, rotateAt, projectionOf, on
+  , shiftAlong, shiftAlong', shift, shift'
+  , rescale
   , line, vector, angle, bisectrissa
   , isPoint, isLine, isPlane
   )
@@ -82,6 +84,8 @@ class (Eq a, Ord e, LinSpace [e] a) => CliffAlgebra e a  where
   inv :: a -> a
   conj :: a -> a
   dual :: a -> a
+  rcompl :: a -> a
+  lcompl :: a -> a
 
   grade m
     | isZero m = 0
@@ -102,6 +106,8 @@ class (Eq a, Ord e, LinSpace [e] a) => CliffAlgebra e a  where
   dual a = lmap (\b -> Just (ps \\ b, 1)) a
     where
       ps = head $ head $ elems <$> [pseudoScalar, a]
+  lcompl a = lapp (composeBlades (const 1) (const 1)) pseudoScalar (rev a)
+  rcompl a = lapp (composeBlades (const 1) (const 1)) (rev a) pseudoScalar
 
 composeBlades
   :: Ord b =>
@@ -150,7 +156,7 @@ e k = if res `elem` generators then res else zero
   where res = monom [k] 1
       
 e_ :: CliffAlgebra e a => [e] -> a
-e_ ks  = monom ks 1
+e_ ks = foldl outer (scalar 1) $ e <$> ks
 
 scalar :: CliffAlgebra e a => Double -> a
 scalar 0 = zero
@@ -176,6 +182,9 @@ isScalar x = grade x == 0
 
 isHomogeneous :: CliffAlgebra b a => a -> Bool
 isHomogeneous m = length (nub (length <$> elems m)) <= 1
+
+isSingular :: (Num a, CliffAlgebra b a) => a -> Bool
+isSingular x = x*x == 0
 
 ------------------------------
 -- norm
@@ -286,12 +295,22 @@ rotateAt p ang x
   where
     r = scalar (cos (ang/2)) + scalar (sin (ang/2)) * p
 
+shift' :: (GeomAlgebra Int a, Num a) => a -> Double -> a -> a
+shift' l d x = t * x * rev t
+  where t = 1 + scale (s * d/2) (e 0) * (point [] `inner` l)
+        (p,q,r) = algebraSignature x
+        s = (-1)^((p+q) `div` 2 + 1)
+
+shift :: (GeomAlgebra Int a, Num a) => a -> a -> a
+shift l = shift' l 1
+
 shiftAlong' :: (Num a, GeomAlgebra b a) => a -> Double -> a -> a
 shiftAlong' l d p = t * p * rev t
   where
     t = (pseudoScalar + scale (4/(d*norm2 l)) l)^2
 
 shiftAlong :: (Num a, GeomAlgebra b a) => a -> a -> a
-shiftAlong l p = t * p * rev t
-  where
-    t = (pseudoScalar + scale (4/norm2 l) l)^2
+shiftAlong l = shiftAlong' l 1
+
+rescale :: (Num a, CliffAlgebra b a) => Double -> a -> a
+rescale s a = scale s (weight a) + bulk a

@@ -10,17 +10,28 @@
 
 module Algeometry.Types
   ( Re, CA, Cl, Outer, VGA, PGA, PGA2 (..), PGA3 (..)
-  , GeometricNum,  Tabulated (..) , TabulatedGA (..)
+  , GeometricNum, Tabulated (..), TabulatedGA (..)
   )
 where
 
+import Algeometry.GeometricAlgebra
 import qualified Data.Map.Strict as M
+import qualified Data.Array as A
 import Data.Maybe
 import Data.List
-import qualified Data.Array as A
-import GHC.TypeLits (Nat, KnownNat, natVal)
+import GHC.TypeLits
 import Data.Coerce
-import Algeometry.GeometricAlgebra
+
+------------------------------------------------------------
+
+type family Cl (p :: Nat) (q :: Nat) (r :: Nat) where
+  Cl 0 0 0 = Re
+  Cl 0 n 0 = Outer n
+  Cl n 0 0 = VGA n
+  Cl 2 1 0 = PGA2
+  Cl 3 1 0 = PGA3
+  Cl n 1 0 = PGA n
+  Cl p q r = CA p q r
   
 ------------------------------------------------------------
 -- geometric numbers
@@ -40,8 +51,9 @@ instance CliffAlgebra b a => Num (GeometricNum a) where
   (+) = add
   (*) = geom
   negate = scale (-1)
-  abs = undefined
-  signum = undefined
+  abs = error "GeometricNum: abs is undefined!"
+  signum 0 = 0
+  signum x = scalar (signum (head (reverse (coefs x))))
 
 instance CliffAlgebra b a => Fractional (GeometricNum a) where
   fromRational = scalar . fromRational 
@@ -67,7 +79,7 @@ instance CliffAlgebra Int a => Show (GeometricNum a) where
           index k = ["₀₁₂₃₄₅₆₇₈₉" !! k]
           
 ------------------------------------------------------------
--- map-based instance
+-- map-based linear space
 ------------------------------------------------------------
 
 instance Ord e => LinSpace e (M.Map e Double) where
@@ -93,12 +105,107 @@ clean = M.filter (\x -> abs x >= 1e-10)
 
 ------------------------------------------------------------
 
+newtype Re = Re Double
+  deriving (Eq, Num, Fractional)
+
+instance Show Re where
+  show (Re x) = show x
+
+instance LinSpace [Int] Re where
+  zero = 0
+  isZero = (== 0)
+  monom _ = Re
+  add = (+)
+  assoc (Re x) = [([],x)]
+  lmap = error "Re: lmap is undefined!"
+  lapp = error "Re: lapp is undefined!"
+  lfilter = error "Re: lfilter is undefined!"
+
+instance CliffAlgebra Int Re where
+  algebraSignature _ = (0,0,0)
+  square _ _ = 1
+  grade _ = 0
+  generators = []
+  geom = (*)
+  outer = (*)
+  inner = (*)
+  lcontract = (*)
+  rcontract = (*)
+  rev = id
+  inv = id
+  conj = id
+  dual = id
+  rcompl = id
+  lcompl = id
+
+------------------------------------------------------------
+type MapLS = M.Map [Int] Double
+
+newtype Outer (n :: Nat) = Outer MapLS
+
+instance KnownNat n => CliffAlgebra Int (Outer n) where
+  algebraSignature x = (0, fromIntegral $ natVal x, 0)
+  square _ _ = 0
+  generators = res
+    where
+      res = (\x -> monom [x] 1) <$> ix
+      ix = [1 .. fromIntegral $ natVal (head res)]
+      
+deriving via MapLS instance LinSpace [Int] (Outer n)
+
+deriving via GeometricNum (Outer n)
+  instance KnownNat n => Eq (Outer n)
+deriving via GeometricNum (Outer n)
+  instance KnownNat n => Show (Outer n)
+deriving via GeometricNum (Outer n)
+  instance KnownNat n => Num (Outer n)
+deriving via GeometricNum (Outer n)
+  instance KnownNat n => Fractional (Outer n)
+
+------------------------------------------------------------
+
+newtype VGA (n :: Nat) = VGA (CA n 0 0)
+  deriving (Num, Eq, Fractional)
+
+deriving via CA n 0 0 instance LinSpace [Int] (VGA n)
+deriving via CA n 0 0 instance KnownNat n => CliffAlgebra Int (VGA n)
+deriving via CA n 0 0 instance KnownNat n => Show (VGA n)
+
+instance KnownNat n => GeomAlgebra Int (VGA n) where
+  dim x = fromIntegral (natVal x) - grade x - 1
+  point = dual . vec
+  toPoint mv = [coeff [k] mv' | k <- [1..n] ]
+    where
+      n = fromIntegral $ natVal mv
+      mv' = dual mv
+      
+------------------------------------------------------------
+  
+newtype PGA (n :: Nat) = PGA (CA n 1 0)
+  deriving (Num, Eq, Fractional)
+
+deriving via CA n 1 0 instance LinSpace [Int] (PGA n)
+deriving via CA n 1 0 instance KnownNat n => CliffAlgebra Int (PGA n)
+deriving via CA n 1 0 instance KnownNat n => Show (PGA n)
+
+instance KnownNat n => GeomAlgebra Int (PGA n) where
+  dim x = fromIntegral (natVal x) - grade x
+  point x = dual $ vec (1:x)
+  toPoint mv =
+    if h == 0 then [] else [coeff [k] mv' / h | k <- [1..n] ]
+    where
+      n = fromIntegral $ natVal mv
+      mv' = dual mv
+      h = coeff [0] mv'
+
+------------------------------------------------------------
+
 newtype Pos a (p :: Nat) = Pos a
 newtype Zero a (q :: Nat) = Zero a
 newtype Neg a (r :: Nat) = Neg a
 
 newtype CA (p :: Nat) (q :: Nat) (r :: Nat)
-  = CA (Pos (Zero (Neg (M.Map [Int] Double) r) q) p)
+  = CA (Pos (Zero (Neg MapLS r) q) p)
 
 instance (KnownNat p, KnownNat q, KnownNat r)
          => CliffAlgebra Int (CA p r q) where
@@ -115,7 +222,7 @@ instance (KnownNat p, KnownNat q, KnownNat r)
       zeros = [0  | q > 0]
       negs  = [-k | r > 0, k <- [1..r]]
       
-deriving via M.Map [Int] Double instance LinSpace [Int] (CA p q r)
+deriving via MapLS instance LinSpace [Int] (CA p q r)
 
 deriving via GeometricNum (CA p q r)
   instance (KnownNat p, KnownNat q, KnownNat r) => Eq (CA p q r)
@@ -127,85 +234,6 @@ deriving via GeometricNum (CA p q r)
   instance (KnownNat p, KnownNat q, KnownNat r) => Fractional (CA p q r)
 
 ------------------------------------------------------------
-
-newtype Outer (n :: Nat) = Outer (M.Map [Int] Double)
-
-instance KnownNat n => CliffAlgebra Int (Outer n) where
-  algebraSignature x = (0, fromIntegral $ natVal x, 0)
-  square _ _ = 0
-  generators = res
-    where
-      res = (\x -> monom [x] 1) <$> ix
-      ix = [1 .. fromIntegral $ natVal (head res)]
-      
-deriving via M.Map [Int] Double instance LinSpace [Int] (Outer n)
-
-deriving via GeometricNum (Outer n)
-  instance KnownNat n => Eq (Outer n)
-deriving via GeometricNum (Outer n)
-  instance KnownNat n => Show (Outer n)
-deriving via GeometricNum (Outer n)
-  instance KnownNat n => Num (Outer n)
-deriving via GeometricNum (Outer n)
-  instance KnownNat n => Fractional (Outer n)
-
-------------------------------------------------------------
-
-newtype VGA (n :: Nat) = VGA (M.Map [Int] Double)
-
-instance KnownNat n => CliffAlgebra Int (VGA n) where
-  algebraSignature x = (fromIntegral $ natVal x, 0, 0)
-  square _ _ = 1
-  generators = res
-    where
-      res = (\x -> monom [x] 1) <$> ix
-      ix = [1 .. fromIntegral $ natVal (head res)]
-      
-deriving via M.Map [Int] Double instance LinSpace [Int] (VGA n)
-
-deriving via GeometricNum (VGA n)
-  instance KnownNat n => Eq (VGA n)
-deriving via GeometricNum (VGA n)
-  instance KnownNat n => Show (VGA n)
-deriving via GeometricNum (VGA n)
-  instance KnownNat n => Num (VGA n)
-deriving via GeometricNum (VGA n)
-  instance KnownNat n => Fractional (VGA n)
-
-------------------------------------------------------------
-
-newtype Re = Re Double
-  deriving (Eq, Num, Fractional)
-
-instance Show Re where
-  show (Re x) = show x
-
-instance LinSpace [Int] Re where
-  zero = 0
-  isZero = (== 0)
-  monom _ = Re
-  add = (+)
-  assoc (Re x) = [([],x)]
-  lmap = undefined
-  lapp = undefined
-  lfilter = undefined
-
-instance CliffAlgebra Int Re where
-  algebraSignature _ = (0,0,0)
-  square _ _ = 1
-  grade _ = 0
-  generators = []
-  geom = (*)
-  outer = (*)
-  inner = (*)
-  lcontract = (*)
-  rcontract = (*)
-  rev = id
-  inv = id
-  conj = id
-  dual = id
-
-------------------------------------------------------------
 -- tabulated instance
 ------------------------------------------------------------
 
@@ -213,6 +241,7 @@ newtype Table e a i = Table (A.Array i (Maybe ([e], Double)))
 newtype IndexMap e a = IndexMap (M.Map e Int)
 
 class Tabulated e a | a -> e where
+  squareT     :: a -> e -> Double
   signatureT  :: a -> (Int,Int,Int)
   generatorsT :: [a]
   indexT      :: IndexMap [e] a
@@ -225,6 +254,8 @@ class Tabulated e a | a -> e where
   invT        :: Table e a Int
   conjT       :: Table e a Int
   dualT       :: Table e a Int
+  rcomplT       :: Table e a Int
+  lcomplT       :: Table e a Int
 
 mkTable2 :: CliffAlgebra e a
          => (a -> a -> a) -> [a] -> Table e b (Int, Int)
@@ -263,7 +294,7 @@ deriving instance LinSpace e a => LinSpace e (TabulatedGA a)
 instance (CliffAlgebra e a, Tabulated e a ) =>
          CliffAlgebra e (TabulatedGA a) where
   algebraSignature (TabulatedGA a) = signatureT a
-  square     = undefined
+  square (TabulatedGA x) = squareT x
   generators = TabulatedGA <$> generatorsT
   geom       = tab2 $ lookup2 geomT indexT
   outer      = tab2 $ lookup2 outerT indexT
@@ -274,6 +305,8 @@ instance (CliffAlgebra e a, Tabulated e a ) =>
   inv        = tab  $ lookup1 invT indexT
   conj       = tab  $ lookup1 conjT indexT
   dual       = tab  $ lookup1 dualT indexT
+  rcompl     = tab  $ lookup1 rcomplT indexT
+  lcompl     = tab  $ lookup1 lcomplT indexT
 
 tab :: (a -> a) -> TabulatedGA a -> TabulatedGA a
 tab f (TabulatedGA a) = TabulatedGA $ f a
@@ -283,40 +316,19 @@ tab2 :: (a -> a -> a)
 tab2 f (TabulatedGA a) (TabulatedGA b) = TabulatedGA $ f a b
 
 ------------------------------------------------------------
-  
-newtype PGA (n :: Nat) = PGA (CA n 1 0)
-  deriving (Num, Eq, Fractional)
 
-deriving via CA n 1 0
-  instance LinSpace [Int] (PGA n)
+newtype PGA2 = PGA2 MapLS
 
-deriving via CA n 1 0
-  instance KnownNat n => CliffAlgebra Int (PGA n)
-
-deriving via CA n 1 0
-  instance KnownNat n => Show (PGA n)
-
-instance KnownNat n => GeomAlgebra Int (PGA n) where
-  dim x = fromIntegral (natVal x) - grade x
-  point x = dual $ vec (1:x)
-  toPoint mv =
-    if h == 0 then [] else [coeff [k] mv' / h | k <- [1..n] ]
-    where
-      n = fromIntegral $ natVal mv
-      mv' = dual mv
-      h = coeff [0] mv'
-
-------------------------------------------------------------
-
-newtype PGA2 = PGA2 (CA 2 1 0)
-  deriving (Eq, Num, Fractional)
-
+deriving via PGA 2 instance Eq PGA2
+deriving via PGA 2 instance Num PGA2
+deriving via PGA 2 instance Fractional PGA2
 deriving via PGA 2 instance Show PGA2
 deriving via PGA 2 instance LinSpace [Int] PGA2
 deriving via PGA 2 instance GeomAlgebra Int PGA2
 deriving via TabulatedGA PGA2 instance CliffAlgebra Int PGA2
 
 instance Tabulated Int PGA2 where
+  squareT _ = fromIntegral . signum
   signatureT _ = algebraSignature (1 :: PGA 2)
   indexT = mkIndexMap (coerce <$> (basis :: [PGA 2]))
   generatorsT = coerce <$> (generators :: [PGA 2])
@@ -329,18 +341,23 @@ instance Tabulated Int PGA2 where
   invT = mkTable inv (basis :: [PGA 2])
   conjT = mkTable conj (basis :: [PGA 2])
   dualT = mkTable dual (basis :: [PGA 2])
+  rcomplT = mkTable rcompl (basis :: [PGA 2])
+  lcomplT = mkTable lcompl (basis :: [PGA 2])
 
 ------------------------------------------------------------
 
-newtype PGA3 = PGA3 (CA 3 1 0)
-  deriving (Eq, Num, Fractional)
+newtype PGA3 = PGA3 MapLS
 
+deriving via PGA 3 instance Eq PGA3
+deriving via PGA 3 instance Num PGA3
+deriving via PGA 3 instance Fractional PGA3
 deriving via PGA 3 instance Show PGA3
 deriving via PGA 3 instance LinSpace [Int] PGA3
 deriving via PGA 3 instance GeomAlgebra Int PGA3
 deriving via TabulatedGA PGA3 instance CliffAlgebra Int PGA3
 
 instance Tabulated Int PGA3 where
+  squareT _ = fromIntegral . signum
   signatureT _ = algebraSignature (1 :: PGA 3)
   indexT = mkIndexMap (coerce <$> (basis :: [PGA 3]))
   generatorsT = coerce <$> (generators :: [PGA 3])
@@ -353,15 +370,8 @@ instance Tabulated Int PGA3 where
   invT = mkTable inv (basis :: [PGA 3])
   conjT = mkTable conj (basis :: [PGA 3])
   dualT = mkTable dual (basis :: [PGA 3])
+  rcomplT = mkTable rcompl (basis :: [PGA 3])
+  lcomplT = mkTable lcompl (basis :: [PGA 3])
 
-------------------------------------------------------------
 
-type family Cl (p :: Nat) (q :: Nat) (r :: Nat) where
-  Cl 0 0 0 = Re
-  Cl 0 n 0 = Outer n
-  Cl n 0 0 = VGA n
-  Cl 2 1 0 = PGA2
-  Cl 3 1 0 = PGA3
-  Cl n 1 0 = PGA n
-  Cl p q r = CA p q r
   

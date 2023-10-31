@@ -149,7 +149,10 @@ multivectorTests = testGroup "Miltivector tests"
 
     , testProperty "geometric product decomposition for bivector and vector" $ 
       \(Multivector a) (Vector b) -> a*b == a |- b + a ∧ b
-    ]
+
+    , testProperty "scalar-outer relation" $ 
+      \(Homogeneous a) (Homogeneous b) -> a ∙ (dual b) == dual (a ∧ b)
+    ]п
   ]
 
 testSuite = testGroup "Base"
@@ -157,3 +160,5 @@ testSuite = testGroup "Base"
   , multivectorTests ]
 
 
+scalout (Homogeneous a) (Homogeneous b) =
+  a `inner` (dual b) == -(-1)^(grade a `div` 2)*dual (a `outer` b)

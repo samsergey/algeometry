@@ -9,10 +9,11 @@
 , OverloadedStrings #-}
 
 module Algeometry.SVG
-  ( Fig (..), svg , writeSVG, writePNG,animate, (@)
-  , figure, figureWith, viewPoint, rotateAbout
-  , axis, vect, viewFrom
-  , polygon, segment, put, plane, plane3, orthoPlane
+  ( Fig (..), Figure, svg , writeSVG, writePNG,animate, (@)
+  , figure, viewPoint
+  , axis, vect, display
+  , polygon, polyline, segment, put, plane, plane3, orthoPlane
+  , getFigure, getResult, mapFig
   ) where
 
 import Algeometry.GeometricAlgebra
@@ -59,27 +60,52 @@ clip mv = let
 
 ------------------------------------------------------------
 
-type Record a b = ([([a], [Attribute])], b)
+newtype Figure a b = Figure ([([a], [Attribute])], b)
+  deriving (Show, Functor, Applicative, Monad)
 
-axis :: Record PGA2 PGA2
+getFigure :: Figure a b -> [([a], [Attribute])]
+getFigure (Figure p) = fst p
+
+getResult :: Figure a b -> b
+getResult (Figure p) = snd p
+
+mapFig :: (a1 -> a2) -> Figure a1 b -> Figure a2 b
+mapFig f (Figure (s, r)) = Figure (map (\(x, a) -> (map f x, a)) s, r)
+
+axis :: Figure PGA2 PGA2
 axis = do
   line [-20,0] [20,0] @ [stroke_width_ "0.25"]
   line [0,-20] [0,20] @ [stroke_width_ "0.25"]
 
-put :: a -> [Attribute] -> Record a ()
-put x attr = ([([x], attr)], ())
+put :: a -> [Attribute] -> Figure a ()
+put x attr = Figure ([([x], attr)], ())
 
-polygon :: [a] -> [Attribute] -> Record a [a]
-polygon pts attr = ([(pts, attr)], pts)
+display :: (Show s, GeomAlgebra e a)
+        => [Double] -> s -> Figure a a
+display p s = point p @ [ id_ (pack (show s))
+                        , fill_ "none"
+                        , stroke_width_ "0"
+                        , class_ "label"]
 
-vect p = [point [], point p]
+polygon :: [a] -> [Attribute] -> Figure a [a]
+polygon pts attr = Figure ([(pts, attr')], pts)
+  where
+    attr' = [class_ "polygon"] <> attr
 
-segment :: a -> a -> [Attribute] -> Record a [a]
-segment p1 p2 = polygon [p1, p2]
+polyline :: [a] -> [Attribute] -> Figure a [a]
+polyline pts attr = Figure ([(pts, attr')], pts)
+  where
+    attr' = [class_ "polyline"] <> attr
+
+vect :: GeomAlgebra b a => [Double] -> a
+vect p = point [] ∨ point p
+
+segment :: a -> a -> [Attribute] -> Figure a [a]
+segment p1 p2 = polyline [p1, p2]
 
 plane
   :: PGA3 -> PGA3 -> (Double, Double) -> [Attribute]
-  -> Record (PGA3) (PGA3)
+  -> Figure (PGA3) (PGA3)
 plane p l (a, b) attr = do
   polygon [ shiftAlong' l' (b) $ shiftAlong' l (a) p
           , shiftAlong' l' (b) $ shiftAlong' l (-a) p 
@@ -92,7 +118,7 @@ plane p l (a, b) attr = do
 
 orthoPlane
   :: PGA3 -> PGA3 -> (Double, Double)
-  -> [Attribute] -> Record (PGA3) (PGA3)
+  -> [Attribute] -> Figure (PGA3) (PGA3)
 orthoPlane p o = plane p l
   where
     p' = projectionOf p `on` o 
@@ -100,17 +126,17 @@ orthoPlane p o = plane p l
 
 plane3
   :: PGA3 -> PGA3 -> PGA3 -> (Double, Double)
-  -> [Attribute]  -> Record (PGA3) (PGA3)
+  -> [Attribute]  -> Figure (PGA3) (PGA3)
 plane3 p1 p2 p3 = plane p1 (p2 `join` p3)
 
 ------------------------------------------------------------
 
 infix 1 @
-(@) :: a -> [Attribute] -> Record a a
+(@) :: a -> [Attribute] -> Figure a a
 mv @ attr = const mv <$> put mv attr
 
-figure :: Record (PGA2) b -> [Fig]
-figure = foldMap draw . fst
+figure :: Figure PGA2 b -> [Fig]
+figure = foldMap draw . getFigure
   where
     draw (mvs, attr) = case mvs of
       [mv] | isPoint mv -> [Point attr $ toXY mv]
@@ -122,22 +148,14 @@ figure = foldMap draw . fst
       _ | all isPoint mvs -> [Polygon attr $ toXY <$> mvs]
         | otherwise -> mvs >>= \v -> draw ([v], attr)
 
-figureWith :: (a -> PGA2) -> Record a b -> [Fig]
-figureWith f = figure . mapFst (mapFst f)
-  where
-    mapFst g (a,b) = (map g a, b)
-
-viewPoint :: [Double] -> PGA3 -> PGA2
-viewPoint vp = coerce . project
+viewPoint :: [Double] -> Figure PGA3 b -> Figure PGA2 b
+viewPoint vp = mapFig (coerce . project)
   where
     p0 = dual (point vp)
     project x
       | isPoint x = -((x `join` point vp) `meet` p0 ) * p0
       | isLine x = -((x `join` point vp) `meet` p0 ) * p0
       | otherwise = undefined
-
-viewFrom :: [Double] -> [[PGA3]] -> [[PGA2]]
-viewFrom p = map (map (viewPoint p))
 
 ------------------------------------------------------------
 
@@ -150,15 +168,21 @@ rescaleTo (w,h) f = case f of
 
 renderFig :: Monad m => Fig -> HtmlT m ()
 renderFig f = case f of
-  Point attr (x, y) -> do 
-    circle_ $ [ cx_ (pack (show x)) , cy_ (pack (show y))
-              , r_ "2.25", fill_ "black" , stroke_ "white"] <> attr
+  Point attr (x, y) -> do
+    case getClass attr of
+      ["label"] -> mempty
+      _ ->
+        circle_ $ [ cx_ (pack (show x)) , cy_ (pack (show y))
+                  , r_ "2.25", fill_ "black" , stroke_ "white"] <> attr
     case getId attr of
       [s] -> label s (x+6, y-6)
       _ -> mempty
       
   Line attr a b -> do
-    polygon_ $ [ points_ (pack $ foldMap toStr [a, b])] <> attr
+    case getClass attr of
+      ["label"] -> mempty
+      _ ->
+        polyline_ $ [ points_ (pack $ foldMap toStr [a, b])] <> attr
     case getId attr of
       [s] -> do
         let (x1, y1) = a
@@ -168,7 +192,12 @@ renderFig f = case f of
       _ -> mempty
  
   Polygon attr pts ->
-    polygon_ $ [ points_ (pack $ foldMap toStr pts)] <> attr
+    case getClass attr of
+      ["polygon"]
+        -> polygon_ $ [ points_ (pack $ foldMap toStr pts)] <> attr
+      ["polyline"]
+        -> polyline_ $ [ points_ (pack $ foldMap toStr pts)] <> attr
+      _ -> mempty
 
   where
     toStr (x,y) = show x <> "," <> show y <> " "
@@ -177,12 +206,19 @@ renderFig f = case f of
       Attribute "id" x -> Just x
       _ -> Nothing
 
+    getClass = mapMaybe $ \case
+      Attribute "class" x -> Just x
+      _ -> Nothing
+
 label :: (ToHtml a, Monad m) => a -> XY -> HtmlT m ()
 label s (x, y) = do
-  circle_ [ cx_ (pack $ show $ x)
-          , cy_ (pack $ show $ y - 5)
-          , r_ "7" , fill_ "white", filter_ "url(#blur)"
-          , stroke_ "none", fill_opacity_ "1"]
+  text_ [ x_ (pack $ show $ x)
+        , y_ (pack $ show $ y)
+        , stroke_ "white", fill_ "white"
+        , stroke_width_ "5"
+        , filter_ "url(#blur1)"
+        , text_anchor_ "middle"
+        , opacity_ "1" ] $ toHtml s
   text_ [ x_ (pack $ show $ x)
         , y_ (pack $ show $ y)
         , stroke_ "none", fill_ "black"
@@ -198,18 +234,18 @@ svg fig = do
     , font_style_ "italic", font_family_ "CMU Serif, sans-serif" ]
   where
     content = do
-      filter_ [id_ "blur"] $ feGaussianBlur_ [stdDeviation_ "2"]
+      filter_ [id_ "blur1"] $ feGaussianBlur_ [stdDeviation_ "0.5"]
       rect_ [ width_ "100%", height_ "100%"
             , fill_ "white", stroke_ "none", fill_opacity_ "1"]
       foldMap (renderFig . rescaleTo (400,400)) $ sort fig
 
-writeSVG :: FilePath -> [Fig] -> IO ()
+writeSVG :: FilePath -> Figure PGA2 b -> IO ()
 writeSVG fname figs = do
   h <- openFile fname WriteMode
-  hPrint h (svg figs)
+  hPrint h (svg (figure figs))
   hClose h
 
-writePNG :: String -> [Fig] -> IO ()
+writePNG :: String -> Figure PGA2 b -> IO ()
 writePNG fname figs = do
   let svgFile = fname <> ".svg"
       pngFile = fname <> ".png"
@@ -221,7 +257,7 @@ writePNG fname figs = do
   print pngFile
 
 animate
-  :: Fractional a => Int -> (a, a) -> (a -> [Fig]) -> String -> IO ()
+  :: Fractional a => Int -> (a, a) -> (a -> Figure PGA2 b) -> String -> IO ()
 animate n (a, b) mkFrame fname = do
   print "producing SVG.."
   forM_ [0..n-1] frame
@@ -241,6 +277,6 @@ animate n (a, b) mkFrame fname = do
       in do writeSVG fname (mkFrame x)
             print fname
   
-rotateAbout ::
-  PGA3 -> (PGA3 -> PGA2) -> Record (PGA3) a -> Double -> [Fig]
-rotateAbout o f fig a = figureWith (f . rotateAt o a) fig
+--rotateAbout ::
+--  PGA3 -> (PGA3 -> PGA2) -> Figure (PGA3) a -> Double -> [Fig]
+--rotateAbout o f fig a = figureWith (f . rotateAt o a) fig

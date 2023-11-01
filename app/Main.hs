@@ -1,9 +1,11 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DataKinds, FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings, TemplateHaskell #-}
 module Main (main) where
 
 import Algeometry
 import Lucid.Svg hiding (scale)
+
+$(defineElements (basis :: [PGA3]))
 
 -- fig1 :: [Fig]
 -- fig1 = figure $ do
@@ -117,9 +119,9 @@ import Lucid.Svg hiding (scale)
 -- -- лента Мёбиуса, полученная одновременным вращением отрезка
 -- -- длины 7 вокруг нескольких осей:
 -- moebius :: (Num a, Num e, GeomAlgebra e a) => [[a]]
--- moebius = [ rot (2*α) (e_[1,3]) $$
---             mov (7*e_[2,3]) $$
---             rot α (e_[1,2]) $$ vect [7,0,0]
+-- moebius = [ rot (2*α) (e13) $$
+--             mov (7*e23) $$
+--             rot α (e12) $$ vect [7,0,0]
 --           | α <- [pi/1000, pi/500 .. 2*pi]]
 
 -- fig β =
@@ -152,8 +154,8 @@ menelaus = do
 
 ceva = mapFig dual menelaus
 
-grid :: Figure PGA2 [PGA2]
-grid = sequence [ point [x,y] @ [ stroke_opacity_ "0.25"
+gridpts :: Figure PGA2 [PGA2]
+gridpts = sequence [ point [x,y] @ [ stroke_opacity_ "0.25"
                                 , stroke_ "green" ]
                 | x <- [-n..n] , y <- [-n..n]]
   where n = 10
@@ -180,15 +182,31 @@ desargues = do
   r∧r'             @ [id_ "R"]
 --  display [-15,-15] $ (p ∧ p')∨(q ∧ q')∨(r ∧ r') == 0
 
-fig = do
-  axis
-  l <- line [] [0,1] @ []
-  m <- line [] [-1,1] @ []
-  shiftAlong' l 2 m @ []
-  shiftAlong' m 2 l @ []
-  return l
+shiftAlong'' :: (GeomAlgebra b a, Fractional a)
+            => a -> Double -> a -> a
+shiftAlong'' l d x = q * x * rev q
+  where
+    q = (pseudoScalar + scale (1/d*4/norm2 l) l)^2
 
 
+fig :: Figure PGA2 PGA2
+
+fig = mapFig (rescale 4) $
+  do
+    axis
+    grid
+    l <- point [-1,1] ∨ point [0,3] @ []
+    p <- point [0,0] @ []
+    shiftAlong' e2 2 p @ []
+
+grid = mapM_ mk [1..19]
+  where
+    mk x = do
+      line [x] [x,1] @ attr
+      line [0,x] [1,x] @ attr
+      line [-x] [-x,1] @ attr
+      line [0,-x] [1,-x] @ attr
+    attr = [stroke_ "lightgray", stroke_width_ "0.2"]
 
 main :: IO ()
 main = do

@@ -6,11 +6,13 @@
   , DerivingVia
   , GeneralizedNewtypeDeriving
   , FunctionalDependencies
-  , TypeFamilies, DataKinds #-}
+  , TypeFamilies, DataKinds
+  , TemplateHaskell #-}
 
 module Algeometry.Types
   ( Re, CA, Cl, Outer, VGA, PGA, PGA2 (..), PGA3 (..)
   , GeometricNum, Tabulated (..), TabulatedGA (..)
+  , defineElements
   )
 where
 
@@ -21,6 +23,8 @@ import Data.Maybe
 import Data.List
 import GHC.TypeLits
 import Data.Coerce
+--import Control.Monad
+import Language.Haskell.TH
 
 ------------------------------------------------------------
 
@@ -254,8 +258,8 @@ class Tabulated e a | a -> e where
   invT        :: Table e a Int
   conjT       :: Table e a Int
   dualT       :: Table e a Int
-  rcomplT       :: Table e a Int
-  lcomplT       :: Table e a Int
+  rcomplT     :: Table e a Int
+  lcomplT     :: Table e a Int
 
 mkTable2 :: CliffAlgebra e a
          => (a -> a -> a) -> [a] -> Table e b (Int, Int)
@@ -373,5 +377,16 @@ instance Tabulated Int PGA3 where
   rcomplT = mkTable rcompl (basis :: [PGA 3])
   lcomplT = mkTable lcompl (basis :: [PGA 3])
 
-
+defineElements :: CliffAlgebra Int a => [a] -> Q [Dec]
+defineElements b = concat <$> (mapM go $ tail $ b >>= elems)
+  where
+    go lst = do
+      let name = mkName $ "e"++ foldMap show lst
+          a = mkName "a"
+          t = mkName "CliffAlgebra"
+      expr <- [| e_ lst |]
+      int <- [t| Int |]
+      return $
+        [ SigD name (ForallT [] [AppT (AppT (ConT t) int) (VarT a)] (VarT a))
+        , ValD (VarP name) (NormalB expr) []]
   

@@ -22,8 +22,8 @@ module Algeometry.GeometricAlgebra
   , (∧), (∨), (|-), (-|), (∙), (•)
   , meet, join, segmentMeet
   , reflectAt, rotateAt, projectionOf, on
-  , shiftAlong, shiftAlong', shift, shift'
-  , rescale
+  , shiftAlong, shiftAlong'
+  , rescale, stretch
   , line, vector, angle, bisectrissa
   , isPoint, isLine, isPlane
   )
@@ -295,22 +295,17 @@ rotateAt p ang x
   where
     r = scalar (cos (ang/2)) + scalar (sin (ang/2)) * p
 
-shift' :: (GeomAlgebra Int a, Num a) => a -> Double -> a -> a
-shift' l d x = t * x * rev t
-  where t = 1 + scale (s * d/2) (e 0) * (point [] `inner` l)
-        (p,q,r) = algebraSignature x
-        s = (-1)^((p+q) `div` 2 + 1)
+shiftAlong' :: (GeomAlgebra b a, Fractional a)
+            => a -> Double -> a -> a
+shiftAlong' l d x = q * x * rev q
+  where q = (pseudoScalar + scale (1/d*4/norm2 l) l)^2
 
-shift :: (GeomAlgebra Int a, Num a) => a -> a -> a
-shift l = shift' l 1
-
-shiftAlong' :: (Num a, GeomAlgebra b a) => a -> Double -> a -> a
-shiftAlong' l d p = t * p * rev t
-  where
-    t = (pseudoScalar + scale (4/(d*norm2 l)) l)^2
-
-shiftAlong :: (Num a, GeomAlgebra b a) => a -> a -> a
+shiftAlong :: (GeomAlgebra b a, Fractional a)
+           => a -> a -> a
 shiftAlong l = shiftAlong' l 1
 
 rescale :: (Num a, CliffAlgebra b a) => Double -> a -> a
 rescale s a = scale s (weight a) + bulk a
+
+stretch :: (Num a, CliffAlgebra b a) => Double -> a -> a
+stretch s a = weight a + scale s (bulk a)

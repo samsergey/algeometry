@@ -1,5 +1,10 @@
-{-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE LambdaCase
+{-|
+Module      : Algeometry.SVG
+Description : Quick and dirty graphic backend for geometric algebra.
+Stability   : experimental
+-}
+{-# LANGUAGE UndecidableInstances
+, LambdaCase
 , DerivingVia
 , StandaloneDeriving
 , DataKinds
@@ -12,19 +17,56 @@
 , BangPatterns #-}
 
 module Algeometry.SVG
-  (  module Lucid.Svg
-  , Fig (..), Figure, svg , writeSVG, writePNG, (@), (<@)
-  , figure, viewPoint
-  , axis, grid, background, display, label
-  , point, line, nline, vect, nvect, plane
-  , angle
-  , polygon, polyline, regularPoly, segment, segm, put
-  , plane2, plane3, orthoPlane
+  ( -- * Types
+    Fig (..)
+  , Figure
+  , figure
+  , getFigure
+  , getResult
+  , mapFig
+  , Animation
+
+  -- * SVG generation and output
+  , put
+  , (@)
+  , (<@)
+  , svg
+  , writeSVG
+  , writePNG
+
+  -- * Simple animation
+  , writeFrame
+  , runAnimation
+  , animate
+  , transform
+  , animateList
+
+  -- * Constructors
+  , origin
+  , point
+  , line
+  , nline
+  , vect
+  , nvect
+  , segm
+  , polygon
+  , polyline
+  , regularPoly
+  , segment
+  , plane
+  , plane2
+  , plane3
+  , orthoPlane
+  , label
+  , display
+  
+  -- * Miscellaneous tools
+  , viewPoint
+  , axis
+  , grid
+  , background
   , clipPoly
---  , rplane
-  , getFigure, getResult, mapFig
-  , Animation, writeFrame, runAnimation, animate, transform, animateList
-   ) where
+  ) where
 
 import Algeometry
 import Control.Monad hiding (join)
@@ -50,6 +92,7 @@ instance With [Attribute] where
 
 type XY = (Double, Double)
 
+-- | Represents graphic primitives
 data Fig = Point   [Attribute] XY
          | Line    [Attribute] XY XY
          | Polygon [Attribute] [XY]
@@ -62,6 +105,7 @@ instance Ord Fig where
 
 ------------------------------------------------------------
 
+-- | For polygon and a line returns list of intersection points.
 clipPoly :: [PGA2] -> PGA2 -> [PGA2]
 clipPoly pts mv = let
   frame = zip pts (tail pts)
@@ -75,6 +119,7 @@ clip mv = let
 
 ------------------------------------------------------------
 
+-- | Representation of a figure with many graphic objects with attributes.
 newtype Figure a b = Figure ([([a], [Attribute])], b)
   deriving (Show, Functor, Applicative, Monad)
 
@@ -88,62 +133,72 @@ instance With (Figure a b) where
   with (Figure !([(a, attr)], b)) as = 
         Figure ([(a, attr `with` as)], b)
     
+-- | Returns list of graphic objects with attributes.
 getFigure :: Figure a b -> [([a], [Attribute])]
 getFigure (Figure p) = fst p
 
+-- | Returns value, stored in Figure type.
 getResult :: Figure a b -> b
 getResult (Figure p) = snd p
 
+-- | Applies transformation to objects, stored in Figure type.
 mapFig :: (a1 -> a2) -> Figure a1 b -> Figure a2 b
 mapFig f (Figure !(s, r)) = Figure (map (\(x, a) -> (map f x, a)) s, r)
 
+-- | Adds multivector as graphic object to Figure.
 put :: a -> Figure a a
 put x = Figure ([([x], [])], x)
 
+-- | Adds multivectors as graphic object to Figure.
 puts :: [a] -> Figure a [a]
 puts x = Figure ([(x, [])], x)
 
 infix 1 @
+-- | Adds multivector as graphic object with given attributes.
 (@) :: a -> [Attribute] -> Figure a a
 a @ attr = put a `with` attr
 
 infix 1 <@
+-- | Appends attributes to attributed object.
 (<@) :: Figure a b -> [Attribute] -> Figure a b
 (<@) = with
 
 ------------------------------
 -- geometric objects
 
+-- | Returns multivector, which represents a point.
 point :: GeomAlgebra b a => [Double] -> a
 point = fromXY
 
+-- | Returns multivector, which represents the origin.
+origin :: GeomAlgebra b a => a
+origin = point []
+
+-- | Returns a label with given value.
 display :: (Show s,  GeomAlgebra b a) => [Double] -> s -> Figure a a
 display p s = label p $ show s
 
+-- | Returns a label at given position.
 label :: (GeomAlgebra b a) => [Double] -> String -> Figure a a
 label p s = point p @ [ id_ (pack s), class_ "label"]
 
+-- | Returns multivector, which represents a normalized line.
 nline :: GeomAlgebra b a => [Double] -> [Double] -> a
 nline a b = fromXY a `join` fromXY b
 
+-- | Returns multivector, which represents a line.
 line :: GeomAlgebra b a => [Double] -> [Double] -> a
 line a b = fromXY a ∨ fromXY b
 
+-- | Returns multivector, which represents a vector (line passing through the origin).
 vect :: GeomAlgebra b a => [Double] -> a
 vect = line []
 
+-- | Returns multivector, which represents a normalized vector (line passing through the origin).
 nvect :: GeomAlgebra b a => [Double] -> a
 nvect = nline []
 
-axis :: Figure PGA2 PGA2
-axis = do
-  line [-20,0] [20,0] @ [stroke_width_ "0.25"]
-  line [0,-20] [0,20] @ [stroke_width_ "0.25"]
-
-plane :: GeomAlgebra b a
-      => [Double] -> [Double] -> [Double] -> Figure a a
-plane a b c = put $ fromXY a `join` fromXY b `join` fromXY c
-
+-- | Returns a graphic object, which represents a polygon.
 polygon :: GeomAlgebra e a => [a] -> Figure a [a]
 polygon pts = res `with` [class_ "polygon"]
   where
@@ -154,20 +209,31 @@ polygon pts = res `with` [class_ "polygon"]
               in const pts <$> puts pts'
       _ -> puts pts
 
+-- | Returns a graphic object, which represents a polyline.
 polyline :: GeomAlgebra e a => [a] -> Figure a [a]
 polyline pts = polygon pts `with` [class_ "polyline"]
 
+-- | Returns a graphic object, which represents a regular polygon.
+regularPoly :: GeomAlgebra e a => Double -> Figure a [a]
 regularPoly n = polygon [ point ([cos (2*pi*t), sin (2*pi*t)])
                         | t <- [0, 1/n .. n-1/n] ]
 
+-- | Returns a graphic object, which represents a segment? given by two points.
 segment :: GeomAlgebra e a => a -> a -> Figure a [a]
 segment p1 p2 = polyline [p1, p2]
 
+-- | Returns a graphic object, which represents a segment given by coordinates.
 segm
   :: GeomAlgebra b a
   => [Double] -> [Double] -> Figure a [a]
 segm a b = segment (fromXY a) (fromXY b)
 
+-- | Returns multivector, which represents a plane passing through three points.
+plane :: GeomAlgebra b a
+      => [Double] -> [Double] -> [Double] -> a
+plane a b c = fromXY a `join` fromXY b `join` fromXY c
+
+-- | Returns graphic object, which represents a plane passing through a point and a line.
 plane2
   :: (Fractional a, GeomAlgebra e a)
   => a -> a -> (Double, Double)
@@ -179,18 +245,20 @@ plane2 p l (a, b) = do
           , shiftAlong' l' (-b) $ shiftAlong' l (a) p' ] 
   return (p ∨ l)
   where
-    p' = projectionOf p `on` l 
+    p' = p ->| l 
     l' = p `join` p'
 
+-- | Returns graphic object, which represents a plane passing through a point, orthogonal to a line.
 orthoPlane
   :: (Fractional a, GeomAlgebra e a)
   => a -> a -> (Double, Double) 
   -> Figure a a
 orthoPlane p o = plane2 p l
   where
-    p' = projectionOf p `on` o 
+    p' = p ->| o 
     l = p' `inner` (p `join` o)
 
+-- | Returns graphic object, which represents a plane passing through three points.
 plane3
   :: (Fractional a, GeomAlgebra e a)
   => a -> a -> a -> (Double, Double)
@@ -216,6 +284,13 @@ plane3 p1 p2 p3 = plane2 p1 (p2 `join` p3)
 --     pts = [ rotateAt n a p2 | a <- [0,pi/20..2*pi] ]
 --     attr' = [fill_ (pack col), stroke_ (pack col), opacity_ "0.25"]
 
+-- | Adds 2D axes to a Figure
+axis :: Figure PGA2 PGA2
+axis = do
+  line [-20,0] [20,0] @ [stroke_width_ "0.25"]
+  line [0,-20] [0,20] @ [stroke_width_ "0.25"]
+
+-- | Adds 2D unit grid to a Figure
 grid :: Figure PGA2 ()
 grid = do
   line [] [0,1] @ attr
@@ -229,11 +304,12 @@ grid = do
       line [0,-x] [1,-x] @ attr
     attr = [stroke_ "lightgray", stroke_width_ "0.2"]
 
+-- | Adds 2D background rectangle to a Figure
 background :: GeomAlgebra e a => String -> Figure a [a]
 background col = polygon [] `with` [ class_ "bg", fill_ (pack col)] 
     
 ------------------------------------------------------------
-
+-- | Returns a figure as a list of primitives.
 figure :: Figure PGA2 b -> [Fig]
 figure = foldMap draw . getFigure
   where
@@ -252,7 +328,7 @@ figure = foldMap draw . getFigure
       [x] -> (x,0)
       x:y:_ -> (x,y)
 
-
+-- | Projects 3D points to a 2D plane, using given viewpoint.
 viewPoint :: [Double] -> Figure PGA3 b -> Figure PGA2 b
 viewPoint vp = mapFig (coerce . project)
   where
@@ -310,7 +386,6 @@ renderFig f = case f of
                    , stroke_ "none", fill_opacity_ "1"] `with` attr
       _ -> mempty
 
-
   where
     toStr (x,y) = show x <> "," <> show y <> " "
     
@@ -337,6 +412,7 @@ mkLabel s (x, y) = do
         , text_anchor_ "middle"
         , opacity_ "1" ] $ toHtml s
 
+-- | Returns raw SVG for a figure.
 svg :: Monad m => [Fig] -> HtmlT m ()
 svg fig = do
   doctype_
@@ -351,12 +427,14 @@ svg fig = do
             , fill_ "white", stroke_ "none", fill_opacity_ "1"]
       foldMap (renderFig . rescaleTo (400,400)) $ sort fig
 
+-- | Outputs figure to SVG file.
 writeSVG :: FilePath -> Figure PGA2 b -> IO ()
 writeSVG fname figs = do
   h <- openFile fname WriteMode
   hPrint h (svg (figure figs))
   hClose h
 
+-- | Outputs figure to PNG file.
 writePNG :: String -> Figure PGA2 b -> IO ()
 writePNG fname figs = do
   let svgFile = fname <> ".svg"
@@ -370,15 +448,18 @@ writePNG fname figs = do
 
 ------------------------------------------------------------
 
+-- | Type representing animationa frames. 
 newtype Animation a = Animation ([[Fig]], a)
   deriving (Show, Functor, Applicative, Monad)
 
+-- | Outputs single frame of animation, given by a frame number. 
 writeFrame n fname (Animation (fs,_)) =
   do h <- openFile fname WriteMode
      hPrint h (svg (fs !! n))
      hClose h
      print fname
 
+-- | Outputs  animation as GIF file, using `convert` utility.
 runAnimation :: String -> Animation a -> IO ()
 runAnimation fname (Animation (fs,_)) = do
   print "producing SVG.."
@@ -400,9 +481,11 @@ runAnimation fname (Animation (fs,_)) = do
             hClose h
             print fname
 
+-- | Creates animation from a list of figures.
 animateList :: [Figure PGA2 a] -> Animation ()
 animateList frs = Animation (figure <$> frs, ())
 
+-- | Creates animation from a parameterized  function and given nuber of frames.
 animate :: Int -> (Double, Double) -> (Double -> Figure PGA2 a) -> Animation ()
 animate n (a, b) mkFrame = mapM_ frame ts
   where
@@ -410,6 +493,7 @@ animate n (a, b) mkFrame = mapM_ frame ts
          | i <- [0..n-1] ]
     frame t = Animation ([figure (mkFrame t)], ())
 
+-- | Creates animation with nonlinear paremeterization.
 transform :: Int -> (Double -> Figure PGA2 a) -> Animation ()
 transform n f = animate n (0,1) go
   where

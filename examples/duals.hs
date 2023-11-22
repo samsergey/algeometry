@@ -4,6 +4,7 @@ module Main (main) where
 
 import Algeometry
 import Algeometry.SVG
+import Lucid.Svg
 import Data.Text (pack)
 import Text.Printf
 import Data.List (inits)

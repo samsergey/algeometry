@@ -4,6 +4,7 @@ module Main (main) where
 
 import Algeometry
 import Algeometry.SVG
+import Lucid.Svg
 
 menelaus :: Figure PGA2 PGA2
 menelaus = do

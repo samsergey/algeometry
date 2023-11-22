@@ -1,3 +1,8 @@
+{-|
+Module      : Algeometry 
+Description : Reexporting all internal stuff.
+Stability   : experimental
+-}
 {-# LANGUAGE
   DerivingVia
 , TypeFamilies
@@ -9,18 +14,98 @@
 , FlexibleContexts #-}
 
 module Algeometry
-  ( module Algeometry.GeometricAlgebra
-  , module Algeometry.Types
+  ( -- * Classes
+
+    -- ** Linear space
+    LinSpace (..)
+  , scale
+  , elems
+  , coefs
+  , terms
+  , lerp
+
+  -- ** Clifford algebras
+  , CliffAlgebra (..)
+  , (∧)
+  , (|-)
+  , (-|)
+  , (∙)
+  , (•)
+
+  -- *** Elements
+  , e
+  , e_
+  , scalar
+  , kvec
+  , nvec
+  , avec
+
+  -- *** Parts
+  , getGrade
+  , trace
+  , weight
+  , bulk
+  , components
+
+  -- *** Predicates
+  , isScalar
+  , isHomogeneous
+  , isSingular
+
+  -- *** Normalization
+  , norm
+  , norm2
+  , normalize
+
+  -- *** Inversion
+  , isInvertible
+  , reciprocal
+  
+  -- ** Geometric algebras
+  , GeomAlgebra (..)
+  -- *** Elements
+  , pseudoScalar
+  , basis
+
+  -- *** Predicates
+  , isPoint
+  , isLine
+  , isPlane
+  -- *** Geometric tools
+  , (∨)
+  , meet
+  , join
+  , projectOn
+  , (->|)
+  , antiprojectTo
+  , (<-|)
+  , segmentMeet
+  , reflectAt
+  , rotateAt
+  , angle
+  , shiftAlong
+  , shiftAlong'
+  , rescale
+  , stretch  
+  
+  -- * Types
   , Cl (..)
+  , Outer (..)
+  , VGA (..)
+  , PGA (..)
+  -- ** Effective realisations of geometric algebras
   , VGA2 (..)
+  , VGA3 (..)
   , PGA2 (..)
   , PGA3 (..)
   , PGA4 (..)
-  , Outer (..)
-  ,e0,e1,e2,e3,e4
-  ,e01,e02,e03,e04,e12,e13,e14,e23,e24,e34
-  ,e012,e013,e014,e023,e024,e034,e123,e124,e134,e234
-  ,e1234,e0234,e0134,e0124,e0123
+  , defineElements
+  , tabulateGA
+  -- ** Basis elements for geometric algebras. 
+  , e0, e1, e2, e3, e4
+  ,e01, e02, e03, e04, e12, e13, e14, e23, e24, e34
+  ,e012, e013, e014, e023, e024, e034, e123, e124, e134, e234
+  ,e1234, e0234, e0134, e0124, e0123
   ,e01234
   )  where
 
@@ -30,6 +115,7 @@ import GHC.TypeLits
 
 ------------------------------------------------------------
 
+-- | Type family for Clifford algebras with given signature.
 type family Cl (p :: Nat) (q :: Nat) (r :: Nat) where
   Cl 0 0 0 = Double
   Cl 0 n 0 = Outer n
@@ -41,15 +127,23 @@ type family Cl (p :: Nat) (q :: Nat) (r :: Nat) where
 
 ------------------------------------------------------------
 
+-- | Tabulated 2D affine geometric algebra.
 newtype VGA2 = VGA2 MapLS
 $(tabulateGA "VGA" 2)
 
+-- | Tabulated 3D affine geometric algebra.
+newtype VGA3 = VGA3 MapLS
+$(tabulateGA "VGA" 3)
+
+-- | Tabulated 2D projective geometric algebra.
 newtype PGA2 = PGA2 MapLS
 $(tabulateGA "PGA" 2)
 
+-- | Tabulated 3D projective geometric algebra.
 newtype PGA3 = PGA3 MapLS
 $(tabulateGA "PGA" 3)
 
+-- | Tabulated 4D projective geometric algebra.
 newtype PGA4 = PGA4 MapLS
 $(tabulateGA "PGA" 4)
 

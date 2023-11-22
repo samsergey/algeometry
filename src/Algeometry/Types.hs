@@ -1,3 +1,8 @@
+{-|
+Module      : Algeometry.Types
+Description : Definitions for exact geometric algebras.
+Stability   : experimental
+-}
 {-# LANGUAGE UndecidableInstances
   , FlexibleInstances
   , FlexibleContexts
@@ -34,8 +39,7 @@ import Data.Coerce
 import Language.Haskell.TH
 import Language.Haskell.TH.Lib.Internal (Decs)
 
-
-  
+ 
 ------------------------------------------------------------
 -- geometric numbers
 ------------------------------------------------------------
@@ -107,8 +111,11 @@ clean :: M.Map k Double -> M.Map k Double
 clean = M.filter (\x -> abs x >= 1e-10)
 
 ------------------------------------------------------------
+
+-- | Representation of linear space as a map, indexed by integer indexes.
 type MapLS = M.Map [Int] Double
 
+-- | Outer (Grassmann) algebra of given dimention.
 newtype Outer (n :: Nat) = Outer MapLS
 
 instance KnownNat n => CliffAlgebra Int (Outer n) where
@@ -132,6 +139,7 @@ deriving via GeometricNum (Outer n)
 
 ------------------------------------------------------------
 
+-- | Affine vector geometric algebra of given dimention.
 newtype VGA (n :: Nat) = VGA (CA n 0 0)
   deriving (Num, Eq, Fractional)
 
@@ -149,6 +157,7 @@ instance KnownNat n => GeomAlgebra Int (VGA n) where
       
 ------------------------------------------------------------
   
+-- | Projective geometric algebra of given dimention.
 newtype PGA (n :: Nat) = PGA (CA n 1 0)
   deriving (Num, Eq, Fractional)
 
@@ -285,6 +294,7 @@ tab2 f (TabulatedGA a) (TabulatedGA b) = TabulatedGA $ f a b
 
 ------------------------------------------------------------
 
+-- | Template which generates aliases for given basis of Clifford algebra. 
 defineElements :: CliffAlgebra Int a => [a] -> Q [Dec]
 defineElements b = concat <$> (mapM go $ tail $ b >>= elems)
   where
@@ -308,6 +318,7 @@ newtypeGA name =
       [t| MapLS |]]]
     []
 
+-- | Template which generates instanses for tabulated geometric algebra. 
 tabulateGA :: String -> Integer -> Q Decs
 tabulateGA ga n = let
   o = mkName ga

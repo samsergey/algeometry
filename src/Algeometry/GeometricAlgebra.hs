@@ -1,3 +1,8 @@
+{-|
+Module      : Algeometry.GeometricAlgebra
+Description : Definitions of classes and general operations.
+Stability   : experimental
+-}
 {-# LANGUAGE UndecidableInstances
   , FlexibleInstances
   , FlexibleContexts
@@ -21,7 +26,7 @@ module Algeometry.GeometricAlgebra
   , scale, weight, bulk, norm, norm2, normalize
   , (∧), (∨), (|-), (-|), (∙), (•), (->|), (<-|)
   , meet, join, segmentMeet
-  , reflectAt, rotateAt, projectionOf, on, antiprojectTo
+  , reflectAt, rotateAt, projectOn, antiprojectTo
   , shiftAlong, shiftAlong'
   , rescale, stretch
   , isPoint, isLine, isPlane
@@ -37,79 +42,132 @@ import Control.Monad hiding (join)
 -- LinSpace
 ------------------------------------------------------------
 
-class Eq e => LinSpace e a | a -> e where
-  zero :: a
-  isZero :: a -> Bool
-  monom :: e  -> Double -> a
-  isMonom :: a -> Bool
-  add :: a -> a -> a
-  lmap :: (e -> Maybe (e, Double)) -> a -> a
-  lapp :: (e -> e -> Maybe (e, Double)) -> a -> a -> a
-  lfilter :: (e -> Double -> Bool) -> a -> a
-  coeff :: e -> a -> Double
-  assoc :: a -> [(e, Double)]
+{- | The class representing a general linear space with basis of type `b` and element (vector) of type `el`.-}
+class Eq b => LinSpace b el | el -> b where
+  {-# MINIMAL zero, isZero, monom, add, lmap, lapp, lfilter, assoc #-}
+  -- | The zero element.
+  zero :: el
 
+  -- | Predicate for the zero element.
+  isZero :: el -> Bool
+
+  -- | Constructor for the monom.
+  monom :: b -> Double -> el
+
+  -- | Predicate for the monom.
+  isMonom :: el -> Bool
   isMonom m = length (assoc m) == 1
+
+  -- | Addition for two elements.
+  add :: el -> el -> el
+
+  -- | Mapping of partial unary linear function through an element.
+  lmap :: (b -> Maybe (b, Double)) -> el -> el
+
+  -- | Distribution of partial binary linear function through two elements.
+  lapp :: (b -> b -> Maybe (b, Double)) -> el -> el -> el
+
+  -- | Extraction of elements with given predicate.
+  lfilter :: (b -> Double -> Bool) -> el -> el
+
+  -- | Scalar coefficient of an element 
+  coeff :: b -> el -> Double
   coeff x mv = fromMaybe 0 $ lookup x (assoc mv)
 
-scale :: LinSpace e a => Double -> a -> a
+  -- | Representation of an element as assoclist.
+  assoc :: el -> [(b, Double)]
+
+-- | Returns an element of a linear space, scaled by given factor.
+scale :: LinSpace b el => Double -> el -> el
 scale a m | a == 0 = zero
           | otherwise = lmap (\k -> Just (k, a)) m
 
-elems :: LinSpace e a => a -> [e]
+-- | Returns list of basis elements for an element.
+elems :: LinSpace b el => el -> [b]
 elems = fmap fst . assoc
 
-coefs :: LinSpace e a => a -> [Double]
+-- | Returns list of coefficients for an element.
+coefs :: LinSpace b el => el -> [Double]
 coefs = fmap snd . assoc
 
-terms :: LinSpace e a => a -> [a]
+-- | Returns list of monoms for an element.
+terms :: LinSpace b el => el -> [el]
 terms m = uncurry monom <$> assoc m
 
-lerp :: (Num a, LinSpace e a) => a -> a -> Double -> a
+-- | Linear interpolation for two elements, parameterized for interval [0,1].
+lerp :: (Num el, LinSpace b el) => el -> el -> Double -> el
 lerp a b t = a + scale t (b - a)
 
 ------------------------------------------------------------
 -- CliffAlgebra
 ------------------------------------------------------------
 
-class (Eq a, Ord e, LinSpace [e] a) => CliffAlgebra e a  where
-  algebraSignature :: a -> (Int,Int,Int)
-  square :: a -> e -> Double
-  generators :: [a]
-  grade :: a -> Int
-  geom :: a -> a -> a
-  outer :: a -> a -> a
-  rcontract :: a -> a -> a
-  lcontract :: a -> a -> a
-  inner :: a -> a -> a
-  rev :: a -> a
-  inv :: a -> a
-  conj :: a -> a
-  dual :: a -> a
-  rcompl :: a -> a
-  lcompl :: a -> a
+{- | The class representing Clifford algebra with generators of type `g`
+and element (multivector) of type `mv`. -}
+class (Eq mv, Ord g, LinSpace [g] mv) => CliffAlgebra g mv  where
+  -- | The signature of Clifford algebra. The first argument is proxy needed to resolve the functional dependence for class instance.
+  algebraSignature :: mv -> (Int,Int,Int)
 
+  -- | Squares of the generators, which define the Clifford algebra. The first argument is proxy needed to resolve the functional dependence for class instance.
+  square :: mv -> g -> Double
+
+  -- | List of generators of the Clifford algebra.
+  generators :: [mv]
+
+  -- | Returns the grade of a multivector.
+  grade :: mv -> Int
   grade m
     | isZero m = 0
     | otherwise = length $ maximumBy (comparing length) (elems m)
+    
+  -- | The geometric product.
+  geom :: mv -> mv -> mv
   geom m1 = lapp (composeBlades (square m1) (const 1)) m1
+
+  -- | The outer product.
+  outer :: mv -> mv -> mv
   outer = lapp (composeBlades (const 0) (const 1))
-  lcontract m1 = lapp (composeBlades (square m1) (const 0)) m1
+
+  -- | The right contraction.
+  rcontract :: mv -> mv -> mv
   rcontract a b = rev (rev b `lcontract` rev a)
 
+  -- | The left contraction.
+  lcontract :: mv -> mv -> mv
+  lcontract m1 = lapp (composeBlades (square m1) (const 0)) m1
+
+  -- | The inner product.
+  inner :: mv -> mv -> mv
   inner a b =
     if grade a <= grade b
     then lcontract a b
     else rcontract a b
 
+  -- | The reverse of a multivector.
+  rev :: mv -> mv
   rev = lmap $ \b -> Just (b, (-1)^(length b `div` 2))
+
+  -- | The inversion of a multivector.
+  inv :: mv -> mv
   inv = lmap $ \b -> Just (b, (-1)^length b)
+
+  -- | The conjugate of a multivector
+  conj :: mv -> mv
   conj = inv . rev
+
+  -- | The dual of a multivector.
+  dual :: mv -> mv
   dual a = lmap (\b -> Just (ps \\ b, 1)) a
     where
       ps = head $ head $ elems <$> [pseudoScalar, a]
-  lcompl a = lapp (composeBlades (const 1) (const 1)) pseudoScalar (rev a)
+
+  -- | The right complement of a multivector.
+  rcompl :: mv -> mv
   rcompl a = lapp (composeBlades (const 1) (const 1)) (rev a) pseudoScalar
+
+  -- | The left complement of a multivector.
+  lcompl :: mv -> mv
+  lcompl a = lapp (composeBlades (const 1) (const 1)) pseudoScalar (rev a)
 
 composeBlades
   :: Ord b =>
@@ -126,92 +184,125 @@ composeBlades g h x y = foldM f (y, (-1)^(length x `div` 2)) x
         then Nothing
         else Just (l <> (i:r), p*(-1)^length l * h i)
 
-infix 8 -|, |-, ∙
 infixr 9 ∧
-(∧),(|-),(-|),(∙) :: CliffAlgebra b a => a -> a -> a
+
+-- | The infix operator for the outer product
+(∧) :: CliffAlgebra g mv => mv -> mv -> mv
 (∧) = outer
+
+infix 8 -|, |-, ∙
+
+-- | The infix operator for the left contraction
+(-|) :: CliffAlgebra g mv => mv -> mv -> mv
 (-|) = lcontract
+
+-- | The infix operator for the right contraction
+(|-) :: CliffAlgebra g mv => mv -> mv -> mv
 (|-) = rcontract
+
+-- | The infix operator for the inner product
+(∙) :: CliffAlgebra g mv => mv -> mv -> mv
 (∙) = inner
 
 infix 9 •
-(•) :: CliffAlgebra e a => a -> a -> Double
+-- | The infix perator for the scalar product
+(•) :: CliffAlgebra g mv => mv -> mv -> Double
 a • b = trace (inner a b)
 
-getGrade :: CliffAlgebra b a => Int -> a -> a
-getGrade n = lfilter (\b _ -> length b == n)
+-- | Extracts k-blade from a multivector.
+getGrade :: CliffAlgebra g mv => Int -> mv -> mv
+getGrade k = lfilter (\b _ -> length b == k)
 
-trace :: CliffAlgebra b a => a -> Double
+-- | Extracts a scalar part from a multivector.
+trace :: CliffAlgebra g mv => mv -> Double
 trace = coeff []
 
-weight :: CliffAlgebra b a => a -> a
+-- | Extracts vanishing part from a multivector.
+weight :: CliffAlgebra g mv => mv -> mv
 weight a = lfilter (const . any ((0 ==) . square a)) a
 
-bulk :: CliffAlgebra b a => a -> a
+-- | Extracts non-vanishing part from a multivector.
+bulk :: CliffAlgebra g mv => mv -> mv
 bulk a = lfilter (const . all ((0 /=) . square a)) a
 
 ------------------------------
 -- constructors
 
-e :: CliffAlgebra e a => e -> a
+-- | Returns a generator of the algebra.
+e :: CliffAlgebra g mv => g -> mv
 e k = if res `elem` generators then res else zero
   where res = monom [k] 1
       
-e_ :: CliffAlgebra e a => [e] -> a
+-- | Returns a monomial element of the algebra (outer product of generators).
+e_ :: CliffAlgebra g mv => [g] -> mv
 e_ ks = foldl outer (scalar 1) $ e <$> ks
 
-scalar :: CliffAlgebra e a => Double -> a
+-- | Returns a scalar element of the algebra.
+scalar :: CliffAlgebra g mv => Double -> mv
 scalar 0 = zero
 scalar a = monom [] a
 
-components :: CliffAlgebra e a => a -> [a]
+-- | Returns a list of monomial components in the multivector.
+components :: CliffAlgebra g mv => mv -> [mv]
 components mv = e <$> sort (foldr union [] (elems mv))
 
-basis :: CliffAlgebra e a => [a]
+-- | Returns a list of all monomial components in the algebra.
+basis :: CliffAlgebra g mv => [mv]
 basis =
   map (foldr outer (scalar 1)) $
   sortOn length $
   filterM (const [True, False]) generators
 
-pseudoScalar :: CliffAlgebra e a => a
+-- | Returns a pseudoscalar of the algebra.
+pseudoScalar :: CliffAlgebra g mv => mv
 pseudoScalar = foldr1 outer generators
 
-kvec :: GeomAlgebra b a => Int -> [Double] -> a
+-- | Returns a k-vector with given coefficients.
+kvec :: GeomAlgebra g mv => Int -> [Double] -> mv
 kvec k xs = let es = filter ((== k).grade) basis
   in foldr add zero $ zipWith scale xs es
 
-nvec :: GeomAlgebra b a => Int -> [Double] -> a
+-- | Returns a normalized k-vector with given coefficients.
+nvec :: GeomAlgebra g mv => Int -> [Double] -> mv
 nvec k = normalize . kvec k
 
-avec :: GeomAlgebra b a => Int -> [Double] -> a
+-- | Returns a normalized k-antivector with given coefficients.
+avec :: GeomAlgebra g mv => Int -> [Double] -> mv
 avec k = dual . kvec k
 
-angle :: GeomAlgebra b a => a -> a -> Double
+-- | Returns an angle between two multivectors.
+angle :: GeomAlgebra g mv => mv -> mv -> Double
 angle l1 l2 = acos (l1 • l2)
 
 ------------------------------
 -- predicates
 
-isScalar :: CliffAlgebra b a => a -> Bool
+-- | Returns `True` if  multivector is scalar and `False` otherwise.
+isScalar :: CliffAlgebra g mv => mv -> Bool
 isScalar x = grade x == 0
 
-isHomogeneous :: CliffAlgebra b a => a -> Bool
+-- | Returns `True` if  multivector is a k-vector and `False` otherwise..
+isHomogeneous :: CliffAlgebra g mv => mv -> Bool
 isHomogeneous m = length (nub (length <$> elems m)) <= 1
 
-isSingular :: (Num a, CliffAlgebra b a) => a -> Bool
+-- | Returns `True` if  multivector is singular (non-invertible) and `False` otherwise.
+isSingular :: (Num mv, CliffAlgebra g mv) => mv -> Bool
 isSingular x = x*x == 0
 
 ------------------------------
 -- norm
 
-normalize :: CliffAlgebra b a => a -> a
+-- | Returns normalized multivector for given nonsingular multivector.
+normalize :: CliffAlgebra g mv => mv -> mv
 normalize m = scale (1 / norm m) m
 
-norm :: CliffAlgebra b a => a -> Double
+-- | Returns norm of a multivector.
+norm :: CliffAlgebra g mv => mv -> Double
 norm m | isScalar m = trace m
        | otherwise = sqrt $ abs $ norm2 m 
 
-norm2 :: CliffAlgebra b a => a -> Double
+-- | Returns square norm of a multivector.
+norm2 :: CliffAlgebra g mv => mv -> Double
 norm2 m
   | isScalar m = trace m ** 2
   | otherwise = trace (rev m `geom` m)
@@ -219,14 +310,16 @@ norm2 m
 ------------------------------
 -- reversing
 
-reciprocal :: CliffAlgebra b a => a -> a
+-- | Returns reciprocal for nonsingular k-vector.
+reciprocal :: CliffAlgebra g mv => mv -> mv
 reciprocal m
     | not (isInvertible m) = error "Multivector is non-invertible!"
     | isScalar m = scalar $ recip $ trace m
     | isHomogeneous m = scale (1 / trace (m `geom` rev m)) $ rev m
-    | otherwise = error "Don't know yet how to invert!"
+    | otherwise = error "Don't know how to invert non-homogeneous multivectors!"
 
-isInvertible :: CliffAlgebra b a => a -> Bool
+-- | Returns `True` if  multivector is not singular (invertible) and `False` otherwise.
+isInvertible :: CliffAlgebra g mv => mv -> Bool
 isInvertible m
     | isZero m = False
     | isMonom m = not $ isZero $ geom m m
@@ -235,86 +328,101 @@ isInvertible m
 
 ------------------------------------------------------------
 
-class CliffAlgebra b a => GeomAlgebra b a where
-  fromXY :: [Double] -> a
-  toXY :: a -> [Double]
-  dim :: a -> Int
+-- | The class representing Clifford algebra that have geometric representation.
+class CliffAlgebra g mv => GeomAlgebra g mv where
+  -- | Converts coordinate list to a k-vector.
+  fromXY :: [Double] -> mv
+  -- | Converts k-vector to coordinate list.
+  toXY :: mv -> [Double]
+  -- | Returns a geometric dimention for a multivector.
+  dim :: mv -> Int
 
-isPoint :: GeomAlgebra b a => a -> Bool
+-- |  Returns `True` if  k-vector represents a point.
+isPoint :: GeomAlgebra g mv => mv -> Bool
 isPoint x = dim x == 0
 
-isLine :: GeomAlgebra b a => a -> Bool
+-- |  Returns `True` if  k-vector represents a line.
+isLine :: GeomAlgebra g mv => mv -> Bool
 isLine x = dim x == 1
 
-isPlane :: GeomAlgebra b a => a -> Bool
+-- |  Returns `True` if  k-vector represents a plane.
+isPlane :: GeomAlgebra g mv => mv -> Bool
 isPlane x = dim x == 2
 
 ------------------------------
--- geometric combibators
+-- geometric combinators
 
 infixr 9 ∨
-(∨) :: GeomAlgebra b a => a -> a -> a
+-- | Regressive product of two multivectors.
+(∨) :: GeomAlgebra g mv => mv -> mv -> mv
 a ∨ b = dual (dual a ∧ dual b)
 
-meet :: GeomAlgebra b a => a -> a -> a
+-- | Normalized outer product of two multivectors.
+meet :: GeomAlgebra g mv => mv -> mv -> mv
 meet a b = normalize $ a ∧ b
 
-join :: GeomAlgebra b a => a -> a -> a
+-- | Normalized regressive product of two multivectors.
+join :: GeomAlgebra g mv => mv -> mv -> mv
 join a b = normalize $ a ∨ b
 
-segmentMeet :: GeomAlgebra b a => a -> (a, a) -> Maybe a
+-- | Returns intersection of an object and a segment.
+segmentMeet :: GeomAlgebra g mv => mv -> (mv, mv) -> Maybe mv
 segmentMeet x (a, b) = let
   p = (a ∨ b) ∧ x
   s = (p ∨ a)•(p ∨ b)
   in if s <= 0 then Just (normalize p) else Nothing
 
-bisectrissa :: (Num a, GeomAlgebra b a) => a -> a -> a
-bisectrissa l1 l2 = normalize (normalize l1 + normalize l2)
-
 ------------------------------------------------------------
 -- transformations
 ------------------------------------------------------------
 
-reflectAt :: (Num a, GeomAlgebra b a) => a -> a -> a
+-- | Returns reflection of object `a` against object `b`.
+reflectAt :: (Num mv, GeomAlgebra g mv) => mv -> mv -> mv
 reflectAt a b = - b * a * reciprocal b
 
-projectionOf :: GeomAlgebra b a => a -> a -> a
-projectionOf p l = (p `inner` l) `geom` l
+-- | Returns projection of object `a` on object `b`.
+projectOn :: GeomAlgebra g mv => mv -> mv -> mv
+projectOn a b = (a `inner` b) `geom` b
 
-(->|) :: GeomAlgebra b a => a -> a -> a
-(->|) = projectionOf
+-- | Infix operator for projection.
+(->|) :: GeomAlgebra g mv => mv -> mv -> mv
+(->|) = projectOn
 
-antiprojectTo :: GeomAlgebra b a => a -> a -> a
-antiprojectTo p l = (p `inner` l) `geom` p
+-- | Returns antiprojection of object `a` on object `b`.
+antiprojectTo :: GeomAlgebra g mv => mv -> mv -> mv
+antiprojectTo a b = (a `inner` b) `geom` a
 
-(<-|) :: GeomAlgebra b a => a -> a -> a
+-- | Infix operator for antiprojection.
+(<-|) :: GeomAlgebra g mv => mv -> mv -> mv
 (<-|) = antiprojectTo
 
-on :: (a -> b) -> a -> b
-on = ($)
-
-rotateAt :: (Num a, GeomAlgebra b a) => a -> Double -> a -> a
+-- | Rotates object `x` against the object `p` by given angle.
+rotateAt :: (Num mv, GeomAlgebra g mv) => mv -> Double -> mv -> mv
 rotateAt p ang x
   | sin ang == 0 && cos ang == 1 = x
   | otherwise = r * x * rev r
   where
     r = scalar (cos (ang/2)) + scalar (sin (ang/2)) * p
 
-shiftAlong' :: (GeomAlgebra b a, Fractional a)
-            => a -> Double -> a -> a
+-- | Translates object `x` along the object `l` by given distance `d`.
+shiftAlong' :: (GeomAlgebra g mv, Fractional mv)
+            => mv -> Double -> mv -> mv
 shiftAlong' l d x
   | l == 0 = x
   | otherwise = q * x * rev q
   where q = (pseudoScalar + scale (1/d*4/norm2 l) l)^2
 
-shiftAlong :: (GeomAlgebra b a, Fractional a)
-           => a -> a -> a
+-- | Translates an object along the object `l` by distance, given by norm of `l`.
+shiftAlong :: (GeomAlgebra g mv, Fractional mv)
+           => mv -> mv -> mv
 shiftAlong l = shiftAlong' l 1
 
-rescale :: (Num a, CliffAlgebra b a) => Double -> a -> a
+-- | Rescales an object `a` by given value.
+rescale :: (Num mv, CliffAlgebra g mv) => Double -> mv -> mv
 rescale s a = scale s (weight a) + bulk a
 
-stretch :: (Num a, CliffAlgebra b a) => Double -> a -> a
+-- | Rescales magnitude of object `a` by given value.
+stretch :: (Num mv, CliffAlgebra g mv) => Double -> mv -> mv
 stretch s a = weight a + scale s (bulk a)
 
 ------------------------------------------------------------

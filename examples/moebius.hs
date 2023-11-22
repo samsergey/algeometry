@@ -4,10 +4,12 @@ module Main (main) where
 
 import Algeometry
 import Algeometry.SVG
+import Lucid.Svg
+
 
 -- лента Мёбиуса, полученная одновременным вращением отрезка
 -- длины 7 вокруг нескольких осей:
-moebius :: Figure (PGA3) ()
+moebius :: Figure PGA3 ()
 moebius = mapM_ (<@ [opacity_ "0.5", stroke_ "blue"]) $
   [ polyline $
     rotateAt e13 (2*α) .

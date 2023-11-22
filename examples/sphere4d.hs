@@ -5,6 +5,7 @@ module Main (main) where
 
 import Algeometry
 import Algeometry.SVG
+import Lucid.Svg
 import Control.Monad.Random hiding (join)
 import Data.Coerce
 
@@ -15,7 +16,7 @@ sphere r θ1 θ2 ϕ =
         , r * sin θ1 * sin θ2 * cos ϕ
         , r * sin θ1 * sin θ2 * sin ϕ] :: PGA4
 
-proj x = coerce (projectionOf x (e 4) * (e 4))
+proj x = coerce $ (x ->| e4) * e4
 
 sphere4d v = animate 51 (-pi,pi) frame
   where

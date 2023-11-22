@@ -1,3 +1,8 @@
+{-|
+Module      : Algeometry.Arbitrary
+Description : Definitions of Arbritrary instanses for multivectors.
+Stability   : experimental
+-}
 {-# LANGUAGE DerivingVia
 , StandaloneDeriving
 , FlexibleInstances
@@ -6,7 +11,14 @@
 , DataKinds
 #-}
 
-module Algeometry.Arbitrary where
+module Algeometry.Arbitrary
+  ( Monom (..)
+  , Vector (..)
+  , Bivector (..)
+  , Trivector (..)
+  , Multivector (..)
+  , Homogeneous (..)
+  ) where
   
 import Test.QuickCheck hiding (scale)
 import Algeometry
@@ -34,6 +46,7 @@ shrinkMV v | isScalar v = []
 
 type MV = Cl 3 1 3
 
+-- | Wrapper for algebra basis elements.
 newtype Monom = Monom MV
   deriving ( Show, Eq, Num, Fractional)
 
@@ -48,6 +61,7 @@ instance Arbitrary Monom where
 
 ------------------------------------------------------------
 
+-- | Wrapper for 1-vector.
 newtype Vector = Vector MV
   deriving ( Show, Eq, Num, Fractional)
 
@@ -60,6 +74,7 @@ instance Arbitrary Vector where
 
 ------------------------------------------------------------
 
+-- | Wrapper for 2-vector.
 newtype Bivector = Bivector MV
   deriving ( Show, Eq, Num, Fractional)
 
@@ -72,6 +87,7 @@ instance Arbitrary Bivector where
 
 ------------------------------------------------------------
 
+-- | Wrapper for 3-vector.
 newtype Trivector = Trivector MV
   deriving ( Show, Eq, Num, Fractional)
 
@@ -84,6 +100,7 @@ instance Arbitrary Trivector where
 
 ------------------------------------------------------------
 
+-- | Wrapper for a general multivector.
 newtype Multivector = Multivector MV
   deriving ( Show, Eq, Num, Fractional)
 
@@ -96,6 +113,7 @@ instance Arbitrary Multivector where
 
 ------------------------------------------------------------
 
+-- | Wrapper for a k-vector.
 newtype Homogeneous = Homogeneous MV
   deriving ( Show, Eq, Num, Fractional)
 

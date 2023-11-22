@@ -3,6 +3,7 @@ module Main (main) where
 
 import Algeometry
 import Algeometry.SVG
+import Lucid.Svg
 import Control.Monad.Random hiding (join)
 import Data.Foldable
 

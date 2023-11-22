@@ -10,9 +10,17 @@
   , TemplateHaskell #-}
 
 module Algeometry.Types
-  ( Re, CA, Cl, Outer, VGA, PGA, PGA2 (..), PGA3 (..)
-  , GeometricNum, Tabulated (..), TabulatedGA (..)
+  ( Pos(..), Neg (..), Zero (..)
+  , CA (..)
+  , Outer (..)
+  , VGA (..)
+  , PGA (..)
+  , GeometricNum
+  , Tabulated (..)
+  , TabulatedGA (..)
+  , MapLS
   , defineElements
+  , tabulateGA
   )
 where
 
@@ -22,20 +30,13 @@ import qualified Data.Array as A
 import Data.Maybe
 import Data.List
 import GHC.TypeLits
+--import GHC.Classes
 import Data.Coerce
 --import Control.Monad
 import Language.Haskell.TH
+import Language.Haskell.TH.Lib.Internal (Decs)
 
-------------------------------------------------------------
 
-type family Cl (p :: Nat) (q :: Nat) (r :: Nat) where
-  Cl 0 0 0 = Re
-  Cl 0 n 0 = Outer n
-  Cl n 0 0 = VGA n
-  Cl 2 1 0 = PGA2
-  Cl 3 1 0 = PGA3
-  Cl n 1 0 = PGA n
-  Cl p q r = CA p q r
   
 ------------------------------------------------------------
 -- geometric numbers
@@ -69,7 +70,7 @@ instance CliffAlgebra Int a => Show (GeometricNum a) where
       trms mv = sortOn (length . fst) $ assoc mv
       strip x = tail $ fromMaybe x $ stripPrefix " +" x
       scal = getGrade 0 m
-      sscal = let c = scalarPart scal
+      sscal = let c = trace scal
               in if c == 0 then "" else ssig c <> show (abs c)
       svecs = do (b, c) <- trms (m - scal)
                  ssig c <> snum c <> showBlade b
@@ -108,41 +109,6 @@ clean :: M.Map k Double -> M.Map k Double
 clean = M.filter (\x -> abs x >= 1e-10)
 
 ------------------------------------------------------------
-
-newtype Re = Re Double
-  deriving (Eq, Num, Fractional)
-
-instance Show Re where
-  show (Re x) = show x
-
-instance LinSpace [Int] Re where
-  zero = 0
-  isZero = (== 0)
-  monom _ = Re
-  add = (+)
-  assoc (Re x) = [([],x)]
-  lmap = error "Re: lmap is undefined!"
-  lapp = error "Re: lapp is undefined!"
-  lfilter = error "Re: lfilter is undefined!"
-
-instance CliffAlgebra Int Re where
-  algebraSignature _ = (0,0,0)
-  square _ _ = 1
-  grade _ = 0
-  generators = []
-  geom = (*)
-  outer = (*)
-  inner = (*)
-  lcontract = (*)
-  rcontract = (*)
-  rev = id
-  inv = id
-  conj = id
-  dual = id
-  rcompl = id
-  lcompl = id
-
-------------------------------------------------------------
 type MapLS = M.Map [Int] Double
 
 newtype Outer (n :: Nat) = Outer MapLS
@@ -177,8 +143,8 @@ deriving via CA n 0 0 instance KnownNat n => Show (VGA n)
 
 instance KnownNat n => GeomAlgebra Int (VGA n) where
   dim x = fromIntegral (natVal x) - grade x - 1
-  point = dual . vec
-  toPoint mv = [coeff [k] mv' | k <- [1..n] ]
+  fromXY = avec 1
+  toXY mv = [coeff [k] mv' | k <- [1..n] ]
     where
       n = fromIntegral $ natVal mv
       mv' = dual mv
@@ -194,8 +160,8 @@ deriving via CA n 1 0 instance KnownNat n => Show (PGA n)
 
 instance KnownNat n => GeomAlgebra Int (PGA n) where
   dim x = fromIntegral (natVal x) - grade x
-  point x = dual $ vec (1:x)
-  toPoint mv =
+  fromXY x = avec 1 (1:x)
+  toXY mv =
     if h == 0 then [] else [coeff [k] mv' / h | k <- [1..n] ]
     where
       n = fromIntegral $ natVal mv
@@ -260,7 +226,7 @@ class Tabulated e a | a -> e where
   dualT       :: Table e a Int
   rcomplT     :: Table e a Int
   lcomplT     :: Table e a Int
-
+  
 mkTable2 :: CliffAlgebra e a
          => (a -> a -> a) -> [a] -> Table e b (Int, Int)
 mkTable2 op b = mkArray $ f <$> b <*> b
@@ -321,62 +287,6 @@ tab2 f (TabulatedGA a) (TabulatedGA b) = TabulatedGA $ f a b
 
 ------------------------------------------------------------
 
-newtype PGA2 = PGA2 MapLS
-
-deriving via PGA 2 instance Eq PGA2
-deriving via PGA 2 instance Num PGA2
-deriving via PGA 2 instance Fractional PGA2
-deriving via PGA 2 instance Show PGA2
-deriving via PGA 2 instance LinSpace [Int] PGA2
-deriving via PGA 2 instance GeomAlgebra Int PGA2
-deriving via TabulatedGA PGA2 instance CliffAlgebra Int PGA2
-
-instance Tabulated Int PGA2 where
-  squareT _ = fromIntegral . signum
-  signatureT _ = algebraSignature (1 :: PGA 2)
-  indexT = mkIndexMap (coerce <$> (basis :: [PGA 2]))
-  generatorsT = coerce <$> (generators :: [PGA 2])
-  geomT = mkTable2 geom (basis :: [PGA 2])
-  outerT = mkTable2 outer (basis :: [PGA 2])
-  innerT = mkTable2 inner (basis :: [PGA 2])
-  lcontractT = mkTable2 lcontract (basis :: [PGA 2])
-  rcontractT = mkTable2 rcontract (basis :: [PGA 2])
-  revT = mkTable rev (basis :: [PGA 2])
-  invT = mkTable inv (basis :: [PGA 2])
-  conjT = mkTable conj (basis :: [PGA 2])
-  dualT = mkTable dual (basis :: [PGA 2])
-  rcomplT = mkTable rcompl (basis :: [PGA 2])
-  lcomplT = mkTable lcompl (basis :: [PGA 2])
-
-------------------------------------------------------------
-
-newtype PGA3 = PGA3 MapLS
-
-deriving via PGA 3 instance Eq PGA3
-deriving via PGA 3 instance Num PGA3
-deriving via PGA 3 instance Fractional PGA3
-deriving via PGA 3 instance Show PGA3
-deriving via PGA 3 instance LinSpace [Int] PGA3
-deriving via PGA 3 instance GeomAlgebra Int PGA3
-deriving via TabulatedGA PGA3 instance CliffAlgebra Int PGA3
-
-instance Tabulated Int PGA3 where
-  squareT _ = fromIntegral . signum
-  signatureT _ = algebraSignature (1 :: PGA 3)
-  indexT = mkIndexMap (coerce <$> (basis :: [PGA 3]))
-  generatorsT = coerce <$> (generators :: [PGA 3])
-  geomT = mkTable2 geom (basis :: [PGA 3])
-  outerT = mkTable2 outer (basis :: [PGA 3])
-  innerT = mkTable2 inner (basis :: [PGA 3])
-  lcontractT = mkTable2 lcontract (basis :: [PGA 3])
-  rcontractT = mkTable2 rcontract (basis :: [PGA 3])
-  revT = mkTable rev (basis :: [PGA 3])
-  invT = mkTable inv (basis :: [PGA 3])
-  conjT = mkTable conj (basis :: [PGA 3])
-  dualT = mkTable dual (basis :: [PGA 3])
-  rcomplT = mkTable rcompl (basis :: [PGA 3])
-  lcomplT = mkTable lcompl (basis :: [PGA 3])
-
 defineElements :: CliffAlgebra Int a => [a] -> Q [Dec]
 defineElements b = concat <$> (mapM go $ tail $ b >>= elems)
   where
@@ -389,4 +299,44 @@ defineElements b = concat <$> (mapM go $ tail $ b >>= elems)
       return $
         [ SigD name (ForallT [] [AppT (AppT (ConT t) int) (VarT a)] (VarT a))
         , ValD (VarP name) (NormalB expr) []]
-  
+
+newtypeGA :: Name -> Q [Dec]
+newtypeGA name =
+  (:[]) <$> dataD
+    (cxt [])
+    name [] Nothing
+    [normalC name
+     [bangType (bang noSourceUnpackedness noSourceStrictness)
+      [t| MapLS |]]]
+    []
+
+tabulateGA :: String -> Integer -> Q Decs
+tabulateGA ga n = let
+  o = mkName ga
+  t = mkName $ ga ++ show n
+  tt = conT t
+  ot = appT (conT o) (litT (numTyLit n))
+  in [d|deriving via $ot instance Eq $tt 
+        deriving via $ot instance Num $tt
+        deriving via $ot instance Fractional $tt
+        deriving via $ot instance Show $tt
+        deriving via $ot instance LinSpace [Int] $tt
+        deriving via $ot instance GeomAlgebra Int $tt
+        deriving via TabulatedGA $tt instance CliffAlgebra Int $tt
+        instance Tabulated Int $tt where
+          squareT _ = fromIntegral . signum
+          signatureT _ = algebraSignature (1 :: $ot)
+          indexT = mkIndexMap (coerce <$> (basis :: [$ot]))
+          generatorsT = coerce <$> (generators :: [$ot])
+          geomT = mkTable2 geom (basis :: [$ot])
+          outerT = mkTable2 outer (basis :: [$ot])
+          innerT = mkTable2 inner (basis :: [$ot])
+          lcontractT = mkTable2 lcontract (basis :: [$ot])
+          rcontractT = mkTable2 rcontract (basis :: [$ot])
+          revT = mkTable rev (basis :: [$ot])
+          invT = mkTable inv (basis :: [$ot])
+          conjT = mkTable conj (basis :: [$ot])
+          dualT = mkTable dual (basis :: [$ot])
+          rcomplT = mkTable rcompl (basis :: [$ot])
+          lcomplT = mkTable lcompl (basis :: [$ot]) |] 
+

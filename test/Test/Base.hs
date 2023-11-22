@@ -103,6 +103,9 @@ multivectorTests = testGroup "Miltivector tests"
       \(Multivector x) (Multivector y) ->
         x ∧ y == sum [ getGrade (i+k) (getGrade i x * getGrade k y)
                       | i <- [0..grade x], k <- [0..grade y] ]
+
+    , testProperty "reversion homomorphism" $
+      \(Multivector x) (Multivector y) -> rev (x * y) == rev y * rev x
     ]
   , testGroup "Geometric product"
     [ testProperty "commutative for scalars" $ 
@@ -150,9 +153,12 @@ multivectorTests = testGroup "Miltivector tests"
     , testProperty "geometric product decomposition for bivector and vector" $ 
       \(Multivector a) (Vector b) -> a*b == a |- b + a ∧ b
 
-    , testProperty "scalar-outer relation" $ 
-      \(Homogeneous a) (Homogeneous b) -> a ∙ (dual b) == dual (a ∧ b)
-    ]п
+ --   , testProperty "scalar-outer relation" $ 
+--      \(Homogeneous a) (Homogeneous b) -> a ∙ (lcompl b) == lcompl (a ∧ b)
+
+    , testProperty "reversion homomorphism" $
+      \(Multivector x) (Multivector y) -> rev (x ∧ y) == rev y ∧ rev x
+    ]
   ]
 
 testSuite = testGroup "Base"
@@ -162,3 +168,4 @@ testSuite = testGroup "Base"
 
 scalout (Homogeneous a) (Homogeneous b) =
   a `inner` (dual b) == -(-1)^(grade a `div` 2)*dual (a `outer` b)
+

@@ -32,6 +32,7 @@ dependencies:
 - array >= 0.5.4
 - template-haskell >= 2.19
 - ghc-prim >= 0.9
+- MonadRandom
     
 ghc-options:
   - -Wdefault
@@ -50,10 +51,20 @@ ghc-options:
 library:
   source-dirs: src
 
-executables:
-  algeometry-exe:
-    main:                Main.hs
-    source-dirs:         app
+executables:    
+  sphere4d:
+    main:                sphere4d.hs
+    source-dirs:         examples
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - algeometry
+    
+  caleidoscope:
+    main:                caleidoscope.hs
+    source-dirs:         examples
     ghc-options:
     - -threaded
     - -rtsopts
@@ -61,6 +72,37 @@ executables:
     dependencies:
     - algeometry
 
+  moebius:
+    main:                moebius.hs
+    source-dirs:         examples
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - algeometry
+
+  menelaus:
+    main:                menelaus.hs
+    source-dirs:         examples
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - algeometry
+    
+  duals:
+    main:                duals.hs
+    source-dirs:         examples
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - algeometry
+
+    
 tests:
   algeometry-test:
     main:                Spec.hs

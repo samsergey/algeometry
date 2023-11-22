@@ -38,7 +38,8 @@ library
       src
   ghc-options: -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports
   build-depends:
-      QuickCheck >=2.14.2 && <2.15
+      MonadRandom
+    , QuickCheck >=2.14.2 && <2.15
     , array >=0.5.4
     , base >=4.15 && <5
     , containers
@@ -52,17 +53,122 @@ library
     , text
   default-language: Haskell2010
 
-executable algeometry-exe
-  main-is: Main.hs
+executable caleidoscope
+  main-is: caleidoscope.hs
   other-modules:
       Paths_algeometry
   autogen-modules:
       Paths_algeometry
   hs-source-dirs:
-      app
+      examples
   ghc-options: -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      QuickCheck >=2.14.2 && <2.15
+      MonadRandom
+    , QuickCheck >=2.14.2 && <2.15
+    , algeometry
+    , array >=0.5.4
+    , base >=4.15 && <5
+    , containers
+    , ghc-prim >=0.9
+    , lucid
+    , lucid-svg
+    , process
+    , tasty >=1.4.2 && <1.5
+    , tasty-quickcheck >=0.10 && <0.12
+    , template-haskell >=2.19
+    , text
+  default-language: Haskell2010
+
+executable duals
+  main-is: duals.hs
+  other-modules:
+      Paths_algeometry
+  autogen-modules:
+      Paths_algeometry
+  hs-source-dirs:
+      examples
+  ghc-options: -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      MonadRandom
+    , QuickCheck >=2.14.2 && <2.15
+    , algeometry
+    , array >=0.5.4
+    , base >=4.15 && <5
+    , containers
+    , ghc-prim >=0.9
+    , lucid
+    , lucid-svg
+    , process
+    , tasty >=1.4.2 && <1.5
+    , tasty-quickcheck >=0.10 && <0.12
+    , template-haskell >=2.19
+    , text
+  default-language: Haskell2010
+
+executable menelaus
+  main-is: menelaus.hs
+  other-modules:
+      Paths_algeometry
+  autogen-modules:
+      Paths_algeometry
+  hs-source-dirs:
+      examples
+  ghc-options: -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      MonadRandom
+    , QuickCheck >=2.14.2 && <2.15
+    , algeometry
+    , array >=0.5.4
+    , base >=4.15 && <5
+    , containers
+    , ghc-prim >=0.9
+    , lucid
+    , lucid-svg
+    , process
+    , tasty >=1.4.2 && <1.5
+    , tasty-quickcheck >=0.10 && <0.12
+    , template-haskell >=2.19
+    , text
+  default-language: Haskell2010
+
+executable moebius
+  main-is: moebius.hs
+  other-modules:
+      Paths_algeometry
+  autogen-modules:
+      Paths_algeometry
+  hs-source-dirs:
+      examples
+  ghc-options: -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      MonadRandom
+    , QuickCheck >=2.14.2 && <2.15
+    , algeometry
+    , array >=0.5.4
+    , base >=4.15 && <5
+    , containers
+    , ghc-prim >=0.9
+    , lucid
+    , lucid-svg
+    , process
+    , tasty >=1.4.2 && <1.5
+    , tasty-quickcheck >=0.10 && <0.12
+    , template-haskell >=2.19
+    , text
+  default-language: Haskell2010
+
+executable sphere4d
+  main-is: sphere4d.hs
+  other-modules:
+      Paths_algeometry
+  autogen-modules:
+      Paths_algeometry
+  hs-source-dirs:
+      examples
+  ghc-options: -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      MonadRandom
+    , QuickCheck >=2.14.2 && <2.15
     , algeometry
     , array >=0.5.4
     , base >=4.15 && <5
@@ -89,7 +195,8 @@ test-suite algeometry-test
       test
   ghc-options: -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      QuickCheck >=2.14.2 && <2.15
+      MonadRandom
+    , QuickCheck >=2.14.2 && <2.15
     , algeometry
     , array >=0.5.4
     , base >=4.15 && <5

@@ -12,19 +12,18 @@ module Algeometry.GeometricAlgebra
   ( LinSpace (..)
   , CliffAlgebra (..)
   , GeomAlgebra (..)
-  , e, e_, scalar, scale, vec, pvec
-  , elems, coefs, terms
+  , e, e_, scalar, kvec, nvec, avec, angle
+  , elems, coefs, terms, lerp
   , isScalar, isHomogeneous, isSingular
-  , scalarPart, getGrade, components
+  , trace, getGrade, components
   , pseudoScalar, basis
   , isInvertible, reciprocal
-  , weight, bulk, norm, norm2, normalize
-  , (∧), (∨), (|-), (-|), (∙), (•)
+  , scale, weight, bulk, norm, norm2, normalize
+  , (∧), (∨), (|-), (-|), (∙), (•), (->|), (<-|)
   , meet, join, segmentMeet
-  , reflectAt, rotateAt, projectionOf, on
+  , reflectAt, rotateAt, projectionOf, on, antiprojectTo
   , shiftAlong, shiftAlong'
   , rescale, stretch
-  , line, vector, angle, bisectrissa
   , isPoint, isLine, isPlane
   )
 where
@@ -65,6 +64,9 @@ coefs = fmap snd . assoc
 
 terms :: LinSpace e a => a -> [a]
 terms m = uncurry monom <$> assoc m
+
+lerp :: (Num a, LinSpace e a) => a -> a -> Double -> a
+lerp a b t = a + scale t (b - a)
 
 ------------------------------------------------------------
 -- CliffAlgebra
@@ -134,13 +136,13 @@ infixr 9 ∧
 
 infix 9 •
 (•) :: CliffAlgebra e a => a -> a -> Double
-a • b = scalarPart (inner a b)
+a • b = trace (inner a b)
 
 getGrade :: CliffAlgebra b a => Int -> a -> a
 getGrade n = lfilter (\b _ -> length b == n)
 
-scalarPart :: CliffAlgebra b a => a -> Double
-scalarPart = coeff []
+trace :: CliffAlgebra b a => a -> Double
+trace = coeff []
 
 weight :: CliffAlgebra b a => a -> a
 weight a = lfilter (const . any ((0 ==) . square a)) a
@@ -174,6 +176,19 @@ basis =
 pseudoScalar :: CliffAlgebra e a => a
 pseudoScalar = foldr1 outer generators
 
+kvec :: GeomAlgebra b a => Int -> [Double] -> a
+kvec k xs = let es = filter ((== k).grade) basis
+  in foldr add zero $ zipWith scale xs es
+
+nvec :: GeomAlgebra b a => Int -> [Double] -> a
+nvec k = normalize . kvec k
+
+avec :: GeomAlgebra b a => Int -> [Double] -> a
+avec k = dual . kvec k
+
+angle :: GeomAlgebra b a => a -> a -> Double
+angle l1 l2 = acos (l1 • l2)
+
 ------------------------------
 -- predicates
 
@@ -193,13 +208,13 @@ normalize :: CliffAlgebra b a => a -> a
 normalize m = scale (1 / norm m) m
 
 norm :: CliffAlgebra b a => a -> Double
-norm m | isScalar m = scalarPart m
+norm m | isScalar m = trace m
        | otherwise = sqrt $ abs $ norm2 m 
 
 norm2 :: CliffAlgebra b a => a -> Double
 norm2 m
-  | isScalar m = scalarPart m ** 2
-  | otherwise = scalarPart (rev m `geom` m)
+  | isScalar m = trace m ** 2
+  | otherwise = trace (rev m `geom` m)
 
 ------------------------------
 -- reversing
@@ -207,8 +222,8 @@ norm2 m
 reciprocal :: CliffAlgebra b a => a -> a
 reciprocal m
     | not (isInvertible m) = error "Multivector is non-invertible!"
-    | isScalar m = scalar $ recip $ scalarPart m
-    | isHomogeneous m = scale (1 / scalarPart (m `geom` rev m)) $ rev m
+    | isScalar m = scalar $ recip $ trace m
+    | isHomogeneous m = scale (1 / trace (m `geom` rev m)) $ rev m
     | otherwise = error "Don't know yet how to invert!"
 
 isInvertible :: CliffAlgebra b a => a -> Bool
@@ -221,28 +236,9 @@ isInvertible m
 ------------------------------------------------------------
 
 class CliffAlgebra b a => GeomAlgebra b a where
-  point :: [Double] -> a
-  toPoint :: a -> [Double]
+  fromXY :: [Double] -> a
+  toXY :: a -> [Double]
   dim :: a -> Int
-
-------------------------------
--- geometric objects
-
-vec :: GeomAlgebra b a => [Double] -> a
-vec xs = let es = filter ((== 1).grade) basis
-  in foldr add zero $ zipWith scale xs es
-
-pvec :: GeomAlgebra b a => [Double] -> a
-pvec = dual . vec
-
-line :: GeomAlgebra b a => [Double] -> [Double] -> a
-line a b = point a `join` point b
-
-vector :: GeomAlgebra b a => [Double] -> [Double] -> a
-vector p1 p2 = point p1 ∨ point p2
-
-angle :: GeomAlgebra b a => a -> a -> Double
-angle l1 l2 = acos (l1 • l2)
 
 isPoint :: GeomAlgebra b a => a -> Bool
 isPoint x = dim x == 0
@@ -282,8 +278,17 @@ bisectrissa l1 l2 = normalize (normalize l1 + normalize l2)
 reflectAt :: (Num a, GeomAlgebra b a) => a -> a -> a
 reflectAt a b = - b * a * reciprocal b
 
-projectionOf :: (Num a, GeomAlgebra b a) => a -> a -> a
-projectionOf p l = (p `inner` l)*l
+projectionOf :: GeomAlgebra b a => a -> a -> a
+projectionOf p l = (p `inner` l) `geom` l
+
+(->|) :: GeomAlgebra b a => a -> a -> a
+(->|) = projectionOf
+
+antiprojectTo :: GeomAlgebra b a => a -> a -> a
+antiprojectTo p l = (p `inner` l) `geom` p
+
+(<-|) :: GeomAlgebra b a => a -> a -> a
+(<-|) = antiprojectTo
 
 on :: (a -> b) -> a -> b
 on = ($)
@@ -297,7 +302,9 @@ rotateAt p ang x
 
 shiftAlong' :: (GeomAlgebra b a, Fractional a)
             => a -> Double -> a -> a
-shiftAlong' l d x = q * x * rev q
+shiftAlong' l d x
+  | l == 0 = x
+  | otherwise = q * x * rev q
   where q = (pseudoScalar + scale (1/d*4/norm2 l) l)^2
 
 shiftAlong :: (GeomAlgebra b a, Fractional a)
@@ -309,3 +316,36 @@ rescale s a = scale s (weight a) + bulk a
 
 stretch :: (Num a, CliffAlgebra b a) => Double -> a -> a
 stretch s a = weight a + scale s (bulk a)
+
+------------------------------------------------------------
+
+instance LinSpace [Double] Double where
+  zero = 0
+  isZero = (== 0)
+  monom _ b = b
+  isMonom _ = True
+  add  = (+)
+  lmap f x = x * maybe 0 snd (f [])
+  lapp f x y = x * y * maybe 0 snd (f [] [])
+  lfilter f x = if f [] x then x else 0 
+  coeff [a] x = x/a
+  coeff _ x = x
+  assoc x = [([],x)]
+
+
+instance CliffAlgebra Double Double where
+  algebraSignature _ = (0,0,0)
+  square _ _ = 1
+  grade _ = 0
+  generators = []
+  geom = (*)
+  outer = (*)
+  inner = (*)
+  lcontract = (*)
+  rcontract = (*)
+  rev = id
+  inv = id
+  conj = id
+  dual = id
+  rcompl = id
+  lcompl = id

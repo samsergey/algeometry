@@ -1,5 +1,5 @@
-{-# LANGUAGE DataKinds, FlexibleContexts #-}
-{-# LANGUAGE OverloadedStrings, TemplateHaskell #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Main (main) where
 
 import Algeometry
@@ -7,8 +7,6 @@ import Algeometry.SVG
 import Data.Text (pack)
 import Text.Printf
 import Data.List (inits)
-
-$(defineElements (basis :: [PGA3]))
 
 duals :: Animation ()
 duals = animate 40 (0,2*pi) frame

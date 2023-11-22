@@ -1,11 +1,9 @@
-{-# LANGUAGE DataKinds, FlexibleContexts #-}
-{-# LANGUAGE OverloadedStrings, TemplateHaskell #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Main (main) where
 
 import Algeometry
 import Algeometry.SVG
-
-$(defineElements (basis :: [PGA3]))
 
 -- лента Мёбиуса, полученная одновременным вращением отрезка
 -- длины 7 вокруг нескольких осей:

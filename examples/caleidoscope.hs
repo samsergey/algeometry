@@ -1,13 +1,10 @@
-{-# LANGUAGE DataKinds, FlexibleContexts #-}
-{-# LANGUAGE OverloadedStrings, TemplateHaskell #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Main (main) where
 
 import Algeometry
 import Algeometry.SVG
 import Control.Monad.Random hiding (join)
 import Data.Foldable
-
-$(defineElements (basis :: [PGA3]))
 
 reflectFig m = mapFig (\x -> m*x/m)
 

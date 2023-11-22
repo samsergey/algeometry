@@ -30,9 +30,7 @@ import qualified Data.Array as A
 import Data.Maybe
 import Data.List
 import GHC.TypeLits
---import GHC.Classes
 import Data.Coerce
---import Control.Monad
 import Language.Haskell.TH
 import Language.Haskell.TH.Lib.Internal (Decs)
 

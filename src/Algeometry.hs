@@ -37,8 +37,8 @@ module Algeometry
   , e_
   , scalar
   , kvec
-  , nvec
   , avec
+  , nvec
 
   -- *** Parts
   , getGrade
@@ -89,10 +89,11 @@ module Algeometry
   , stretch  
   
   -- * Types
+  , Dual
   , Cl (..)
-  , Outer (..)
-  , VGA (..)
-  , PGA (..)
+  , Outer (..), Outer'
+  , VGA (..), VGA'
+  , PGA (..), PGA'
   -- ** Effective realisations of geometric algebras
   , VGA2 (..)
   , VGA3 (..)
@@ -103,10 +104,10 @@ module Algeometry
   , tabulateGA
   -- ** Basis elements for geometric algebras. 
   , e0, e1, e2, e3, e4
-  ,e01, e02, e03, e04, e12, e13, e14, e23, e24, e34
-  ,e012, e013, e014, e023, e024, e034, e123, e124, e134, e234
-  ,e1234, e0234, e0134, e0124, e0123
-  ,e01234
+  , e01, e02, e03, e04, e12, e13, e14, e23, e24, e34
+  , e012, e013, e014, e023, e024, e034, e123, e124, e134, e234
+  , e1234, e0234, e0134, e0124, e0123
+  , e01234
   )  where
 
 import Algeometry.GeometricAlgebra
@@ -129,22 +130,22 @@ type family Cl (p :: Nat) (q :: Nat) (r :: Nat) where
 
 -- | Tabulated 2D affine geometric algebra.
 newtype VGA2 = VGA2 MapLS
-$(tabulateGA "VGA" 2)
+$(tabulateGA "VGA'" 2 "VGA2")
 
 -- | Tabulated 3D affine geometric algebra.
 newtype VGA3 = VGA3 MapLS
-$(tabulateGA "VGA" 3)
+$(tabulateGA "VGA'" 3 "VGA3")
 
 -- | Tabulated 2D projective geometric algebra.
 newtype PGA2 = PGA2 MapLS
-$(tabulateGA "PGA" 2)
+$(tabulateGA "PGA'" 2 "PGA2")
 
 -- | Tabulated 3D projective geometric algebra.
 newtype PGA3 = PGA3 MapLS
-$(tabulateGA "PGA" 3)
+$(tabulateGA "PGA'" 3 "PGA3")
 
 -- | Tabulated 4D projective geometric algebra.
 newtype PGA4 = PGA4 MapLS
-$(tabulateGA "PGA" 4)
+$(tabulateGA "PGA'" 4 "PGA4")
 
 $(defineElements (basis :: [PGA 4]))

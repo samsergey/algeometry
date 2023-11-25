@@ -66,16 +66,16 @@ grade :: CliffAlgebra g mv => mv -> Int
 -- | The geometric product.
 geom :: CliffAlgebra g mv => mv -> mv -> mv
 
--- | The outer product.
+-- | The outer product (same as <a>(∧)</a>).
 outer :: CliffAlgebra g mv => mv -> mv -> mv
 
--- | The right contraction.
+-- | The right contraction (same as <a>(|-)</a>).
 rcontract :: CliffAlgebra g mv => mv -> mv -> mv
 
--- | The left contraction.
+-- | The left contraction (same as <a>(-|)</a>).
 lcontract :: CliffAlgebra g mv => mv -> mv -> mv
 
--- | The inner product.
+-- | The inner product (same as <tt>(·)</tt>).
 inner :: CliffAlgebra g mv => mv -> mv -> mv
 
 -- | The reverse of a multivector.
@@ -100,13 +100,19 @@ lcompl :: CliffAlgebra g mv => mv -> mv
 --   representation.
 class CliffAlgebra g mv => GeomAlgebra g mv
 
--- | Converts coordinate list to a k-vector.
-fromXY :: GeomAlgebra g mv => [Double] -> mv
+-- | Representation of a point, given as coordinate list, as a k-vector.
+point :: GeomAlgebra g mv => [Double] -> mv
 
--- | Converts k-vector to coordinate list.
-toXY :: GeomAlgebra g mv => mv -> [Double]
+-- | Representation of a k-vector as a point, given as coordinate list.
+coord :: GeomAlgebra g mv => mv -> [Double]
 
--- | Returns a geometric dimention for a multivector.
+-- | Returns a geometric dimention for the embedding space of the algebra.
+--   The multivector is used as a type witness.
+spaceDim :: GeomAlgebra g mv => mv -> Int
+
+-- | Returns a geometric dimention for a multivector. It does not alwais
+--   correspond to grade, and depends on the dimension of the embedding
+--   space for dual algebras.
 dim :: GeomAlgebra g mv => mv -> Int
 
 -- | Returns a generator of the algebra.
@@ -117,15 +123,36 @@ e :: CliffAlgebra g mv => g -> mv
 e_ :: CliffAlgebra g mv => [g] -> mv
 
 -- | Returns a scalar element of the algebra.
+--   
+--   <pre>
+--   &gt;&gt;&gt; scalar (sin 1) + scalar (cos 1) * e12 :: VGA 2
+--   0.8414709848078965 + 0.5403023058681398e₁₂
+--   </pre>
 scalar :: CliffAlgebra g mv => Double -> mv
 
--- | Returns a k-vector with given coefficients.
+-- | Returns a k-vector with given grade and coefficients.
+--   
+--   <pre>
+--   &gt;&gt;&gt; kvec 1 [1,2,3] :: VGA 2
+--   e₁ + 2.0e₂ + 3.0e₃
+--   
+--   &gt;&gt;&gt; kvec 2 [1,2,3] :: VGA 3
+--   e₁₂ + 2.0e₁₃ + 3.0e₂₃
+--   </pre>
 kvec :: GeomAlgebra g mv => Int -> [Double] -> mv
 
--- | Returns a normalized k-vector with given coefficients.
+-- | Returns a normalized k-vector with given grade and coefficients.
 nvec :: GeomAlgebra g mv => Int -> [Double] -> mv
 
--- | Returns a normalized k-antivector with given coefficients.
+-- | Returns a normalized k-antivector with given grade and coefficients.
+--   
+--   <pre>
+--   &gt;&gt;&gt; avec 1 [1,2,3] :: VGA 3
+--   3.0e₁₂ + 2.0e₁₃ + e₂₃
+--   
+--   &gt;&gt;&gt; avec 2 [1,2,3] :: VGA 3
+--   3.0e₁ + 2.0e₂ + e₃
+--   </pre>
 avec :: GeomAlgebra g mv => Int -> [Double] -> mv
 
 -- | Returns an angle between two multivectors.
@@ -144,16 +171,16 @@ terms :: LinSpace b el => el -> [el]
 --   [0,1].
 lerp :: (Num el, LinSpace b el) => el -> el -> Double -> el
 
--- | Returns <a>True</a> if multivector is scalar and <a>False</a>
+-- | Returns <tt>True</tt> if multivector is scalar and <tt>False</tt>
 --   otherwise.
 isScalar :: CliffAlgebra g mv => mv -> Bool
 
--- | Returns <a>True</a> if multivector is a k-vector and <a>False</a>
+-- | Returns <tt>True</tt> if multivector is a k-vector and <tt>False</tt>
 --   otherwise..
 isHomogeneous :: CliffAlgebra g mv => mv -> Bool
 
--- | Returns <a>True</a> if multivector is singular (non-invertible) and
---   <a>False</a> otherwise.
+-- | Returns <tt>True</tt> if multivector is singular (non-invertible) and
+--   <tt>False</tt> otherwise.
 isSingular :: (Num mv, CliffAlgebra g mv) => mv -> Bool
 
 -- | Extracts a scalar part from a multivector.
@@ -166,13 +193,29 @@ getGrade :: CliffAlgebra g mv => Int -> mv -> mv
 components :: CliffAlgebra g mv => mv -> [mv]
 
 -- | Returns a pseudoscalar of the algebra.
+--   
+--   <pre>
+--   &gt;&gt;&gt; pseudoScalar :: VGA 3
+--   e₁₂₃
+--   
+--   &gt;&gt;&gt; pseudoScalar :: PGA 3
+--   e₀₁₂₃
+--   </pre>
 pseudoScalar :: CliffAlgebra g mv => mv
 
 -- | Returns a list of all monomial components in the algebra.
+--   
+--   <pre>
+--   &gt;&gt;&gt; basis :: [VGA 3]
+--   [1.0,e₁,e₂,e₃,e₁₂,e₁₃,e₂₃,e₁₂₃]
+--   
+--   &gt;&gt;&gt; basis :: [PGA 3]
+--   [1.0,e₀,e₁,e₂,e₃,e₀₁,e₀₂,e₀₃,e₁₂,e₁₃,e₂₃,e₀₁₂,e₀₁₃,e₀₂₃,e₁₂₃,e₀₁₂₃]
+--   </pre>
 basis :: CliffAlgebra g mv => [mv]
 
--- | Returns <a>True</a> if multivector is not singular (invertible) and
---   <a>False</a> otherwise.
+-- | Returns <tt>True</tt> if multivector is not singular (invertible) and
+--   <tt>False</tt> otherwise.
 isInvertible :: CliffAlgebra g mv => mv -> Bool
 
 -- | Returns reciprocal for nonsingular k-vector.
@@ -196,7 +239,7 @@ norm2 :: CliffAlgebra g mv => mv -> Double
 -- | Returns normalized multivector for given nonsingular multivector.
 normalize :: CliffAlgebra g mv => mv -> mv
 
--- | The infix operator for the outer product
+-- | The infix operator for the <a>outer</a> product
 (∧) :: CliffAlgebra g mv => mv -> mv -> mv
 infixr 9 ∧
 
@@ -204,15 +247,15 @@ infixr 9 ∧
 (∨) :: GeomAlgebra g mv => mv -> mv -> mv
 infixr 9 ∨
 
--- | The infix operator for the right contraction
+-- | The infix operator for <a>rcontract</a>.
 (|-) :: CliffAlgebra g mv => mv -> mv -> mv
 infix 8 |-
 
--- | The infix operator for the left contraction
+-- | The infix operator for the <a>lcontract</a>.
 (-|) :: CliffAlgebra g mv => mv -> mv -> mv
 infix 8 -|
 
--- | The infix operator for the inner product
+-- | The infix operator for the <a>inner</a> product
 (∙) :: CliffAlgebra g mv => mv -> mv -> mv
 infix 8 ∙
 
@@ -234,6 +277,9 @@ join :: GeomAlgebra g mv => mv -> mv -> mv
 
 -- | Returns intersection of an object and a segment.
 segmentMeet :: GeomAlgebra g mv => mv -> (mv, mv) -> Maybe mv
+
+-- | For polygon and a line returns list of intersection points.
+clipPoly :: GeomAlgebra g mv => [mv] -> mv -> [mv]
 
 -- | Returns reflection of object <tt>a</tt> against object <tt>b</tt>.
 reflectAt :: (Num mv, GeomAlgebra g mv) => mv -> mv -> mv
@@ -262,13 +308,13 @@ rescale :: (Num mv, CliffAlgebra g mv) => Double -> mv -> mv
 -- | Rescales magnitude of object <tt>a</tt> by given value.
 stretch :: (Num mv, CliffAlgebra g mv) => Double -> mv -> mv
 
--- | Returns <a>True</a> if k-vector represents a point.
+-- | Returns <tt>True</tt> if k-vector represents a point.
 isPoint :: GeomAlgebra g mv => mv -> Bool
 
--- | Returns <a>True</a> if k-vector represents a line.
+-- | Returns <tt>True</tt> if k-vector represents a line.
 isLine :: GeomAlgebra g mv => mv -> Bool
 
--- | Returns <a>True</a> if k-vector represents a plane.
+-- | Returns <tt>True</tt> if k-vector represents a plane.
 isPlane :: GeomAlgebra g mv => mv -> Bool
 instance Algeometry.GeometricAlgebra.CliffAlgebra GHC.Types.Double GHC.Types.Double
 instance Algeometry.GeometricAlgebra.LinSpace [GHC.Types.Double] GHC.Types.Double
@@ -284,17 +330,31 @@ Zero :: a -> Zero a (q :: Nat)
 newtype CA (p :: Nat) (q :: Nat) (r :: Nat)
 CA :: Pos (Zero (Neg MapLS r) q) p -> CA (p :: Nat) (q :: Nat) (r :: Nat)
 
+-- | Wrapper which represents dual algebra for a given one.
+newtype Dual a
+Dual :: a -> Dual a
+[getDual] :: Dual a -> a
+
 -- | Outer (Grassmann) algebra of given dimention.
 newtype Outer (n :: Nat)
 Outer :: MapLS -> Outer (n :: Nat)
+
+-- | Dual outer (Grassmann) algebra of given dimention.
+type Outer' n = Dual (Outer n)
 
 -- | Affine vector geometric algebra of given dimention.
 newtype VGA (n :: Nat)
 VGA :: CA n 0 0 -> VGA (n :: Nat)
 
+-- | Dual affine vector geometric algebra of given dimention.
+type VGA' n = Dual (VGA n)
+
 -- | Projective geometric algebra of given dimention.
 newtype PGA (n :: Nat)
 PGA :: CA n 1 0 -> PGA (n :: Nat)
+
+-- | Dual projective geometric algebra of given dimention.
+type PGA' n = Dual (PGA n)
 data GeometricNum a
 class Tabulated e a | a -> e
 squareT :: Tabulated e a => a -> e -> Double
@@ -322,7 +382,7 @@ type MapLS = Map [Int] Double
 defineElements :: CliffAlgebra Int a => [a] -> Q [Dec]
 
 -- | Template which generates instanses for tabulated geometric algebra.
-tabulateGA :: String -> Integer -> Q Decs
+tabulateGA :: String -> Integer -> String -> Q Decs
 instance GHC.TypeNats.KnownNat n => GHC.Real.Fractional (Algeometry.Types.PGA n)
 instance GHC.TypeNats.KnownNat n => GHC.Classes.Eq (Algeometry.Types.PGA n)
 instance GHC.TypeNats.KnownNat n => GHC.Num.Num (Algeometry.Types.PGA n)
@@ -332,6 +392,12 @@ instance GHC.TypeNats.KnownNat n => GHC.Num.Num (Algeometry.Types.VGA n)
 instance GHC.Classes.Eq a => GHC.Classes.Eq (Algeometry.Types.TabulatedGA a)
 instance Algeometry.GeometricAlgebra.LinSpace e a => Algeometry.GeometricAlgebra.LinSpace e (Algeometry.Types.GeometricNum a)
 instance Algeometry.GeometricAlgebra.CliffAlgebra b a => Algeometry.GeometricAlgebra.CliffAlgebra b (Algeometry.Types.GeometricNum a)
+instance Algeometry.GeometricAlgebra.CliffAlgebra e a => GHC.Classes.Eq (Algeometry.Types.Dual a)
+instance Algeometry.GeometricAlgebra.CliffAlgebra e a => GHC.Num.Num (Algeometry.Types.Dual a)
+instance Algeometry.GeometricAlgebra.CliffAlgebra GHC.Types.Int a => GHC.Real.Fractional (Algeometry.Types.Dual a)
+instance Algeometry.GeometricAlgebra.CliffAlgebra GHC.Types.Int a => GHC.Show.Show (Algeometry.Types.Dual a)
+instance Algeometry.GeometricAlgebra.LinSpace [GHC.Types.Int] a => Algeometry.GeometricAlgebra.LinSpace [GHC.Types.Int] (Algeometry.Types.Dual a)
+instance Algeometry.GeometricAlgebra.CliffAlgebra GHC.Types.Int a => Algeometry.GeometricAlgebra.CliffAlgebra GHC.Types.Int (Algeometry.Types.Dual a)
 instance Algeometry.GeometricAlgebra.LinSpace [GHC.Types.Int] (Algeometry.Types.Outer n)
 instance GHC.TypeNats.KnownNat n => GHC.Classes.Eq (Algeometry.Types.Outer n)
 instance GHC.TypeNats.KnownNat n => GHC.Show.Show (Algeometry.Types.Outer n)
@@ -340,6 +406,7 @@ instance GHC.TypeNats.KnownNat n => GHC.Real.Fractional (Algeometry.Types.Outer 
 instance Algeometry.GeometricAlgebra.LinSpace [GHC.Types.Int] (Algeometry.Types.VGA n)
 instance GHC.TypeNats.KnownNat n => Algeometry.GeometricAlgebra.CliffAlgebra GHC.Types.Int (Algeometry.Types.VGA n)
 instance GHC.TypeNats.KnownNat n => GHC.Show.Show (Algeometry.Types.VGA n)
+instance GHC.TypeNats.KnownNat n => Algeometry.GeometricAlgebra.GeomAlgebra GHC.Types.Int (Algeometry.Types.VGA n)
 instance Algeometry.GeometricAlgebra.LinSpace [GHC.Types.Int] (Algeometry.Types.PGA n)
 instance GHC.TypeNats.KnownNat n => Algeometry.GeometricAlgebra.CliffAlgebra GHC.Types.Int (Algeometry.Types.PGA n)
 instance GHC.TypeNats.KnownNat n => GHC.Show.Show (Algeometry.Types.PGA n)
@@ -350,10 +417,11 @@ instance (GHC.TypeNats.KnownNat p, GHC.TypeNats.KnownNat q, GHC.TypeNats.KnownNa
 instance (GHC.TypeNats.KnownNat p, GHC.TypeNats.KnownNat q, GHC.TypeNats.KnownNat r) => GHC.Real.Fractional (Algeometry.Types.CA p q r)
 instance Algeometry.GeometricAlgebra.LinSpace e a => Algeometry.GeometricAlgebra.LinSpace e (Algeometry.Types.TabulatedGA a)
 instance (Algeometry.GeometricAlgebra.CliffAlgebra e a, Algeometry.Types.Tabulated e a) => Algeometry.GeometricAlgebra.CliffAlgebra e (Algeometry.Types.TabulatedGA a)
-instance GHC.TypeNats.KnownNat n => Algeometry.GeometricAlgebra.GeomAlgebra GHC.Types.Int (Algeometry.Types.VGA n)
 instance GHC.TypeNats.KnownNat n => Algeometry.GeometricAlgebra.GeomAlgebra GHC.Types.Int (Algeometry.Types.PGA n)
 instance (GHC.TypeNats.KnownNat p, GHC.TypeNats.KnownNat q, GHC.TypeNats.KnownNat r) => Algeometry.GeometricAlgebra.CliffAlgebra GHC.Types.Int (Algeometry.Types.CA p r q)
 instance GHC.TypeNats.KnownNat n => Algeometry.GeometricAlgebra.CliffAlgebra GHC.Types.Int (Algeometry.Types.Outer n)
+instance GHC.TypeNats.KnownNat n => Algeometry.GeometricAlgebra.GeomAlgebra GHC.Types.Int (Algeometry.Types.Outer n)
+instance Algeometry.GeometricAlgebra.GeomAlgebra GHC.Types.Int a => Algeometry.GeometricAlgebra.GeomAlgebra GHC.Types.Int (Algeometry.Types.Dual a)
 instance Algeometry.GeometricAlgebra.CliffAlgebra b a => GHC.Classes.Eq (Algeometry.Types.GeometricNum a)
 instance Algeometry.GeometricAlgebra.CliffAlgebra b a => GHC.Num.Num (Algeometry.Types.GeometricNum a)
 instance Algeometry.GeometricAlgebra.CliffAlgebra b a => GHC.Real.Fractional (Algeometry.Types.GeometricNum a)
@@ -435,16 +503,16 @@ grade :: CliffAlgebra g mv => mv -> Int
 -- | The geometric product.
 geom :: CliffAlgebra g mv => mv -> mv -> mv
 
--- | The outer product.
+-- | The outer product (same as <a>(∧)</a>).
 outer :: CliffAlgebra g mv => mv -> mv -> mv
 
--- | The right contraction.
+-- | The right contraction (same as <a>(|-)</a>).
 rcontract :: CliffAlgebra g mv => mv -> mv -> mv
 
--- | The left contraction.
+-- | The left contraction (same as <a>(-|)</a>).
 lcontract :: CliffAlgebra g mv => mv -> mv -> mv
 
--- | The inner product.
+-- | The inner product (same as <tt>(·)</tt>).
 inner :: CliffAlgebra g mv => mv -> mv -> mv
 
 -- | The reverse of a multivector.
@@ -465,19 +533,19 @@ rcompl :: CliffAlgebra g mv => mv -> mv
 -- | The left complement of a multivector.
 lcompl :: CliffAlgebra g mv => mv -> mv
 
--- | The infix operator for the outer product
+-- | The infix operator for the <a>outer</a> product
 (∧) :: CliffAlgebra g mv => mv -> mv -> mv
 infixr 9 ∧
 
--- | The infix operator for the right contraction
+-- | The infix operator for <a>rcontract</a>.
 (|-) :: CliffAlgebra g mv => mv -> mv -> mv
 infix 8 |-
 
--- | The infix operator for the left contraction
+-- | The infix operator for the <a>lcontract</a>.
 (-|) :: CliffAlgebra g mv => mv -> mv -> mv
 infix 8 -|
 
--- | The infix operator for the inner product
+-- | The infix operator for the <a>inner</a> product
 (∙) :: CliffAlgebra g mv => mv -> mv -> mv
 infix 8 ∙
 
@@ -493,16 +561,37 @@ e :: CliffAlgebra g mv => g -> mv
 e_ :: CliffAlgebra g mv => [g] -> mv
 
 -- | Returns a scalar element of the algebra.
+--   
+--   <pre>
+--   &gt;&gt;&gt; scalar (sin 1) + scalar (cos 1) * e12 :: VGA 2
+--   0.8414709848078965 + 0.5403023058681398e₁₂
+--   </pre>
 scalar :: CliffAlgebra g mv => Double -> mv
 
--- | Returns a k-vector with given coefficients.
+-- | Returns a k-vector with given grade and coefficients.
+--   
+--   <pre>
+--   &gt;&gt;&gt; kvec 1 [1,2,3] :: VGA 2
+--   e₁ + 2.0e₂ + 3.0e₃
+--   
+--   &gt;&gt;&gt; kvec 2 [1,2,3] :: VGA 3
+--   e₁₂ + 2.0e₁₃ + 3.0e₂₃
+--   </pre>
 kvec :: GeomAlgebra g mv => Int -> [Double] -> mv
 
--- | Returns a normalized k-vector with given coefficients.
-nvec :: GeomAlgebra g mv => Int -> [Double] -> mv
-
--- | Returns a normalized k-antivector with given coefficients.
+-- | Returns a normalized k-antivector with given grade and coefficients.
+--   
+--   <pre>
+--   &gt;&gt;&gt; avec 1 [1,2,3] :: VGA 3
+--   3.0e₁₂ + 2.0e₁₃ + e₂₃
+--   
+--   &gt;&gt;&gt; avec 2 [1,2,3] :: VGA 3
+--   3.0e₁ + 2.0e₂ + e₃
+--   </pre>
 avec :: GeomAlgebra g mv => Int -> [Double] -> mv
+
+-- | Returns a normalized k-vector with given grade and coefficients.
+nvec :: GeomAlgebra g mv => Int -> [Double] -> mv
 
 -- | Extracts k-blade from a multivector.
 getGrade :: CliffAlgebra g mv => Int -> mv -> mv
@@ -519,16 +608,16 @@ bulk :: CliffAlgebra g mv => mv -> mv
 -- | Returns a list of monomial components in the multivector.
 components :: CliffAlgebra g mv => mv -> [mv]
 
--- | Returns <a>True</a> if multivector is scalar and <a>False</a>
+-- | Returns <tt>True</tt> if multivector is scalar and <tt>False</tt>
 --   otherwise.
 isScalar :: CliffAlgebra g mv => mv -> Bool
 
--- | Returns <a>True</a> if multivector is a k-vector and <a>False</a>
+-- | Returns <tt>True</tt> if multivector is a k-vector and <tt>False</tt>
 --   otherwise..
 isHomogeneous :: CliffAlgebra g mv => mv -> Bool
 
--- | Returns <a>True</a> if multivector is singular (non-invertible) and
---   <a>False</a> otherwise.
+-- | Returns <tt>True</tt> if multivector is singular (non-invertible) and
+--   <tt>False</tt> otherwise.
 isSingular :: (Num mv, CliffAlgebra g mv) => mv -> Bool
 
 -- | Returns norm of a multivector.
@@ -540,8 +629,8 @@ norm2 :: CliffAlgebra g mv => mv -> Double
 -- | Returns normalized multivector for given nonsingular multivector.
 normalize :: CliffAlgebra g mv => mv -> mv
 
--- | Returns <a>True</a> if multivector is not singular (invertible) and
---   <a>False</a> otherwise.
+-- | Returns <tt>True</tt> if multivector is not singular (invertible) and
+--   <tt>False</tt> otherwise.
 isInvertible :: CliffAlgebra g mv => mv -> Bool
 
 -- | Returns reciprocal for nonsingular k-vector.
@@ -551,28 +640,50 @@ reciprocal :: CliffAlgebra g mv => mv -> mv
 --   representation.
 class CliffAlgebra g mv => GeomAlgebra g mv
 
--- | Converts coordinate list to a k-vector.
-fromXY :: GeomAlgebra g mv => [Double] -> mv
+-- | Representation of a point, given as coordinate list, as a k-vector.
+point :: GeomAlgebra g mv => [Double] -> mv
 
--- | Converts k-vector to coordinate list.
-toXY :: GeomAlgebra g mv => mv -> [Double]
+-- | Representation of a k-vector as a point, given as coordinate list.
+coord :: GeomAlgebra g mv => mv -> [Double]
 
--- | Returns a geometric dimention for a multivector.
+-- | Returns a geometric dimention for the embedding space of the algebra.
+--   The multivector is used as a type witness.
+spaceDim :: GeomAlgebra g mv => mv -> Int
+
+-- | Returns a geometric dimention for a multivector. It does not alwais
+--   correspond to grade, and depends on the dimension of the embedding
+--   space for dual algebras.
 dim :: GeomAlgebra g mv => mv -> Int
 
 -- | Returns a pseudoscalar of the algebra.
+--   
+--   <pre>
+--   &gt;&gt;&gt; pseudoScalar :: VGA 3
+--   e₁₂₃
+--   
+--   &gt;&gt;&gt; pseudoScalar :: PGA 3
+--   e₀₁₂₃
+--   </pre>
 pseudoScalar :: CliffAlgebra g mv => mv
 
 -- | Returns a list of all monomial components in the algebra.
+--   
+--   <pre>
+--   &gt;&gt;&gt; basis :: [VGA 3]
+--   [1.0,e₁,e₂,e₃,e₁₂,e₁₃,e₂₃,e₁₂₃]
+--   
+--   &gt;&gt;&gt; basis :: [PGA 3]
+--   [1.0,e₀,e₁,e₂,e₃,e₀₁,e₀₂,e₀₃,e₁₂,e₁₃,e₂₃,e₀₁₂,e₀₁₃,e₀₂₃,e₁₂₃,e₀₁₂₃]
+--   </pre>
 basis :: CliffAlgebra g mv => [mv]
 
--- | Returns <a>True</a> if k-vector represents a point.
+-- | Returns <tt>True</tt> if k-vector represents a point.
 isPoint :: GeomAlgebra g mv => mv -> Bool
 
--- | Returns <a>True</a> if k-vector represents a line.
+-- | Returns <tt>True</tt> if k-vector represents a line.
 isLine :: GeomAlgebra g mv => mv -> Bool
 
--- | Returns <a>True</a> if k-vector represents a plane.
+-- | Returns <tt>True</tt> if k-vector represents a plane.
 isPlane :: GeomAlgebra g mv => mv -> Bool
 
 -- | Regressive product of two multivectors.
@@ -624,6 +735,9 @@ rescale :: (Num mv, CliffAlgebra g mv) => Double -> mv -> mv
 -- | Rescales magnitude of object <tt>a</tt> by given value.
 stretch :: (Num mv, CliffAlgebra g mv) => Double -> mv -> mv
 
+-- | Wrapper which represents dual algebra for a given one.
+data Dual a
+
 -- | Type family for Clifford algebras with given signature.
 type family Cl (p :: Nat) (q :: Nat) (r :: Nat)
 
@@ -631,13 +745,22 @@ type family Cl (p :: Nat) (q :: Nat) (r :: Nat)
 newtype Outer (n :: Nat)
 Outer :: MapLS -> Outer (n :: Nat)
 
+-- | Dual outer (Grassmann) algebra of given dimention.
+type Outer' n = Dual (Outer n)
+
 -- | Affine vector geometric algebra of given dimention.
 newtype VGA (n :: Nat)
 VGA :: CA n 0 0 -> VGA (n :: Nat)
 
+-- | Dual affine vector geometric algebra of given dimention.
+type VGA' n = Dual (VGA n)
+
 -- | Projective geometric algebra of given dimention.
 newtype PGA (n :: Nat)
 PGA :: CA n 1 0 -> PGA (n :: Nat)
+
+-- | Dual projective geometric algebra of given dimention.
+type PGA' n = Dual (PGA n)
 
 -- | Tabulated 2D affine geometric algebra.
 newtype VGA2
@@ -663,7 +786,7 @@ PGA4 :: MapLS -> PGA4
 defineElements :: CliffAlgebra Int a => [a] -> Q [Dec]
 
 -- | Template which generates instanses for tabulated geometric algebra.
-tabulateGA :: String -> Integer -> Q Decs
+tabulateGA :: String -> Integer -> String -> Q Decs
 e0 :: CliffAlgebra Int a => a
 e1 :: CliffAlgebra Int a => a
 e2 :: CliffAlgebra Int a => a
@@ -802,8 +925,8 @@ animateList :: [Figure PGA2 a] -> Animation ()
 -- | Returns multivector, which represents the origin.
 origin :: GeomAlgebra b a => a
 
--- | Returns multivector, which represents a point.
-point :: GeomAlgebra b a => [Double] -> a
+-- | Representation of a point, given as coordinate list, as a k-vector.
+point :: GeomAlgebra g mv => [Double] -> mv
 
 -- | Returns multivector, which represents a line.
 line :: GeomAlgebra b a => [Double] -> [Double] -> a
@@ -869,9 +992,6 @@ grid :: Figure PGA2 ()
 
 -- | Adds 2D background rectangle to a Figure
 background :: GeomAlgebra e a => String -> Figure a [a]
-
--- | For polygon and a line returns list of intersection points.
-clipPoly :: [PGA2] -> PGA2 -> [PGA2]
 instance GHC.Classes.Eq Algeometry.SVG.Fig
 instance GHC.Show.Show Algeometry.SVG.Fig
 instance GHC.Base.Monad (Algeometry.SVG.Figure a)

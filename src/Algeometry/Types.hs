@@ -16,10 +16,10 @@ Stability   : experimental
 
 module Algeometry.Types
   ( Pos(..), Neg (..), Zero (..)
-  , CA (..)
-  , Outer (..)
-  , VGA (..)
-  , PGA (..)
+  , CA (..), Dual (..)
+  , Outer (..), Outer'
+  , VGA (..), VGA'
+  , PGA (..), PGA'
   , GeometricNum
   , Tabulated (..)
   , TabulatedGA (..)
@@ -84,6 +84,21 @@ instance CliffAlgebra Int a => Show (GeometricNum a) where
           showIx k | k < 0 = '₋' : index (-k)
                    | otherwise = index k
           index k = ["₀₁₂₃₄₅₆₇₈₉" !! k]
+
+instance CliffAlgebra Int a => Floating (GeometricNum a) where
+  pi = scalar pi
+  exp = scalar . exp . trace
+  log = scalar . log . trace
+  sin = scalar . sin . trace
+  cos = scalar . cos . trace
+  asin = scalar . asin . trace
+  acos = scalar . acos . trace
+  atan = scalar . atan . trace
+  sinh = scalar . sinh . trace
+  cosh = scalar . cosh . trace
+  asinh = scalar . asinh . trace
+  acosh = scalar . acosh . trace
+  atanh = scalar . atanh . trace
           
 ------------------------------------------------------------
 -- map-based linear space
@@ -112,11 +127,40 @@ clean = M.filter (\x -> abs x >= 1e-10)
 
 ------------------------------------------------------------
 
+-- | Wrapper which represents dual algebra for a given one. 
+newtype Dual a = Dual { getDual :: a }
+
+deriving via GeometricNum a
+  instance CliffAlgebra e a => Eq (Dual a)
+deriving via GeometricNum a
+  instance CliffAlgebra e a => Num (Dual a)
+deriving via GeometricNum a
+  instance CliffAlgebra Int a => Fractional (Dual a)
+deriving via GeometricNum a
+  instance CliffAlgebra Int a => Floating (Dual a)
+deriving via GeometricNum a
+  instance CliffAlgebra Int a => Show (Dual a)
+deriving via GeometricNum a
+  instance LinSpace [Int] a => LinSpace [Int] (Dual a)
+deriving via GeometricNum a
+  instance CliffAlgebra Int a => CliffAlgebra Int (Dual a)
+
+instance GeomAlgebra Int a => GeomAlgebra Int (Dual a) where
+  point = Dual . dual . point
+  coord = coord . dual . getDual
+  spaceDim = spaceDim . getDual
+  dim = dim . dual . getDual
+
+------------------------------------------------------------
+
 -- | Representation of linear space as a map, indexed by integer indexes.
 type MapLS = M.Map [Int] Double
 
 -- | Outer (Grassmann) algebra of given dimention.
 newtype Outer (n :: Nat) = Outer MapLS
+
+-- | Dual outer (Grassmann) algebra of given dimention.
+type Outer' n = Dual (Outer n)
 
 instance KnownNat n => CliffAlgebra Int (Outer n) where
   algebraSignature x = (0, fromIntegral $ natVal x, 0)
@@ -136,44 +180,51 @@ deriving via GeometricNum (Outer n)
   instance KnownNat n => Num (Outer n)
 deriving via GeometricNum (Outer n)
   instance KnownNat n => Fractional (Outer n)
+deriving via GeometricNum (Outer n)
+  instance KnownNat n => Floating (Outer n)
 
+instance KnownNat n => GeomAlgebra Int (Outer n) where
+  point = kvec 1
+  coord mv = [coeff [k] mv | k <- [1..spaceDim mv] ]
+  spaceDim = fromIntegral . natVal
+  dim = grade
+
+  
 ------------------------------------------------------------
 
 -- | Affine vector geometric algebra of given dimention.
 newtype VGA (n :: Nat) = VGA (CA n 0 0)
-  deriving (Num, Eq, Fractional)
+  deriving (Num, Eq, Fractional, Floating)
+
+-- | Dual affine vector geometric algebra of given dimention.
+type VGA' n = Dual (VGA n)
 
 deriving via CA n 0 0 instance LinSpace [Int] (VGA n)
 deriving via CA n 0 0 instance KnownNat n => CliffAlgebra Int (VGA n)
 deriving via CA n 0 0 instance KnownNat n => Show (VGA n)
+deriving via Outer n instance KnownNat n => GeomAlgebra Int (VGA n)
 
-instance KnownNat n => GeomAlgebra Int (VGA n) where
-  dim x = fromIntegral (natVal x) - grade x - 1
-  fromXY = avec 1
-  toXY mv = [coeff [k] mv' | k <- [1..n] ]
-    where
-      n = fromIntegral $ natVal mv
-      mv' = dual mv
-      
 ------------------------------------------------------------
-  
+
 -- | Projective geometric algebra of given dimention.
 newtype PGA (n :: Nat) = PGA (CA n 1 0)
-  deriving (Num, Eq, Fractional)
+  deriving (Num, Eq, Fractional, Floating)
+
+-- | Dual projective geometric algebra of given dimention.
+type PGA' n = Dual (PGA n)
 
 deriving via CA n 1 0 instance LinSpace [Int] (PGA n)
 deriving via CA n 1 0 instance KnownNat n => CliffAlgebra Int (PGA n)
 deriving via CA n 1 0 instance KnownNat n => Show (PGA n)
 
 instance KnownNat n => GeomAlgebra Int (PGA n) where
-  dim x = fromIntegral (natVal x) - grade x
-  fromXY x = avec 1 (1:x)
-  toXY mv =
-    if h == 0 then [] else [coeff [k] mv' / h | k <- [1..n] ]
+  spaceDim = fromIntegral . natVal
+  dim x = grade x - 1
+  point x = kvec 1 (1:x)
+  coord mv =
+    if h == 0 then [] else [coeff [k] mv / h | k <- [1..spaceDim mv] ]
     where
-      n = fromIntegral $ natVal mv
-      mv' = dual mv
-      h = coeff [0] mv'
+      h = coeff [0] mv
 
 ------------------------------------------------------------
 
@@ -209,6 +260,8 @@ deriving via GeometricNum (CA p q r)
   instance (KnownNat p, KnownNat q, KnownNat r) => Num (CA p q r)
 deriving via GeometricNum (CA p q r)
   instance (KnownNat p, KnownNat q, KnownNat r) => Fractional (CA p q r)
+deriving via GeometricNum (CA p q r)
+  instance (KnownNat p, KnownNat q, KnownNat r) => Floating (CA p q r)
 
 ------------------------------------------------------------
 -- tabulated instance
@@ -319,10 +372,10 @@ newtypeGA name =
     []
 
 -- | Template which generates instanses for tabulated geometric algebra. 
-tabulateGA :: String -> Integer -> Q Decs
-tabulateGA ga n = let
+tabulateGA :: String -> Integer -> String -> Q Decs
+tabulateGA ga n tga = let
   o = mkName ga
-  t = mkName $ ga ++ show n
+  t = mkName $ tga
   tt = conT t
   ot = appT (conT o) (litT (numTyLit n))
   in [d|deriving via $ot instance Eq $tt 

@@ -65,7 +65,6 @@ module Algeometry.SVG
   , axis
   , grid
   , background
-  , clipPoly
   ) where
 
 import Algeometry
@@ -105,15 +104,9 @@ instance Ord Fig where
 
 ------------------------------------------------------------
 
--- | For polygon and a line returns list of intersection points.
-clipPoly :: [PGA2] -> PGA2 -> [PGA2]
-clipPoly pts mv = let
-  frame = zip pts (tail pts)
-  in mapMaybe (segmentMeet mv) frame
-
 clip :: PGA2 -> [PGA2]
 clip mv = let
-  vs = fromXY <$> [[-20,-20],[-20,20],[20,20],[20,-20],[-20,-20]]
+  vs = point <$> [[-20,-20],[-20,20],[20,20],[20,-20],[-20,-20]]
   frame = zip vs (tail vs)
   in mapMaybe (segmentMeet mv) frame
 
@@ -166,10 +159,6 @@ infix 1 <@
 ------------------------------
 -- geometric objects
 
--- | Returns multivector, which represents a point.
-point :: GeomAlgebra b a => [Double] -> a
-point = fromXY
-
 -- | Returns multivector, which represents the origin.
 origin :: GeomAlgebra b a => a
 origin = point []
@@ -184,11 +173,11 @@ label p s = point p @ [ id_ (pack s), class_ "label"]
 
 -- | Returns multivector, which represents a normalized line.
 nline :: GeomAlgebra b a => [Double] -> [Double] -> a
-nline a b = fromXY a `join` fromXY b
+nline a b = point a `join` point b
 
 -- | Returns multivector, which represents a line.
 line :: GeomAlgebra b a => [Double] -> [Double] -> a
-line a b = fromXY a ∨ fromXY b
+line a b = point a ∨ point b
 
 -- | Returns multivector, which represents a vector (line passing through the origin).
 vect :: GeomAlgebra b a => [Double] -> a
@@ -226,12 +215,12 @@ segment p1 p2 = polyline [p1, p2]
 segm
   :: GeomAlgebra b a
   => [Double] -> [Double] -> Figure a [a]
-segm a b = segment (fromXY a) (fromXY b)
+segm a b = segment (point a) (point b)
 
 -- | Returns multivector, which represents a plane passing through three points.
 plane :: GeomAlgebra b a
       => [Double] -> [Double] -> [Double] -> a
-plane a b c = fromXY a `join` fromXY b `join` fromXY c
+plane a b c = point a `join` point b `join` point c
 
 -- | Returns graphic object, which represents a plane passing through a point and a line.
 plane2
@@ -323,7 +312,7 @@ figure = foldMap draw . getFigure
       _ | all isPoint mvs -> [Polygon attr $ xy <$> mvs]
         | otherwise -> mvs >>= \v -> draw ([v], attr)
       
-    xy mv = case toXY mv of
+    xy mv = case coord mv of
       [] -> (0,0)
       [x] -> (x,0)
       x:y:_ -> (x,y)
@@ -332,11 +321,11 @@ figure = foldMap draw . getFigure
 viewPoint :: [Double] -> Figure PGA3 b -> Figure PGA2 b
 viewPoint vp = mapFig (coerce . project)
   where
-    p0 = dual (fromXY vp)
+    p0 = dual (point vp)
     project x
-      | isPoint x = -((x `join` fromXY vp) `meet` p0 ) * p0
-      | isLine x = -((x `join` fromXY vp) `meet` p0 ) * p0
-      | otherwise =  -((x `join` fromXY vp) `meet` p0 ) * p0
+      | isPoint x = -((x `join` point vp) `meet` p0 ) * p0
+      | isLine x = -((x `join` point vp) `meet` p0 ) * p0
+      | otherwise =  -((x `join` point vp) `meet` p0 ) * p0
 
 ------------------------------------------------------------
 

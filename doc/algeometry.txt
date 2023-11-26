@@ -259,7 +259,7 @@ infix 8 -|
 (∙) :: CliffAlgebra g mv => mv -> mv -> mv
 infix 8 ∙
 
--- | The infix perator for the scalar product
+-- | The infix operator for the scalar product
 (•) :: CliffAlgebra g mv => mv -> mv -> Double
 infix 9 •
 
@@ -335,25 +335,25 @@ newtype Dual a
 Dual :: a -> Dual a
 [getDual] :: Dual a -> a
 
--- | Outer (Grassmann) algebra of given dimention.
+-- | Outer (Grassmann) algebra of given dimension.
 newtype Outer (n :: Nat)
 Outer :: MapLS -> Outer (n :: Nat)
 
--- | Dual outer (Grassmann) algebra of given dimention.
+-- | Dual outer (Grassmann) algebra of given dimension.
 type Outer' n = Dual (Outer n)
 
--- | Affine vector geometric algebra of given dimention.
+-- | Affine vector geometric algebra of given dimension.
 newtype VGA (n :: Nat)
 VGA :: CA n 0 0 -> VGA (n :: Nat)
 
--- | Dual affine vector geometric algebra of given dimention.
+-- | Dual affine vector geometric algebra of given dimension.
 type VGA' n = Dual (VGA n)
 
--- | Projective geometric algebra of given dimention.
+-- | Projective geometric algebra of given dimension.
 newtype PGA (n :: Nat)
 PGA :: CA n 1 0 -> PGA (n :: Nat)
 
--- | Dual projective geometric algebra of given dimention.
+-- | Dual projective geometric algebra of given dimension.
 type PGA' n = Dual (PGA n)
 data GeometricNum a
 class Tabulated e a | a -> e
@@ -383,9 +383,11 @@ defineElements :: CliffAlgebra Int a => [a] -> Q [Dec]
 
 -- | Template which generates instanses for tabulated geometric algebra.
 tabulateGA :: String -> Integer -> String -> Q Decs
+instance GHC.TypeNats.KnownNat n => GHC.Float.Floating (Algeometry.Types.PGA n)
 instance GHC.TypeNats.KnownNat n => GHC.Real.Fractional (Algeometry.Types.PGA n)
 instance GHC.TypeNats.KnownNat n => GHC.Classes.Eq (Algeometry.Types.PGA n)
 instance GHC.TypeNats.KnownNat n => GHC.Num.Num (Algeometry.Types.PGA n)
+instance GHC.TypeNats.KnownNat n => GHC.Float.Floating (Algeometry.Types.VGA n)
 instance GHC.TypeNats.KnownNat n => GHC.Real.Fractional (Algeometry.Types.VGA n)
 instance GHC.TypeNats.KnownNat n => GHC.Classes.Eq (Algeometry.Types.VGA n)
 instance GHC.TypeNats.KnownNat n => GHC.Num.Num (Algeometry.Types.VGA n)
@@ -395,6 +397,7 @@ instance Algeometry.GeometricAlgebra.CliffAlgebra b a => Algeometry.GeometricAlg
 instance Algeometry.GeometricAlgebra.CliffAlgebra e a => GHC.Classes.Eq (Algeometry.Types.Dual a)
 instance Algeometry.GeometricAlgebra.CliffAlgebra e a => GHC.Num.Num (Algeometry.Types.Dual a)
 instance Algeometry.GeometricAlgebra.CliffAlgebra GHC.Types.Int a => GHC.Real.Fractional (Algeometry.Types.Dual a)
+instance Algeometry.GeometricAlgebra.CliffAlgebra GHC.Types.Int a => GHC.Float.Floating (Algeometry.Types.Dual a)
 instance Algeometry.GeometricAlgebra.CliffAlgebra GHC.Types.Int a => GHC.Show.Show (Algeometry.Types.Dual a)
 instance Algeometry.GeometricAlgebra.LinSpace [GHC.Types.Int] a => Algeometry.GeometricAlgebra.LinSpace [GHC.Types.Int] (Algeometry.Types.Dual a)
 instance Algeometry.GeometricAlgebra.CliffAlgebra GHC.Types.Int a => Algeometry.GeometricAlgebra.CliffAlgebra GHC.Types.Int (Algeometry.Types.Dual a)
@@ -403,6 +406,7 @@ instance GHC.TypeNats.KnownNat n => GHC.Classes.Eq (Algeometry.Types.Outer n)
 instance GHC.TypeNats.KnownNat n => GHC.Show.Show (Algeometry.Types.Outer n)
 instance GHC.TypeNats.KnownNat n => GHC.Num.Num (Algeometry.Types.Outer n)
 instance GHC.TypeNats.KnownNat n => GHC.Real.Fractional (Algeometry.Types.Outer n)
+instance GHC.TypeNats.KnownNat n => GHC.Float.Floating (Algeometry.Types.Outer n)
 instance Algeometry.GeometricAlgebra.LinSpace [GHC.Types.Int] (Algeometry.Types.VGA n)
 instance GHC.TypeNats.KnownNat n => Algeometry.GeometricAlgebra.CliffAlgebra GHC.Types.Int (Algeometry.Types.VGA n)
 instance GHC.TypeNats.KnownNat n => GHC.Show.Show (Algeometry.Types.VGA n)
@@ -415,6 +419,7 @@ instance (GHC.TypeNats.KnownNat p, GHC.TypeNats.KnownNat q, GHC.TypeNats.KnownNa
 instance (GHC.TypeNats.KnownNat p, GHC.TypeNats.KnownNat q, GHC.TypeNats.KnownNat r) => GHC.Show.Show (Algeometry.Types.CA p q r)
 instance (GHC.TypeNats.KnownNat p, GHC.TypeNats.KnownNat q, GHC.TypeNats.KnownNat r) => GHC.Num.Num (Algeometry.Types.CA p q r)
 instance (GHC.TypeNats.KnownNat p, GHC.TypeNats.KnownNat q, GHC.TypeNats.KnownNat r) => GHC.Real.Fractional (Algeometry.Types.CA p q r)
+instance (GHC.TypeNats.KnownNat p, GHC.TypeNats.KnownNat q, GHC.TypeNats.KnownNat r) => GHC.Float.Floating (Algeometry.Types.CA p q r)
 instance Algeometry.GeometricAlgebra.LinSpace e a => Algeometry.GeometricAlgebra.LinSpace e (Algeometry.Types.TabulatedGA a)
 instance (Algeometry.GeometricAlgebra.CliffAlgebra e a, Algeometry.Types.Tabulated e a) => Algeometry.GeometricAlgebra.CliffAlgebra e (Algeometry.Types.TabulatedGA a)
 instance GHC.TypeNats.KnownNat n => Algeometry.GeometricAlgebra.GeomAlgebra GHC.Types.Int (Algeometry.Types.PGA n)
@@ -426,6 +431,7 @@ instance Algeometry.GeometricAlgebra.CliffAlgebra b a => GHC.Classes.Eq (Algeome
 instance Algeometry.GeometricAlgebra.CliffAlgebra b a => GHC.Num.Num (Algeometry.Types.GeometricNum a)
 instance Algeometry.GeometricAlgebra.CliffAlgebra b a => GHC.Real.Fractional (Algeometry.Types.GeometricNum a)
 instance Algeometry.GeometricAlgebra.CliffAlgebra GHC.Types.Int a => GHC.Show.Show (Algeometry.Types.GeometricNum a)
+instance Algeometry.GeometricAlgebra.CliffAlgebra GHC.Types.Int a => GHC.Float.Floating (Algeometry.Types.GeometricNum a)
 instance GHC.Classes.Ord e => Algeometry.GeometricAlgebra.LinSpace e (Data.Map.Internal.Map e GHC.Types.Double)
 
 
@@ -549,7 +555,7 @@ infix 8 -|
 (∙) :: CliffAlgebra g mv => mv -> mv -> mv
 infix 8 ∙
 
--- | The infix perator for the scalar product
+-- | The infix operator for the scalar product
 (•) :: CliffAlgebra g mv => mv -> mv -> Double
 infix 9 •
 
@@ -741,25 +747,25 @@ data Dual a
 -- | Type family for Clifford algebras with given signature.
 type family Cl (p :: Nat) (q :: Nat) (r :: Nat)
 
--- | Outer (Grassmann) algebra of given dimention.
+-- | Outer (Grassmann) algebra of given dimension.
 newtype Outer (n :: Nat)
 Outer :: MapLS -> Outer (n :: Nat)
 
--- | Dual outer (Grassmann) algebra of given dimention.
+-- | Dual outer (Grassmann) algebra of given dimension.
 type Outer' n = Dual (Outer n)
 
--- | Affine vector geometric algebra of given dimention.
+-- | Affine vector geometric algebra of given dimension.
 newtype VGA (n :: Nat)
 VGA :: CA n 0 0 -> VGA (n :: Nat)
 
--- | Dual affine vector geometric algebra of given dimention.
+-- | Dual affine vector geometric algebra of given dimension.
 type VGA' n = Dual (VGA n)
 
--- | Projective geometric algebra of given dimention.
+-- | Projective geometric algebra of given dimension.
 newtype PGA (n :: Nat)
 PGA :: CA n 1 0 -> PGA (n :: Nat)
 
--- | Dual projective geometric algebra of given dimention.
+-- | Dual projective geometric algebra of given dimension.
 type PGA' n = Dual (PGA n)
 
 -- | Tabulated 2D affine geometric algebra.

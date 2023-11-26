@@ -364,10 +364,10 @@ class CliffAlgebra g mv => GeomAlgebra g mv where
   -- | Representation of a k-vector as a point, given as coordinate list.
   coord :: mv -> [Double]
 
-  -- | Returns a geometric dimention for the embedding space of the algebra. The multivector is used as a type witness.
+  -- | Returns a geometric dimension for the embedding space of the algebra. The multivector is used as a type witness.
   spaceDim :: mv -> Int
 
-  -- | Returns a geometric dimention for a multivector. It does not alwais correspond to grade, and depends on the dimension of the embedding space for dual algebras.   
+  -- | Returns a geometric dimension for a multivector. It does not alwais correspond to grade, and depends on the dimension of the embedding space for dual algebras.   
   dim :: mv -> Int
 
 -- |  Returns @True@ if  k-vector represents a point.
@@ -421,7 +421,7 @@ reflectAt a b = - b * a * reciprocal b
 
 -- | Returns projection of object @a@ on object @b@.
 projectOn :: GeomAlgebra g mv => mv -> mv -> mv
-projectOn a b = (a `inner` b) `geom` b
+projectOn a b = (a `inner` b) `geom` reciprocal b
 
 -- | Infix operator for projection.
 (->|) :: GeomAlgebra g mv => mv -> mv -> mv
@@ -429,7 +429,7 @@ projectOn a b = (a `inner` b) `geom` b
 
 -- | Returns antiprojection of object @a@ on object @b@.
 antiprojectTo :: GeomAlgebra g mv => mv -> mv -> mv
-antiprojectTo a b = (a `inner` b) `geom` a
+antiprojectTo a b = (a `inner` b) `geom` reciprocal a
 
 -- | Infix operator for antiprojection.
 (<-|) :: GeomAlgebra g mv => mv -> mv -> mv

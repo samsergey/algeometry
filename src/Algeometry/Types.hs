@@ -87,19 +87,60 @@ instance CliffAlgebra Int a => Show (GeometricNum a) where
 
 instance CliffAlgebra Int a => Floating (GeometricNum a) where
   pi = scalar pi
-  exp = scalar . exp . trace
-  log = scalar . log . trace
-  sin = scalar . sin . trace
-  cos = scalar . cos . trace
+
+  exp x
+    | isScalar x = scalar $ exp $ trace x
+    | trace x /= 0 = scale (exp (trace x)) $ exp (x - scalar (trace x))
+    | isHomogeneous x = let n = norm x
+      in case trace (x*x) `compare` 0 of
+        EQ -> 1 + x
+        LT -> scalar (cos n) + scale (sin n / n) x
+        GT -> scalar (cosh n) + scale (sinh n / n) x
+    | otherwise = expSeries x
+        
+  log x
+    | isScalar x = scalar $ log $ trace x
+    | otherwise = case norm (x - 1) `compare` 1 of
+        EQ -> 0
+        LT -> logSeries (x - 1) 
+        GT -> - logSeries (1/(x - 1))
+
+  sqrt x
+    | isScalar x = scalar $ sqrt $ trace x
+    | isHomogeneous x = let n = norm x
+      in case trace (x*x) `compare` 0 of
+           EQ -> undefined
+           LT -> scale (sqrt (n/2)) (1 + scale (1/n) x)
+           GT -> error "sqrt for unit multivector is undefined"
+    | otherwise = exp (0.5 * log x)
+  
+  sin x
+    | isScalar x = scalar $ sin $ trace x
+    | otherwise = let i = head [pseudoScalar, x]
+          in (exp x - exp (-x)) / (2*i)
+             
+  cos x
+    | isScalar x = scalar $ cos $ trace x
+    | otherwise = scale  0.5 $ exp x + exp (-x)
+    
+  sinh x
+    | isScalar x = scalar $ sinh $ trace x
+    | otherwise = scale  0.5 $ exp x - exp (-x)
+    
+  cosh x
+    | isScalar x = scalar $ cosh $ trace x
+    | otherwise = scale  0.5 $ exp x + exp (-x)
+  
   asin = scalar . asin . trace
   acos = scalar . acos . trace
   atan = scalar . atan . trace
-  sinh = scalar . sinh . trace
-  cosh = scalar . cosh . trace
   asinh = scalar . asinh . trace
   acosh = scalar . acosh . trace
   atanh = scalar . atanh . trace
-          
+
+expSeries x = foldr (\i r -> 1 + scale (1/i) x*r) 0 [1..100]
+logSeries x = x * foldr (\i r -> scalar ((-1)**(i-1)/i) + x*r) 0 [1..100]
+
 ------------------------------------------------------------
 -- map-based linear space
 ------------------------------------------------------------
@@ -156,10 +197,10 @@ instance GeomAlgebra Int a => GeomAlgebra Int (Dual a) where
 -- | Representation of linear space as a map, indexed by integer indexes.
 type MapLS = M.Map [Int] Double
 
--- | Outer (Grassmann) algebra of given dimention.
+-- | Outer (Grassmann) algebra of given dimension.
 newtype Outer (n :: Nat) = Outer MapLS
 
--- | Dual outer (Grassmann) algebra of given dimention.
+-- | Dual outer (Grassmann) algebra of given dimension.
 type Outer' n = Dual (Outer n)
 
 instance KnownNat n => CliffAlgebra Int (Outer n) where
@@ -192,11 +233,11 @@ instance KnownNat n => GeomAlgebra Int (Outer n) where
   
 ------------------------------------------------------------
 
--- | Affine vector geometric algebra of given dimention.
+-- | Affine vector geometric algebra of given dimension.
 newtype VGA (n :: Nat) = VGA (CA n 0 0)
   deriving (Num, Eq, Fractional, Floating)
 
--- | Dual affine vector geometric algebra of given dimention.
+-- | Dual affine vector geometric algebra of given dimension.
 type VGA' n = Dual (VGA n)
 
 deriving via CA n 0 0 instance LinSpace [Int] (VGA n)
@@ -206,11 +247,11 @@ deriving via Outer n instance KnownNat n => GeomAlgebra Int (VGA n)
 
 ------------------------------------------------------------
 
--- | Projective geometric algebra of given dimention.
+-- | Projective geometric algebra of given dimension.
 newtype PGA (n :: Nat) = PGA (CA n 1 0)
   deriving (Num, Eq, Fractional, Floating)
 
--- | Dual projective geometric algebra of given dimention.
+-- | Dual projective geometric algebra of given dimension.
 type PGA' n = Dual (PGA n)
 
 deriving via CA n 1 0 instance LinSpace [Int] (PGA n)

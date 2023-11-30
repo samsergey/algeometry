@@ -20,9 +20,9 @@ module Algeometry.GeometricAlgebra
   , e, e_, scalar, kvec, nvec, avec, angle
   , elems, coefs, terms, lerp
   , isScalar, isHomogeneous, isSingular
-  , trace, getGrade, components
+  , trace, nonScalar, decompose, getGrade, components
   , pseudoScalar, basis
-  , isInvertible, reciprocal
+  , isInvertible, reciprocal, isSquare
   , scale, weight, bulk, norm, norm2, normalize
   , (∧), (∨), (|-), (-|), (∙), (•), (->|), (<-|)
   , meet, join, segmentMeet, clipPoly
@@ -217,6 +217,13 @@ getGrade k = lfilter (\b _ -> length b == k)
 trace :: CliffAlgebra g mv => mv -> Double
 trace = coeff []
 
+-- | Extracts a non-scalar part from a multivector.
+nonScalar :: CliffAlgebra g mv => mv -> mv
+nonScalar = lfilter (\b _ -> not (null b))
+
+decompose :: CliffAlgebra g b => b -> (Double, b)
+decompose x = (trace x, nonScalar x) 
+
 -- | Extracts vanishing part from a multivector.
 weight :: CliffAlgebra g mv => mv -> mv
 weight a = lfilter (const . any ((0 ==) . square a)) a
@@ -343,8 +350,7 @@ reciprocal :: CliffAlgebra g mv => mv -> mv
 reciprocal m
     | not (isInvertible m) = error "Multivector is non-invertible!"
     | isScalar m = scalar $ recip $ trace m
-    | isHomogeneous m = scale (1 / trace (m `geom` rev m)) $ rev m
-    | otherwise = error "Don't know how to invert non-homogeneous multivectors!"
+    | otherwise = scale (1 / trace (m `geom` rev m)) $ rev m
 
 -- | Returns @True@ if  multivector is not singular (invertible) and @False@ otherwise.
 isInvertible :: CliffAlgebra g mv => mv -> Bool
@@ -354,6 +360,11 @@ isInvertible m
     | otherwise = let m' = geom m (conj m)
                   in grade m' <= 2 && isInvertible m'
 
+-- | Returns @True@ if  multivector could be expressed as square of another mulivector, and @False@ otherwise.
+isSquare :: CliffAlgebra g mv => mv -> Bool
+isSquare x =
+  any (\a -> trace (geom a a) < 0) [x, pseudoScalar]
+  
 ------------------------------------------------------------
 
 -- | The class representing Clifford algebra that have geometric representation.

@@ -90,29 +90,43 @@ instance CliffAlgebra Int a => Floating (GeometricNum a) where
 
   exp x
     | isScalar x = scalar $ exp $ trace x
-    | trace x /= 0 = scale (exp (trace x)) $ exp (x - scalar (trace x))
-    | isHomogeneous x = let n = norm x
-      in case trace (x*x) `compare` 0 of
-        EQ -> 1 + x
-        LT -> scalar (cos n) + scale (sin n / n) x
-        GT -> scalar (cosh n) + scale (sinh n / n) x
+    | isHomogeneous v =
+        scale (exp x0) $
+        case trace (v*v) `compare` 0 of
+          LT -> scalar (cos n) + scale (sin n / n) v
+          EQ -> 1 + v
+          GT -> scalar (cosh n) + scale (sinh n / n) v
     | otherwise = expSeries x
+    where
+      (x0, v) = decompose x
+      n = norm v
         
   log x
     | isScalar x = scalar $ log $ trace x
-    | otherwise = case norm (x - 1) `compare` 1 of
-        EQ -> 0
-        LT -> logSeries (x - 1) 
-        GT -> - logSeries (1/(x - 1))
+    | isHomogeneous x' = case trace (x'*x') `compare` 0 of
+        LT -> scalar (log n) + scale (atan2 n' x0 / n') x'
+        EQ -> error $ "log of vanishing multivector " ++ show x
+        GT -> scalar (log n) + scale (atanh (n'/x0) / n') x'
+    | otherwise = logSeries x
+    where
+      (x0, x') = decompose x
+      n' = norm x'
+      n = norm x
 
   sqrt x
     | isScalar x = scalar $ sqrt $ trace x
-    | isHomogeneous x = let n = norm x
-      in case trace (x*x) `compare` 0 of
-           EQ -> undefined
-           LT -> scale (sqrt (n/2)) (1 + scale (1/n) x)
-           GT -> error "sqrt for unit multivector is undefined"
+    | not (isSquare x) = error $ "sqrt is not defined for " ++ show x
+    | isScalar x2 =
+        if trace x2 < 0
+        then scale (sqrt (n/2)) (1 + scale (1/n) x)
+        else scale (sqrt n / 2) $ (i + scale (1/n) x) * (1 - i)
+    | isHomogeneous x = sqrt a * (1 + b / (2*a))
     | otherwise = exp (0.5 * log x)
+    where x2 = x*x
+          n = norm x
+          i = pseudoScalar
+          a = weight a
+          b = bulk a
   
   sin x
     | isScalar x = scalar $ sin $ trace x
@@ -139,8 +153,16 @@ instance CliffAlgebra Int a => Floating (GeometricNum a) where
   atanh = scalar . atanh . trace
 
 expSeries x = foldr (\i r -> 1 + scale (1/i) x*r) 0 [1..100]
-logSeries x = x * foldr (\i r -> scalar ((-1)**(i-1)/i) + x*r) 0 [1..100]
 
+logSeries x
+  | n < 1 = x' * foldr (\i r -> scalar ((-1)**(i-1)/i) + x'*r) 0 [1..200]
+  | otherwise = - logSeries (1/x)
+  where
+    x' = x-1
+    n = norm x
+
+test = let x = 3 - 4*e_[1] - 2*e_[2] :: CA 3 0 0
+       in (exp(log x), x)
 ------------------------------------------------------------
 -- map-based linear space
 ------------------------------------------------------------
@@ -442,4 +464,5 @@ tabulateGA ga n tga = let
           dualT = mkTable dual (basis :: [$ot])
           rcomplT = mkTable rcompl (basis :: [$ot])
           lcomplT = mkTable lcompl (basis :: [$ot]) |] 
+
 

@@ -15,8 +15,7 @@ Stability   : experimental
   , TemplateHaskell #-}
 
 module Algeometry.Types
-  ( Pos(..), Neg (..), Zero (..)
-  , CA (..), Dual (..)
+  ( CA (..), Dual (..)
   , Outer (..), Outer'
   , VGA (..), VGA'
   , PGA (..), PGA'
@@ -34,6 +33,7 @@ import qualified Data.Map.Strict as M
 import qualified Data.Array as A
 import Data.Maybe
 import Data.List
+import Data.Proxy
 import GHC.TypeLits
 import Data.Coerce
 import Language.Haskell.TH
@@ -74,7 +74,7 @@ instance CliffAlgebra Int a => Show (GeometricNum a) where
       scal = getGrade 0 m
       sscal = let c = trace scal
               in if c == 0 then "" else ssig c <> show (abs c)
-      svecs = do (b, c) <- trms (m - scal)
+      svecs = do (b, c) <- trms (nonScalar m)
                  ssig c <> snum c <> showBlade b
       ssig n = if n < 0 then " - " else " + "
       snum n = if abs n == 1 then "" else show (abs n)
@@ -96,7 +96,7 @@ instance CliffAlgebra Int a => Floating (GeometricNum a) where
           LT -> scalar (cos n) + scale (sin n / n) v
           EQ -> 1 + v
           GT -> scalar (cosh n) + scale (sinh n / n) v
-    | otherwise = expSeries x
+    | otherwise = series expS x
     where
       (x0, v) = decompose x
       n = norm v
@@ -130,20 +130,21 @@ instance CliffAlgebra Int a => Floating (GeometricNum a) where
   
   sin x
     | isScalar x = scalar $ sin $ trace x
-    | otherwise = let i = head [pseudoScalar, x]
-          in (exp x - exp (-x)) / (2*i)
+    | otherwise = series sinS x
              
   cos x
     | isScalar x = scalar $ cos $ trace x
-    | otherwise = scale  0.5 $ exp x + exp (-x)
+    | otherwise = series cosS x
     
   sinh x
     | isScalar x = scalar $ sinh $ trace x
-    | otherwise = scale  0.5 $ exp x - exp (-x)
+    | isHomogeneous x = nonScalar (exp x)
+    | otherwise = series sinhS x
     
   cosh x
     | isScalar x = scalar $ cosh $ trace x
-    | otherwise = scale  0.5 $ exp x + exp (-x)
+    | isHomogeneous x = scalar $ trace (exp x)
+    | otherwise = series coshS x
   
   asin = scalar . asin . trace
   acos = scalar . acos . trace
@@ -152,7 +153,8 @@ instance CliffAlgebra Int a => Floating (GeometricNum a) where
   acosh = scalar . acosh . trace
   atanh = scalar . atanh . trace
 
-expSeries x = foldr (\i r -> 1 + scale (1/i) x*r) 0 [1..100]
+--expSeries x = foldr (\i r -> 1 + scale (1/i) x*r) 0 [1..100]
+series step x = converge $ scanl (+) 0 $ take 1000 $ step x
 
 logSeries x
   | n < 1 = x' * foldr (\i r -> scalar ((-1)**(i-1)/i) + x'*r) 0 [1..200]
@@ -163,6 +165,35 @@ logSeries x
 
 test = let x = 3 - 4*e_[1] - 2*e_[2] :: CA 3 0 0
        in (exp(log x), x)
+
+converge [] = error "converge: empty list"
+converge xs = fromMaybe empty (convergeBy checkPeriodic Just xs) 
+    where
+      empty = error "converge: error in implementation"
+      checkPeriodic (a:b:c:_)
+          | a == b = Just a
+          | a == c = Just a
+      checkPeriodic _ = Nothing
+
+convergeBy :: ([a] -> Maybe b) -> (a -> Maybe b) -> [a] -> Maybe b
+convergeBy f end = listToMaybe . catMaybes . map f' . tails
+    where 
+        f' xs = case f xs of
+            Nothing -> end' xs
+            other   -> other
+        end' [x] = end x
+        end'  _  = Nothing
+
+expS x = map snd $ iterate (\(n,b) -> (n + 1, (scale (1/fromInteger n) (x*b)))) (1,1)
+
+coshS x = thinOut $ expS x
+sinhS x = thinOut $ tail $ expS x
+cosS x = zipWith (*) (cycle [1,-1]) $ coshS x
+sinS x = zipWith (*) (cycle [1,-1]) $ sinhS x
+
+thinOut (x:y:t) = x: thinOut t
+thinOut x = x
+        
 ------------------------------------------------------------
 -- map-based linear space
 ------------------------------------------------------------
@@ -232,6 +263,10 @@ instance KnownNat n => CliffAlgebra Int (Outer n) where
     where
       res = (\x -> monom [x] 1) <$> ix
       ix = [1 .. fromIntegral $ natVal (head res)]
+  decompose (Outer mv) = (fromMaybe 0 $ s M.!? [], Outer v)
+    where
+      (s, v) = M.partitionWithKey (\k a -> length k == 0) mv
+
       
 deriving via MapLS instance LinSpace [Int] (Outer n)
 
@@ -252,7 +287,6 @@ instance KnownNat n => GeomAlgebra Int (Outer n) where
   spaceDim = fromIntegral . natVal
   dim = grade
 
-  
 ------------------------------------------------------------
 
 -- | Affine vector geometric algebra of given dimension.
@@ -291,20 +325,17 @@ instance KnownNat n => GeomAlgebra Int (PGA n) where
 
 ------------------------------------------------------------
 
-newtype Pos a (p :: Nat) = Pos a
-newtype Zero a (q :: Nat) = Zero a
-newtype Neg a (r :: Nat) = Neg a
-
-newtype CA (p :: Nat) (q :: Nat) (r :: Nat)
-  = CA (Pos (Zero (Neg MapLS r) q) p)
+newtype CA (p :: Nat) (q :: Nat) (r :: Nat) = CA MapLS
 
 instance (KnownNat p, KnownNat q, KnownNat r)
-         => CliffAlgebra Int (CA p r q) where
-  algebraSignature x = let { CA p = x; Pos z = p; Zero n = z}
-           in ( fromIntegral $ natVal p
-              , fromIntegral $ natVal z
-              , fromIntegral $ natVal n)
+         => CliffAlgebra Int (CA p q r) where
+  algebraSignature x = 
+    ( fromIntegral $ natVal (Proxy :: Proxy p)
+    , fromIntegral $ natVal (Proxy :: Proxy q)
+    , fromIntegral $ natVal (Proxy :: Proxy r))
+
   square _ i = fromIntegral (signum i)
+
   generators = res
     where
       res = (\x -> monom [x] 1) <$> (reverse negs <> zeros <> pos)
@@ -312,7 +343,11 @@ instance (KnownNat p, KnownNat q, KnownNat r)
       pos   = [k  | p > 0, k <- [1..p]]
       zeros = [0  | q > 0]
       negs  = [-k | r > 0, k <- [1..r]]
-      
+
+  decompose (CA mv) = (fromMaybe 0 $ s M.!? [], CA v)
+    where
+      (s, v) = M.partitionWithKey (\k a -> length k == 0) mv
+
 deriving via MapLS instance LinSpace [Int] (CA p q r)
 
 deriving via GeometricNum (CA p q r)
@@ -444,6 +479,7 @@ tabulateGA ga n tga = let
   in [d|deriving via $ot instance Eq $tt 
         deriving via $ot instance Num $tt
         deriving via $ot instance Fractional $tt
+        deriving via $ot instance Floating $tt
         deriving via $ot instance Show $tt
         deriving via $ot instance LinSpace [Int] $tt
         deriving via $ot instance GeomAlgebra Int $tt

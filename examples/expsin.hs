@@ -6,4 +6,6 @@ import Algeometry
 import Algeometry.SVG
 import Lucid.Svg
 
-main = pure ()
+fig = mapFig (\x -> nonScalar (exp x)) grid
+
+main = writeSVG "test2.svg" fig

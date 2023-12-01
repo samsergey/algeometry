@@ -20,7 +20,7 @@ module Algeometry.GeometricAlgebra
   , e, e_, scalar, kvec, nvec, avec, angle
   , elems, coefs, terms, lerp
   , isScalar, isHomogeneous, isSingular
-  , trace, nonScalar, decompose, getGrade, components
+  , getGrade, components
   , pseudoScalar, basis
   , isInvertible, reciprocal, isSquare
   , scale, weight, bulk, norm, norm2, normalize
@@ -169,6 +169,18 @@ class (Eq mv, Ord g, LinSpace [g] mv) => CliffAlgebra g mv  where
   lcompl :: mv -> mv
   lcompl a = lapp (composeBlades (const 1) (const 1)) pseudoScalar (rev a)
 
+  -- | Separates scalar and non-scalar part of a multivector.
+  decompose :: mv -> (Double, mv)
+  decompose x = (coeff [] x, lfilter (\b _ -> not (null b)) x)
+
+  -- | Extracts a scalar part from a multivector.
+  trace :: mv -> Double
+  trace = fst . decompose
+
+  -- | Extracts a non-scalar part from a multivector.
+  nonScalar :: mv -> mv
+  nonScalar = snd . decompose 
+  
 composeBlades
   :: Ord b =>
   (b -> Double) -> (b -> Double) -> [b] -> [b] -> Maybe ([b], Double)
@@ -212,17 +224,6 @@ a • b = trace (inner a b)
 -- | Extracts k-blade from a multivector.
 getGrade :: CliffAlgebra g mv => Int -> mv -> mv
 getGrade k = lfilter (\b _ -> length b == k)
-
--- | Extracts a scalar part from a multivector.
-trace :: CliffAlgebra g mv => mv -> Double
-trace = coeff []
-
--- | Extracts a non-scalar part from a multivector.
-nonScalar :: CliffAlgebra g mv => mv -> mv
-nonScalar = lfilter (\b _ -> not (null b))
-
-decompose :: CliffAlgebra g b => b -> (Double, b)
-decompose x = (trace x, nonScalar x) 
 
 -- | Extracts vanishing part from a multivector.
 weight :: CliffAlgebra g mv => mv -> mv
@@ -507,3 +508,5 @@ instance CliffAlgebra Double Double where
   dual = id
   rcompl = id
   lcompl = id
+  decompose x = (x, 0)
+  

@@ -42,7 +42,6 @@ module Algeometry
 
   -- *** Parts
   , getGrade
-  , trace
   , weight
   , bulk
   , components

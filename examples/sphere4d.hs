@@ -1,6 +1,6 @@
 {-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE DataKinds, FlexibleContexts #-}
-{-# LANGUAGE OverloadedStrings, TemplateHaskell #-}
+{-# LANGUAGE OverloadedStrings, TemplateHaskell, TypeFamilies #-}
 module Main (main) where
 
 import Algeometry

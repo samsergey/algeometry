@@ -1,11 +1,13 @@
 module Test.Base (testSuite) where
 
 import Test.Tasty
-import Test.QuickCheck hiding (scale)
-import Test.Tasty.QuickCheck hiding (scale)
+import Test.QuickCheck ( (==>) )
+import Test.Tasty.QuickCheck ( testProperty )
 import Algeometry.GeometricAlgebra
+import Algeometry.GeometricNum 
 import Algeometry.Arbitrary
 
+bladeTests :: TestTree
 bladeTests = testGroup "Blades tests"
   [ testProperty "blades square to scalars" $
     \(Monom m) -> isScalar $ m*m
@@ -78,6 +80,7 @@ bladeTests = testGroup "Blades tests"
     ]
   ]
 
+multivectorTests :: TestTree
 multivectorTests = testGroup "Miltivector tests"
   [ testGroup "Outer product"
     [ testProperty "associative" $ 
@@ -161,11 +164,28 @@ multivectorTests = testGroup "Miltivector tests"
     ]
   ]
 
+numericTests :: TestTree
+numericTests = testGroup "Numeric tests"
+  [ testGroup "Exponent"
+    [ testProperty "scalar values" $ 
+      \x -> let x0 = scalar x :: Multivector
+            in trace (exp x0) == exp (trace x)
+    , testProperty "homogeneous multivectors: bulk" $ 
+      \(Homogeneous x) -> let x' = bulk x
+                          in exp x' == expSeries x'
+    , testProperty "homogeneous multivectors: weight" $ 
+      \(Homogeneous x) -> let x' = weight x
+                          in exp x' == expSeries x'
+    ]
+  ]
+
+testSuite :: TestTree
 testSuite = testGroup "Base"
   [ bladeTests
   , multivectorTests ]
 
-
+scalout :: Homogeneous -> Homogeneous -> Bool
 scalout (Homogeneous a) (Homogeneous b) =
-  a `inner` (dual b) == -(-1)^(grade a `div` 2)*dual (a `outer` b)
+  a `inner` dual b == -(-1)^(grade a `div` 2)*dual (a `outer` b)
 
+main = defaultMain numericTests

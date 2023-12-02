@@ -223,10 +223,7 @@ plane :: GeomAlgebra a
 plane a b c = point a `join` point b `join` point c
 
 -- | Returns graphic object, which represents a plane passing through a point and a line.
-plane2
-  :: (Fractional a, GeomAlgebra a)
-  => a -> a -> (Double, Double)
-  -> Figure a a
+plane2 :: GeomAlgebra a => a -> a -> (Double, Double) -> Figure a a
 plane2 p l (a, b) = do
   polygon [ shiftAlong' l' (b) $ shiftAlong' l (a) p
           , shiftAlong' l' (b) $ shiftAlong' l (-a) p 
@@ -239,7 +236,7 @@ plane2 p l (a, b) = do
 
 -- | Returns graphic object, which represents a plane passing through a point, orthogonal to a line.
 orthoPlane
-  :: (Fractional a, GeomAlgebra a)
+  :: GeomAlgebra a
   => a -> a -> (Double, Double) 
   -> Figure a a
 orthoPlane p o = plane2 p l
@@ -249,7 +246,7 @@ orthoPlane p o = plane2 p l
 
 -- | Returns graphic object, which represents a plane passing through three points.
 plane3
-  :: (Fractional a, GeomAlgebra a)
+  :: GeomAlgebra a
   => a -> a -> a -> (Double, Double)
   -> Figure a a
 plane3 p1 p2 p3 = plane2 p1 (p2 `join` p3)

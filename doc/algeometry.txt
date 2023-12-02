@@ -16,8 +16,7 @@ type family Basis a
 -- | Type family for generator of Clifford algebra
 type family Generator a
 
--- | The class representing a general linear space with basis of type
---   <tt>b</tt> and element (vector) of type <tt>el</tt>.
+-- | The class representing a general linear space.
 class Eq (Basis el) => LinSpace el
 
 -- | The zero element.
@@ -50,17 +49,16 @@ coeff :: LinSpace el => Basis el -> el -> Double
 -- | Representation of an element as assoclist.
 assoc :: LinSpace el => el -> [(Basis el, Double)]
 
--- | The class representing Clifford algebra with generators of type
---   <tt>g</tt> and element (multivector) of type <tt>mv</tt>.
+-- | The class representing Clifford algebra.
 class (Ord (Generator mv), Basis mv ~ [Generator mv], LinSpace mv, Eq mv) => CliffAlgebra mv
 
 -- | The signature of Clifford algebra. The first argument is proxy needed
---   to resolve the functional dependence for class instance.
+--   to specify the class.
 algebraSignature :: CliffAlgebra mv => mv -> (Int, Int, Int)
 
 -- | Squares of the generators, which define the Clifford algebra. The
---   first argument is proxy needed to resolve the functional dependence
---   for class instance.
+--   first argument is proxy needed to resolve the dependence for
+--   <a>Generator</a> type instance.
 square :: CliffAlgebra mv => mv -> Generator mv -> Double
 
 -- | List of generators of the Clifford algebra.
@@ -184,7 +182,7 @@ terms :: LinSpace el => el -> [el]
 
 -- | Linear interpolation for two elements, parameterized for interval
 --   [0,1].
-lerp :: (Num el, LinSpace el) => el -> el -> Double -> el
+lerp :: LinSpace el => el -> el -> Double -> el
 
 -- | Returns <tt>True</tt> if multivector is scalar and <tt>False</tt>
 --   otherwise.
@@ -196,7 +194,7 @@ isHomogeneous :: CliffAlgebra mv => mv -> Bool
 
 -- | Returns <tt>True</tt> if multivector is singular (non-invertible) and
 --   <tt>False</tt> otherwise.
-isSingular :: (Num mv, CliffAlgebra mv) => mv -> Bool
+isSingular :: CliffAlgebra mv => mv -> Bool
 
 -- | Extracts k-blade from a multivector.
 getGrade :: CliffAlgebra mv => Int -> mv -> mv
@@ -298,11 +296,11 @@ segmentMeet :: GeomAlgebra mv => mv -> (mv, mv) -> Maybe mv
 clipPoly :: GeomAlgebra mv => [mv] -> mv -> [mv]
 
 -- | Returns reflection of object <tt>a</tt> against object <tt>b</tt>.
-reflectAt :: (Num mv, GeomAlgebra mv) => mv -> mv -> mv
+reflectAt :: GeomAlgebra mv => mv -> mv -> mv
 
 -- | Rotates object <tt>x</tt> against the object <tt>p</tt> by given
 --   angle.
-rotateAt :: (Num mv, GeomAlgebra mv) => mv -> Double -> mv -> mv
+rotateAt :: GeomAlgebra mv => mv -> Double -> mv -> mv
 
 -- | Returns projection of object <tt>a</tt> on object <tt>b</tt>.
 projectOn :: GeomAlgebra mv => mv -> mv -> mv
@@ -312,17 +310,17 @@ antiprojectTo :: GeomAlgebra mv => mv -> mv -> mv
 
 -- | Translates an object along the object <tt>l</tt> by distance, given by
 --   norm of <tt>l</tt>.
-shiftAlong :: (GeomAlgebra mv, Fractional mv) => mv -> mv -> mv
+shiftAlong :: GeomAlgebra mv => mv -> mv -> mv
 
 -- | Translates object <tt>x</tt> along the object <tt>l</tt> by given
 --   distance <tt>d</tt>.
-shiftAlong' :: (GeomAlgebra mv, Fractional mv) => mv -> Double -> mv -> mv
+shiftAlong' :: GeomAlgebra mv => mv -> Double -> mv -> mv
 
 -- | Rescales an object <tt>a</tt> by given value.
-rescale :: (Num mv, CliffAlgebra mv) => Double -> mv -> mv
+rescale :: CliffAlgebra mv => Double -> mv -> mv
 
 -- | Rescales magnitude of object <tt>a</tt> by given value.
-stretch :: (Num mv, CliffAlgebra mv) => Double -> mv -> mv
+stretch :: CliffAlgebra mv => Double -> mv -> mv
 
 -- | Returns <tt>True</tt> if k-vector represents a point.
 isPoint :: GeomAlgebra mv => mv -> Bool
@@ -455,8 +453,7 @@ instance GHC.Classes.Ord e => Algeometry.GeometricAlgebra.LinSpace (Data.Map.Int
 
 module Algeometry
 
--- | The class representing a general linear space with basis of type
---   <tt>b</tt> and element (vector) of type <tt>el</tt>.
+-- | The class representing a general linear space.
 class Eq (Basis el) => LinSpace el
 
 -- | The zero element.
@@ -506,19 +503,18 @@ terms :: LinSpace el => el -> [el]
 
 -- | Linear interpolation for two elements, parameterized for interval
 --   [0,1].
-lerp :: (Num el, LinSpace el) => el -> el -> Double -> el
+lerp :: LinSpace el => el -> el -> Double -> el
 
--- | The class representing Clifford algebra with generators of type
---   <tt>g</tt> and element (multivector) of type <tt>mv</tt>.
+-- | The class representing Clifford algebra.
 class (Ord (Generator mv), Basis mv ~ [Generator mv], LinSpace mv, Eq mv) => CliffAlgebra mv
 
 -- | The signature of Clifford algebra. The first argument is proxy needed
---   to resolve the functional dependence for class instance.
+--   to specify the class.
 algebraSignature :: CliffAlgebra mv => mv -> (Int, Int, Int)
 
 -- | Squares of the generators, which define the Clifford algebra. The
---   first argument is proxy needed to resolve the functional dependence
---   for class instance.
+--   first argument is proxy needed to resolve the dependence for
+--   <a>Generator</a> type instance.
 square :: CliffAlgebra mv => mv -> Generator mv -> Double
 
 -- | List of generators of the Clifford algebra.
@@ -654,7 +650,7 @@ isHomogeneous :: CliffAlgebra mv => mv -> Bool
 
 -- | Returns <tt>True</tt> if multivector is singular (non-invertible) and
 --   <tt>False</tt> otherwise.
-isSingular :: (Num mv, CliffAlgebra mv) => mv -> Bool
+isSingular :: CliffAlgebra mv => mv -> Bool
 
 -- | Returns norm of a multivector.
 norm :: CliffAlgebra mv => mv -> Double
@@ -748,28 +744,28 @@ antiprojectTo :: GeomAlgebra mv => mv -> mv -> mv
 segmentMeet :: GeomAlgebra mv => mv -> (mv, mv) -> Maybe mv
 
 -- | Returns reflection of object <tt>a</tt> against object <tt>b</tt>.
-reflectAt :: (Num mv, GeomAlgebra mv) => mv -> mv -> mv
+reflectAt :: GeomAlgebra mv => mv -> mv -> mv
 
 -- | Rotates object <tt>x</tt> against the object <tt>p</tt> by given
 --   angle.
-rotateAt :: (Num mv, GeomAlgebra mv) => mv -> Double -> mv -> mv
+rotateAt :: GeomAlgebra mv => mv -> Double -> mv -> mv
 
 -- | Returns an angle between two multivectors.
 angle :: GeomAlgebra mv => mv -> mv -> Double
 
 -- | Translates an object along the object <tt>l</tt> by distance, given by
 --   norm of <tt>l</tt>.
-shiftAlong :: (GeomAlgebra mv, Fractional mv) => mv -> mv -> mv
+shiftAlong :: GeomAlgebra mv => mv -> mv -> mv
 
 -- | Translates object <tt>x</tt> along the object <tt>l</tt> by given
 --   distance <tt>d</tt>.
-shiftAlong' :: (GeomAlgebra mv, Fractional mv) => mv -> Double -> mv -> mv
+shiftAlong' :: GeomAlgebra mv => mv -> Double -> mv -> mv
 
 -- | Rescales an object <tt>a</tt> by given value.
-rescale :: (Num mv, CliffAlgebra mv) => Double -> mv -> mv
+rescale :: CliffAlgebra mv => Double -> mv -> mv
 
 -- | Rescales magnitude of object <tt>a</tt> by given value.
-stretch :: (Num mv, CliffAlgebra mv) => Double -> mv -> mv
+stretch :: CliffAlgebra mv => Double -> mv -> mv
 
 -- | Type family for Clifford algebras with given signature.
 type family Cl (p :: Nat) (q :: Nat) (r :: Nat)
@@ -1006,15 +1002,15 @@ plane :: GeomAlgebra a => [Double] -> [Double] -> [Double] -> a
 
 -- | Returns graphic object, which represents a plane passing through a
 --   point and a line.
-plane2 :: (Fractional a, GeomAlgebra a) => a -> a -> (Double, Double) -> Figure a a
+plane2 :: GeomAlgebra a => a -> a -> (Double, Double) -> Figure a a
 
 -- | Returns graphic object, which represents a plane passing through three
 --   points.
-plane3 :: (Fractional a, GeomAlgebra a) => a -> a -> a -> (Double, Double) -> Figure a a
+plane3 :: GeomAlgebra a => a -> a -> a -> (Double, Double) -> Figure a a
 
 -- | Returns graphic object, which represents a plane passing through a
 --   point, orthogonal to a line.
-orthoPlane :: (Fractional a, GeomAlgebra a) => a -> a -> (Double, Double) -> Figure a a
+orthoPlane :: GeomAlgebra a => a -> a -> (Double, Double) -> Figure a a
 
 -- | Returns a label at given position.
 label :: GeomAlgebra a => [Double] -> String -> Figure a a

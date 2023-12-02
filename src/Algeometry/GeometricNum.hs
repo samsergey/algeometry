@@ -14,7 +14,8 @@ Stability   : experimental
 , TypeOperators #-}
 
 module Algeometry.GeometricNum
-  ( GeometricNum (..)  ) where
+  ( GeometricNum (..)
+  , expSeries ) where
 
 import Algeometry.GeometricAlgebra
 import Data.List
@@ -137,7 +138,11 @@ instance (Generator a ~ Int, CliffAlgebra a) => Floating (GeometricNum a) where
   acosh = scalar . acosh . trace
   atanh = scalar . atanh . trace
 
+series :: (Eq a, Num a) => (t -> [a]) -> t -> a
 series step x = converge $ scanl (+) 0 $ take 1000 $ step x
+
+expSeries :: (Num a, LinSpace a, Eq a) => a -> a
+expSeries = series expS
 
 logSeries x
   | n < 1 = x' * foldr (\i r -> scalar ((-1)**(i-1)/i) + x'*r) 0 [1..200]
@@ -164,6 +169,7 @@ convergeBy f end = listToMaybe . catMaybes . map f' . tails
         end' [x] = end x
         end'  _  = Nothing
 
+expS :: (LinSpace b, Num b) => b -> [b]
 expS x = map snd $ iterate step (1,1)
   where
     step (n,b) = (n + 1, scale (1/n) (x*b))

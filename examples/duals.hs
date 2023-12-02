@@ -1,5 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, TypeFamilies #-}
 module Main (main) where
 
 import Algeometry
@@ -34,7 +34,7 @@ dualcurves = animateList $ mkFrame <$> tail (inits pts)
     n = 100
     --curve t = [(1 - 0.99*cos (t))*sin (t-pi/2), (1 - 0.99*cos (t))*cos (t-pi/2)]
     curve t = [0.35 + 0.8*cos (t), 0.5*sin (t)]
-    pts = [ point (curve (2*pi*t/n)) | t <- [0 .. n-1] ]
+    pts = [ point (curve (2*pi*t/n)) :: PGA2 | t <- [0 .. n-1] ]
     mkFrame ps = mapFig (rescale 10) $ do
 --      regularPoly 100 <@ [stroke_ "gray"]
       polyline ps <@ []

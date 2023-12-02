@@ -52,7 +52,8 @@ type MV = Cl 3 1 3
 
 -- | Wrapper for algebra basis elements.
 newtype Monom = Monom MV
-  deriving (Show, Eq, Num, Fractional, LinSpace, CliffAlgebra)
+  deriving ( Show, Eq, Num, Fractional, Floating
+           , LinSpace, CliffAlgebra)
 type instance Basis Monom = Basis MV
 type instance Generator Monom = Generator MV
 
@@ -66,7 +67,8 @@ instance Arbitrary Monom where
 
 -- | Wrapper for 1-vector.
 newtype Vector = Vector MV
-  deriving (Show, Eq, Num, Fractional, LinSpace, CliffAlgebra)
+  deriving ( Show, Eq, Num, Fractional, Floating
+           , LinSpace, CliffAlgebra)
 type instance Basis Vector = Basis MV
 type instance Generator Vector = Generator MV
 
@@ -78,7 +80,8 @@ instance Arbitrary Vector where
 
 -- | Wrapper for 2-vector.
 newtype Bivector = Bivector MV
-  deriving (Show, Eq, Num, Fractional, LinSpace, CliffAlgebra)
+  deriving ( Show, Eq, Num, Fractional, Floating
+           , LinSpace, CliffAlgebra)
 type instance Basis Bivector = Basis MV
 type instance Generator Bivector = Generator MV
 
@@ -90,7 +93,8 @@ instance Arbitrary Bivector where
 
 -- | Wrapper for 3-vector.
 newtype Trivector = Trivector MV
-  deriving (Show, Eq, Num, Fractional, LinSpace, CliffAlgebra)
+  deriving ( Show, Eq, Num, Fractional, Floating
+           , LinSpace, CliffAlgebra)
 type instance Basis Trivector = Basis MV
 type instance Generator Trivector = Generator MV
 
@@ -102,7 +106,8 @@ instance Arbitrary Trivector where
 
 -- | Wrapper for a general multivector.
 newtype Multivector = Multivector MV
-  deriving (Show, Eq, Num, Fractional, LinSpace, CliffAlgebra)
+  deriving ( Show, Eq, Num, Fractional, Floating
+           , LinSpace, CliffAlgebra)
 type instance Basis Multivector = Basis MV
 type instance Generator Multivector = Generator MV
 
@@ -114,7 +119,8 @@ instance Arbitrary Multivector where
 
 -- | Wrapper for a k-vector.
 newtype Homogeneous = Homogeneous MV
-  deriving (Show, Eq, Num, Fractional, LinSpace, CliffAlgebra)
+  deriving ( Show, Eq, Num, Fractional, Floating
+           , LinSpace, CliffAlgebra)
 type instance Basis Homogeneous = Basis MV
 type instance Generator Homogeneous = Generator MV
 

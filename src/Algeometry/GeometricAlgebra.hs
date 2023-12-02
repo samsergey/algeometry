@@ -34,15 +34,15 @@ module Algeometry.GeometricAlgebra
   , isPoint, isLine, isPlane
   ) where
 
-import Data.Maybe
-import Data.List
-import Data.Ord
-import Control.Monad hiding (join)
+import Data.Maybe ( fromMaybe, mapMaybe )
+import Data.List ( maximumBy, (\\), nub, sort, sortOn, union )
+import Data.Ord ( comparing )
+import Control.Monad ( filterM, foldM )
 
 -- | Type family for basis element  of LinearSpace
 type family Basis a
 
-{- | The class representing a general linear space with basis of type @b@ and element (vector) of type @el@.-}
+{- | The class representing a general linear space. -}
 class Eq (Basis el) => LinSpace el where
   {-# MINIMAL zero, isZero, monom, add, lmap, lapp, lfilter, assoc #-}
   -- | The zero element.
@@ -95,24 +95,23 @@ terms :: LinSpace el => el -> [el]
 terms m = uncurry monom <$> assoc m
 
 -- | Linear interpolation for two elements, parameterized for interval [0,1].
-lerp :: (Num el, LinSpace el) => el -> el -> Double -> el
-lerp a b t = a + scale t (b - a)
+lerp :: LinSpace el => el -> el -> Double -> el
+lerp a b t = a `add` scale t (b `add` scale (-1) a)
 
 ------------------------------------------------------------
 
 -- | Type family for generator of Clifford algebra
 type family Generator a
 
-{- | The class representing Clifford algebra with generators of type @g@
-and element (multivector) of type @mv@. -}
+{- | The class representing Clifford algebra. -}
 class ( Ord (Generator mv)
       , Basis mv ~ [Generator mv]
       , LinSpace mv
       , Eq mv ) => CliffAlgebra mv where
-  -- | The signature of Clifford algebra. The first argument is proxy needed to resolve the functional dependence for class instance.
+  -- | The signature of Clifford algebra. The first argument is proxy needed to specify the class.
   algebraSignature :: mv -> (Int,Int,Int)
 
-  -- | Squares of the generators, which define the Clifford algebra. The first argument is proxy needed to resolve the functional dependence for class instance.
+  -- | Squares of the generators, which define the Clifford algebra. The first argument is proxy needed to resolve the dependence for `Generator` type instance.
   square :: mv -> Generator mv -> Double
 
   -- | List of generators of the Clifford algebra.
@@ -125,67 +124,80 @@ class ( Ord (Generator mv)
     | otherwise = length $ maximumBy (comparing length) (elems m)
 
   -- | The geometric product.
+  {-# INLINE geom #-}
   geom :: mv -> mv -> mv
   geom m = lapp (composeBlades (square m) (const 1)) m
 
   -- | The outer product (same as `(∧)`).
+  {-# INLINE outer #-}
   outer :: mv -> mv -> mv
   outer = lapp (composeBlades (const 0) (const 1))
 
   -- | The right contraction (same as `(|-)`).
+  {-# INLINE rcontract #-}
   rcontract :: mv -> mv -> mv
   rcontract a b = rev (rev b `lcontract` rev a)
 
   -- | The left contraction (same as `(-|)`).
+  {-# INLINE lcontract #-}
   lcontract :: mv -> mv -> mv
   lcontract m1 = lapp (composeBlades (square m1) (const 0)) m1
 
   -- | The inner product  (same as `(·)`).
+  {-# INLINE inner #-}
   inner :: mv -> mv -> mv
   inner a b =
     if grade a <= grade b
     then lcontract a b
     else rcontract a b
 
+  {-# INLINE rev #-}
   -- | The reverse of a multivector.
   rev :: mv -> mv
   rev = lmap $ \b -> Just (b, (-1)^(length b `div` 2))
 
+  {-# INLINE inv #-}
   -- | The inversion of a multivector.
   inv :: mv -> mv
   inv = lmap $ \b -> Just (b, (-1)^length b)
 
+  {-# INLINE conj #-}
   -- | The conjugate of a multivector
   conj :: mv -> mv
   conj = inv . rev
 
+  {-# INLINE dual #-}
   -- | The dual of a multivector.
   dual :: mv -> mv
   dual a = lmap (\b -> Just (ps \\ b, 1)) a
     where
       ps = head $ head $ elems <$> [pseudoScalar, a]
 
+  {-# INLINE rcompl #-}
   -- | The right complement of a multivector.
   rcompl :: mv -> mv
   rcompl a = lapp (composeBlades (const 1) (const 1)) (rev a) pseudoScalar
 
+  {-# INLINE lcompl #-}
   -- | The left complement of a multivector.
   lcompl :: mv -> mv
   lcompl a = lapp (composeBlades (const 1) (const 1)) pseudoScalar (rev a)
 
+  {-# INLINE decompose #-}
   -- | Separates scalar and non-scalar part of a multivector.
   decompose :: mv -> (Double, mv)
   decompose x = (coeff [] x, lfilter (\b _ -> not (null b)) x)
 
+  {-# INLINE trace #-}
   -- | Extracts a scalar part from a multivector.
   trace :: mv -> Double
   trace = fst . decompose
 
+  {-# INLINE nonScalar #-}
   -- | Extracts a non-scalar part from a multivector.
   nonScalar :: mv -> mv
   nonScalar = snd . decompose 
   
-
 composeBlades
   :: Ord b =>
   (b -> Double) -> (b -> Double) -> [b] -> [b] -> Maybe ([b], Double)
@@ -345,8 +357,8 @@ isHomogeneous :: CliffAlgebra mv => mv -> Bool
 isHomogeneous m = length (nub (length <$> elems m)) <= 1
 
 -- | Returns @True@ if  multivector is singular (non-invertible) and @False@ otherwise.
-isSingular :: (Num mv, CliffAlgebra mv) => mv -> Bool
-isSingular x = x*x == 0
+isSingular :: CliffAlgebra mv => mv -> Bool
+isSingular x = isZero $ x `geom` x
 
 ------------------------------
 -- norm
@@ -436,8 +448,8 @@ clipPoly pts mv = let
 ------------------------------------------------------------
 
 -- | Returns reflection of object @a@ against object @b@.
-reflectAt :: (Num mv, GeomAlgebra mv) => mv -> mv -> mv
-reflectAt a b = b * inv a * reciprocal b
+reflectAt :: GeomAlgebra mv => mv -> mv -> mv
+reflectAt a b = b `geom` inv a `geom` reciprocal b
 
 -- | Returns projection of object @a@ on object @b@.
 projectOn :: GeomAlgebra mv => mv -> mv -> mv
@@ -456,37 +468,36 @@ antiprojectTo a b = (a `inner` b) `geom` reciprocal a
 (<-|) = antiprojectTo
 
 -- | Rotates object @x@ against the object @p@ by given angle.
-rotateAt :: (Num mv, GeomAlgebra mv) => mv -> Double -> mv -> mv
+rotateAt :: GeomAlgebra mv => mv -> Double -> mv -> mv
 rotateAt p ang x
   | sin ang == 0 && cos ang == 1 = x
-  | otherwise = r * x * rev r
+  | otherwise = r `geom` x `geom` rev r
   where
-    r = scalar (cos (ang/2)) + scale (sin (ang/2)) p
+    r = scalar (cos (ang/2)) `add` scale (sin (ang/2)) p
 
 -- | Translates object @x@ along the object @l@ by given distance @d@.
-shiftAlong' :: (GeomAlgebra mv, Fractional mv)
-            => mv -> Double -> mv -> mv
+shiftAlong' :: GeomAlgebra mv => mv -> Double -> mv -> mv
 shiftAlong' l d x
-  | l == 0 = x
-  | otherwise = q * x * rev q
-  where q = (pseudoScalar + scale (1/d*4/norm2 l) l)^2
+  | isZero l = x
+  | otherwise = q `geom` x `geom` rev q
+  where q' = pseudoScalar `add` scale (1/d*4/norm2 l) l
+        q = q' `geom` q'
 
 -- | Translates an object along the object @l@ by distance, given by norm of @l@.
-shiftAlong :: (GeomAlgebra mv, Fractional mv)
-           => mv -> mv -> mv
+shiftAlong :: GeomAlgebra mv => mv -> mv -> mv
 shiftAlong l = shiftAlong' l 1
 
 -- | Rescales an object @a@ by given value.
-rescale :: (Num mv, CliffAlgebra mv) => Double -> mv -> mv
-rescale s a = scale s (weight a) + bulk a
+rescale :: CliffAlgebra mv => Double -> mv -> mv
+rescale s a = scale s (weight a) `add` bulk a
 
 -- | Rescales magnitude of object @a@ by given value.
-stretch :: (Num mv, CliffAlgebra mv) => Double -> mv -> mv
-stretch s a = weight a + scale s (bulk a)
+stretch :: CliffAlgebra mv => Double -> mv -> mv
+stretch s a = weight a `add` scale s (bulk a)
 
 ------------------------------------------------------------
 
-type instance Basis Double = [Double]
+type instance Basis Double = [()]
 
 instance LinSpace Double where
   zero = 0
@@ -497,11 +508,10 @@ instance LinSpace Double where
   lmap f x = x * maybe 0 snd (f [])
   lapp f x y = x * y * maybe 0 snd (f [] [])
   lfilter f x = if f [] x then x else 0 
-  coeff [a] x = x/a
   coeff _ x = x
   assoc x = [([],x)]
 
-type instance Generator Double = Double
+type instance Generator Double = ()
 
 instance CliffAlgebra Double where
   algebraSignature _ = (0,0,0)

@@ -1,8 +1,8 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="annot"><span class="hs-comment">{-|
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-|
 Module      : Algeometry.Arbitrary
 Description : Definitions of Arbritrary instanses for multivectors.
 Stability   : experimental
--}</span></span><span>
+-}</span><span>
 </span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE DerivingVia
 , StandaloneDeriving
 , FlexibleInstances
@@ -29,98 +29,70 @@ Stability   : experimental
 </span><span id="line-29"></span><span>
 </span><span id="line-30"></span><span class="hs-comment">------------------------------------------------------------</span><span>
 </span><span id="line-31"></span><span>
-</span><span id="line-32"></span><span id="local-6989586621679269869"><span class="annot"><a href="Algeometry.Arbitrary.html#abitraryMV"><span class="hs-identifier hs-type">abitraryMV</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Num</span></span><span> </span><span class="annot"><a href="#local-6989586621679269869"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Algeometry.GeometricAlgebra.html#CliffAlgebra"><span class="hs-identifier hs-type">CliffAlgebra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679269869"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679269869"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679269869"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="annot"><a href="#local-6989586621679269869"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-32"></span><span id="local-6989586621679263368"><span class="annot"><a href="Algeometry.Arbitrary.html#abitraryMV"><span class="hs-identifier hs-type">abitraryMV</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Num</span></span><span> </span><span class="annot"><a href="#local-6989586621679263368"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Algeometry.GeometricAlgebra.html#CliffAlgebra"><span class="hs-identifier hs-type">CliffAlgebra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679263368"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679263368"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679263368"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Gen</span></span><span> </span><span class="annot"><a href="#local-6989586621679263368"><span class="hs-identifier hs-type">a</span></a></span></span><span>
 </span><span id="line-33"></span><span id="abitraryMV"><span class="annot"><span class="annottext">abitraryMV :: forall a. (Num a, CliffAlgebra a) =&gt; ([a] -&gt; [a]) -&gt; Gen a
-</span><a href="Algeometry.Arbitrary.html#abitraryMV"><span class="hs-identifier hs-var hs-var">abitraryMV</span></a></span></span><span> </span><span id="local-6989586621679269978"><span class="annot"><span class="annottext">[a] -&gt; [a]
-</span><a href="#local-6989586621679269978"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen a
-</span><a href="#local-6989586621679269979"><span class="hs-identifier hs-var">res</span></a></span><span> </span><span class="annot"><span class="annottext">Gen a -&gt; (a -&gt; Bool) -&gt; Gen a
-forall a. Gen a -&gt; (a -&gt; Bool) -&gt; Gen a
+</span><a href="Algeometry.Arbitrary.html#abitraryMV"><span class="hs-identifier hs-var hs-var">abitraryMV</span></a></span></span><span> </span><span id="local-6989586621679263247"><span class="annot"><span class="annottext">[a] -&gt; [a]
+</span><a href="#local-6989586621679263247"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Gen a
+</span><a href="#local-6989586621679263246"><span class="hs-identifier hs-var">res</span></a></span><span> </span><span class="annot"><span class="annottext">forall a. Gen a -&gt; (a -&gt; Bool) -&gt; Gen a
 </span><span class="hs-operator hs-var">`suchThat`</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool
-</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; (a -&gt; Bool) -&gt; a -&gt; Bool
-forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; Bool
-forall mv. CliffAlgebra mv =&gt; mv -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">forall mv. CliffAlgebra mv =&gt; mv -&gt; Bool
 </span><a href="Algeometry.GeometricAlgebra.html#isScalar"><span class="hs-identifier hs-var">isScalar</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-34"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-35"></span><span>    </span><span id="local-6989586621679269979"><span class="annot"><span class="annottext">res :: Gen a
-</span><a href="#local-6989586621679269979"><span class="hs-identifier hs-var hs-var">res</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-36"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679269984"><span class="annot"><span class="annottext">els :: [a]
-</span><a href="#local-6989586621679269984"><span class="hs-identifier hs-var hs-var">els</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; [a] -&gt; [a]
-forall a. Int -&gt; [a] -&gt; [a]
+</span><span id="line-35"></span><span>    </span><span id="local-6989586621679263246"><span class="annot"><span class="annottext">res :: Gen a
+</span><a href="#local-6989586621679263246"><span class="hs-identifier hs-var hs-var">res</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-36"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679263241"><span class="annot"><span class="annottext">els :: [a]
+</span><a href="#local-6989586621679263241"><span class="hs-identifier hs-var hs-var">els</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. Int -&gt; [a] -&gt; [a]
 </span><span class="hs-identifier hs-var">take</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><span class="hs-number">5</span></span><span> </span><span class="annot"><span class="annottext">([a] -&gt; [a]) -&gt; [a] -&gt; [a]
-forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-number">5</span></span><span> </span><span class="annot"><span class="annottext">forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; [a]
-</span><a href="#local-6989586621679269978"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">[a]
-forall mv. CliffAlgebra mv =&gt; [mv]
+</span><a href="#local-6989586621679263247"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">forall mv. CliffAlgebra mv =&gt; [mv]
 </span><a href="Algeometry.GeometricAlgebra.html#basis"><span class="hs-identifier hs-var">basis</span></a></span><span>
-</span><span id="line-37"></span><span>          </span><span id="local-6989586621679269997"><span class="annot"><span class="annottext">coeff :: Gen Double
-</span><a href="#local-6989586621679269997"><span class="hs-identifier hs-var hs-var">coeff</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Double
-forall a. Num a =&gt; Integer -&gt; a
-</span><span class="hs-identifier hs-var">fromInteger</span></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Double) -&gt; Gen Integer -&gt; Gen Double
-forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">(Integer, Integer) -&gt; Gen Integer
-forall a. Random a =&gt; (a, a) -&gt; Gen a
+</span><span id="line-37"></span><span>          </span><span id="local-6989586621679263228"><span class="annot"><span class="annottext">coeff :: Gen Double
+</span><a href="#local-6989586621679263228"><span class="hs-identifier hs-var hs-var">coeff</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. Num a =&gt; Integer -&gt; a
+</span><span class="hs-identifier hs-var">fromInteger</span></span><span> </span><span class="annot"><span class="annottext">forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">forall a. Random a =&gt; (a, a) -&gt; Gen a
 </span><span class="hs-identifier hs-var">choose</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">-</span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">3</span></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">3</span></span><span class="hs-special">)</span><span>
-</span><span id="line-38"></span><span>      </span><span id="local-6989586621679270000"><span class="annot"><span class="annottext">[a]
-</span><a href="#local-6989586621679270000"><span class="hs-identifier hs-var">vs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[a] -&gt; Gen [a]
-forall a. [a] -&gt; Gen [a]
+</span><span id="line-38"></span><span>      </span><span id="local-6989586621679263225"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679263225"><span class="hs-identifier hs-var">vs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">forall a. [a] -&gt; Gen [a]
 </span><span class="hs-identifier hs-var">sublistOf</span></span><span> </span><span class="annot"><span class="annottext">[a]
-</span><a href="#local-6989586621679269984"><span class="hs-identifier hs-var">els</span></a></span><span>
-</span><span id="line-39"></span><span>      </span><span id="local-6989586621679270002"><span class="annot"><span class="annottext">[Double]
-</span><a href="#local-6989586621679270002"><span class="hs-identifier hs-var">cs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(a -&gt; Gen Double) -&gt; [a] -&gt; Gen [Double]
-forall (t :: * -&gt; *) (f :: * -&gt; *) a b.
+</span><a href="#local-6989586621679263241"><span class="hs-identifier hs-var">els</span></a></span><span>
+</span><span id="line-39"></span><span>      </span><span id="local-6989586621679263223"><span class="annot"><span class="annottext">[Double]
+</span><a href="#local-6989586621679263223"><span class="hs-identifier hs-var">cs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">forall (t :: * -&gt; *) (f :: * -&gt; *) a b.
 (Traversable t, Applicative f) =&gt;
 (a -&gt; f b) -&gt; t a -&gt; f (t b)
-forall (f :: * -&gt; *) a b.
-Applicative f =&gt;
-(a -&gt; f b) -&gt; [a] -&gt; f [b]
-</span><span class="hs-identifier hs-var">traverse</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Gen Double -&gt; a -&gt; Gen Double
-forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">traverse</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">forall a b. a -&gt; b -&gt; a
 </span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">Gen Double
-</span><a href="#local-6989586621679269997"><span class="hs-identifier hs-var">coeff</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[a]
-</span><a href="#local-6989586621679270000"><span class="hs-identifier hs-var">vs</span></a></span><span>
-</span><span id="line-40"></span><span>      </span><span class="annot"><span class="annottext">a -&gt; Gen a
-forall a. a -&gt; Gen a
-forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
-</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(a -&gt; Gen a) -&gt; a -&gt; Gen a
-forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; a
-forall a. Num a =&gt; [a] -&gt; a
-forall (t :: * -&gt; *) a. (Foldable t, Num a) =&gt; t a -&gt; a
-</span><span class="hs-identifier hs-var">sum</span></span><span> </span><span class="annot"><span class="annottext">([a] -&gt; a) -&gt; [a] -&gt; a
-forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Double -&gt; a -&gt; a) -&gt; [Double] -&gt; [a] -&gt; [a]
-forall a b c. (a -&gt; b -&gt; c) -&gt; [a] -&gt; [b] -&gt; [c]
-</span><span class="hs-identifier hs-var">zipWith</span></span><span> </span><span class="annot"><span class="annottext">Double -&gt; a -&gt; a
-forall el. LinSpace el =&gt; Double -&gt; el -&gt; el
+</span><a href="#local-6989586621679263228"><span class="hs-identifier hs-var">coeff</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679263225"><span class="hs-identifier hs-var">vs</span></a></span><span>
+</span><span id="line-40"></span><span>      </span><span class="annot"><span class="annottext">forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">forall (t :: * -&gt; *) a. (Foldable t, Num a) =&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">sum</span></span><span> </span><span class="annot"><span class="annottext">forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">forall a b c. (a -&gt; b -&gt; c) -&gt; [a] -&gt; [b] -&gt; [c]
+</span><span class="hs-identifier hs-var">zipWith</span></span><span> </span><span class="annot"><span class="annottext">forall el. LinSpace el =&gt; Double -&gt; el -&gt; el
 </span><a href="Algeometry.GeometricAlgebra.html#scale"><span class="hs-identifier hs-var">scale</span></a></span><span> </span><span class="annot"><span class="annottext">[Double]
-</span><a href="#local-6989586621679270002"><span class="hs-identifier hs-var">cs</span></a></span><span> </span><span class="annot"><span class="annottext">[a]
-</span><a href="#local-6989586621679270000"><span class="hs-identifier hs-var">vs</span></a></span><span>
+</span><a href="#local-6989586621679263223"><span class="hs-identifier hs-var">cs</span></a></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679263225"><span class="hs-identifier hs-var">vs</span></a></span><span>
 </span><span id="line-41"></span><span>
-</span><span id="line-42"></span><span id="local-6989586621679269906"><span class="annot"><a href="Algeometry.Arbitrary.html#shrinkMV"><span class="hs-identifier hs-type">shrinkMV</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Num</span></span><span> </span><span class="annot"><a href="#local-6989586621679269906"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Algeometry.GeometricAlgebra.html#CliffAlgebra"><span class="hs-identifier hs-type">CliffAlgebra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679269906"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679269906"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679269906"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span></span><span>
+</span><span id="line-42"></span><span id="local-6989586621679263331"><span class="annot"><a href="Algeometry.Arbitrary.html#shrinkMV"><span class="hs-identifier hs-type">shrinkMV</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Num</span></span><span> </span><span class="annot"><a href="#local-6989586621679263331"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Algeometry.GeometricAlgebra.html#CliffAlgebra"><span class="hs-identifier hs-type">CliffAlgebra</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679263331"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679263331"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679263331"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span></span><span>
 </span><span id="line-43"></span><span id="shrinkMV"><span class="annot"><span class="annottext">shrinkMV :: forall a. (Num a, CliffAlgebra a) =&gt; a -&gt; [a]
-</span><a href="Algeometry.Arbitrary.html#shrinkMV"><span class="hs-identifier hs-var hs-var">shrinkMV</span></a></span></span><span> </span><span id="local-6989586621679270018"><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679270018"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">a -&gt; Bool
-forall mv. CliffAlgebra mv =&gt; mv -&gt; Bool
+</span><a href="Algeometry.Arbitrary.html#shrinkMV"><span class="hs-identifier hs-var hs-var">shrinkMV</span></a></span></span><span> </span><span id="local-6989586621679263207"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679263207"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">forall mv. CliffAlgebra mv =&gt; mv -&gt; Bool
 </span><a href="Algeometry.GeometricAlgebra.html#isScalar"><span class="hs-identifier hs-var">isScalar</span></a></span><span> </span><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679270018"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
-</span><span id="line-44"></span><span>           </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">a -&gt; Bool
-forall el. LinSpace el =&gt; el -&gt; Bool
+</span><a href="#local-6989586621679263207"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-44"></span><span>           </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">forall el. LinSpace el =&gt; el -&gt; Bool
 </span><a href="Algeometry.GeometricAlgebra.html#isMonom"><span class="hs-identifier hs-var">isMonom</span></a></span><span> </span><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679270018"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><a href="#local-6989586621679263207"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
 </span><span id="line-45"></span><span>           </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
 </span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679270018"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
-forall a. Num a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-glyph hs-var">-</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(a -&gt; a) -&gt; [a] -&gt; [a]
-forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; [a]
-forall el. LinSpace el =&gt; el -&gt; [el]
+</span><a href="#local-6989586621679263207"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">forall el. LinSpace el =&gt; el -&gt; [el]
 </span><a href="Algeometry.GeometricAlgebra.html#terms"><span class="hs-identifier hs-var">terms</span></a></span><span> </span><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679270018"><span class="hs-identifier hs-var">v</span></a></span><span>
+</span><a href="#local-6989586621679263207"><span class="hs-identifier hs-var">v</span></a></span><span>
 </span><span id="line-46"></span><span>
 </span><span id="line-47"></span><span class="hs-comment">------------------------------------------------------------</span><span>
 </span><span id="line-48"></span><span>
@@ -128,39 +100,28 @@ forall el. LinSpace el =&gt; el -&gt; [el]
 </span><span id="line-50"></span><span>
 </span><span id="line-51"></span><span class="hs-comment">------------------------------------------------------------</span><span>
 </span><span id="line-52"></span><span>
-</span><span id="line-53"></span><span class="annot"><span class="hs-comment">-- | Wrapper for algebra basis elements.</span></span><span>
+</span><span id="line-53"></span><span class="hs-comment">-- | Wrapper for algebra basis elements.</span><span>
 </span><span id="line-54"></span><span class="hs-keyword">newtype</span><span> </span><span id="Monom"><span class="annot"><a href="Algeometry.Arbitrary.html#Monom"><span class="hs-identifier hs-var">Monom</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Monom"><span class="annot"><a href="Algeometry.Arbitrary.html#Monom"><span class="hs-identifier hs-var">Monom</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
-</span><span id="line-55"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679270024"><span id="local-6989586621679270033"><span id="local-6989586621679270037"><span class="annot"><span class="annottext">Int -&gt; Monom -&gt; ShowS
+</span><span id="line-55"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679263190"><span id="local-6989586621679263192"><span id="local-6989586621679263201"><span class="annot"><span class="annottext">Int -&gt; Monom -&gt; ShowS
 [Monom] -&gt; ShowS
 Monom -&gt; String
-(Int -&gt; Monom -&gt; ShowS)
--&gt; (Monom -&gt; String) -&gt; ([Monom] -&gt; ShowS) -&gt; Show Monom
 forall a.
 (Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
-$cshowsPrec :: Int -&gt; Monom -&gt; ShowS
-showsPrec :: Int -&gt; Monom -&gt; ShowS
-$cshow :: Monom -&gt; String
-show :: Monom -&gt; String
-$cshowList :: [Monom] -&gt; ShowS
 showList :: [Monom] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679270041"><span id="local-6989586621679270047"><span class="annot"><span class="annottext">Monom -&gt; Monom -&gt; Bool
-(Monom -&gt; Monom -&gt; Bool) -&gt; (Monom -&gt; Monom -&gt; Bool) -&gt; Eq Monom
+$cshowList :: [Monom] -&gt; ShowS
+show :: Monom -&gt; String
+$cshow :: Monom -&gt; String
+showsPrec :: Int -&gt; Monom -&gt; ShowS
+$cshowsPrec :: Int -&gt; Monom -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679263181"><span id="local-6989586621679263187"><span class="annot"><span class="annottext">Monom -&gt; Monom -&gt; Bool
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
-$c== :: Monom -&gt; Monom -&gt; Bool
-== :: Monom -&gt; Monom -&gt; Bool
-$c/= :: Monom -&gt; Monom -&gt; Bool
 /= :: Monom -&gt; Monom -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679270062"><span id="local-6989586621679270068"><span id="local-6989586621679270074"><span id="local-6989586621679270080"><span id="local-6989586621679270086"><span id="local-6989586621679270092"><span id="local-6989586621679270098"><span class="annot"><span class="annottext">Integer -&gt; Monom
+$c/= :: Monom -&gt; Monom -&gt; Bool
+== :: Monom -&gt; Monom -&gt; Bool
+$c== :: Monom -&gt; Monom -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679263130"><span id="local-6989586621679263136"><span id="local-6989586621679263142"><span id="local-6989586621679263148"><span id="local-6989586621679263154"><span id="local-6989586621679263160"><span id="local-6989586621679263166"><span class="annot"><span class="annottext">Integer -&gt; Monom
 Monom -&gt; Monom
 Monom -&gt; Monom -&gt; Monom
-(Monom -&gt; Monom -&gt; Monom)
--&gt; (Monom -&gt; Monom -&gt; Monom)
--&gt; (Monom -&gt; Monom -&gt; Monom)
--&gt; (Monom -&gt; Monom)
--&gt; (Monom -&gt; Monom)
--&gt; (Monom -&gt; Monom)
--&gt; (Integer -&gt; Monom)
--&gt; Num Monom
 forall a.
 (a -&gt; a -&gt; a)
 -&gt; (a -&gt; a -&gt; a)
@@ -170,53 +131,35 @@ forall a.
 -&gt; (a -&gt; a)
 -&gt; (Integer -&gt; a)
 -&gt; Num a
-$c+ :: Monom -&gt; Monom -&gt; Monom
-+ :: Monom -&gt; Monom -&gt; Monom
-$c- :: Monom -&gt; Monom -&gt; Monom
-- :: Monom -&gt; Monom -&gt; Monom
-$c* :: Monom -&gt; Monom -&gt; Monom
-* :: Monom -&gt; Monom -&gt; Monom
-$cnegate :: Monom -&gt; Monom
-negate :: Monom -&gt; Monom
-$cabs :: Monom -&gt; Monom
-abs :: Monom -&gt; Monom
-$csignum :: Monom -&gt; Monom
-signum :: Monom -&gt; Monom
-$cfromInteger :: Integer -&gt; Monom
 fromInteger :: Integer -&gt; Monom
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679270130"><span id="local-6989586621679270136"><span id="local-6989586621679270142"><span class="annot"><span class="annottext">Num Monom
-Num Monom
--&gt; (Monom -&gt; Monom -&gt; Monom)
--&gt; (Monom -&gt; Monom)
--&gt; (Rational -&gt; Monom)
--&gt; Fractional Monom
+$cfromInteger :: Integer -&gt; Monom
+signum :: Monom -&gt; Monom
+$csignum :: Monom -&gt; Monom
+abs :: Monom -&gt; Monom
+$cabs :: Monom -&gt; Monom
+negate :: Monom -&gt; Monom
+$cnegate :: Monom -&gt; Monom
+* :: Monom -&gt; Monom -&gt; Monom
+$c* :: Monom -&gt; Monom -&gt; Monom
+- :: Monom -&gt; Monom -&gt; Monom
+$c- :: Monom -&gt; Monom -&gt; Monom
++ :: Monom -&gt; Monom -&gt; Monom
+$c+ :: Monom -&gt; Monom -&gt; Monom
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679263086"><span id="local-6989586621679263092"><span id="local-6989586621679263098"><span class="annot"><span class="annottext">Num Monom
 Rational -&gt; Monom
 Monom -&gt; Monom
 Monom -&gt; Monom -&gt; Monom
 forall a.
 Num a
 -&gt; (a -&gt; a -&gt; a) -&gt; (a -&gt; a) -&gt; (Rational -&gt; a) -&gt; Fractional a
-$c/ :: Monom -&gt; Monom -&gt; Monom
-/ :: Monom -&gt; Monom -&gt; Monom
-$crecip :: Monom -&gt; Monom
-recip :: Monom -&gt; Monom
-$cfromRational :: Rational -&gt; Monom
 fromRational :: Rational -&gt; Monom
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Fractional</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679270163"><span id="local-6989586621679270169"><span id="local-6989586621679270175"><span id="local-6989586621679270181"><span id="local-6989586621679270187"><span id="local-6989586621679270193"><span id="local-6989586621679270199"><span id="local-6989586621679270205"><span id="local-6989586621679270211"><span id="local-6989586621679270217"><span class="annot"><span class="annottext">Eq (Basis Monom)
+$cfromRational :: Rational -&gt; Monom
+recip :: Monom -&gt; Monom
+$crecip :: Monom -&gt; Monom
+/ :: Monom -&gt; Monom -&gt; Monom
+$c/ :: Monom -&gt; Monom -&gt; Monom
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Fractional</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679263011"><span id="local-6989586621679263017"><span id="local-6989586621679263023"><span id="local-6989586621679263029"><span id="local-6989586621679263035"><span id="local-6989586621679263041"><span id="local-6989586621679263047"><span id="local-6989586621679263053"><span id="local-6989586621679263059"><span id="local-6989586621679263065"><span class="annot"><span class="annottext">Eq (Basis Monom)
 Monom
-Eq (Basis Monom)
--&gt; Monom
--&gt; (Monom -&gt; Bool)
--&gt; (Basis Monom -&gt; Double -&gt; Monom)
--&gt; (Monom -&gt; Bool)
--&gt; (Monom -&gt; Monom -&gt; Monom)
--&gt; ((Basis Monom -&gt; Maybe (Basis Monom, Double)) -&gt; Monom -&gt; Monom)
--&gt; ((Basis Monom -&gt; Basis Monom -&gt; Maybe (Basis Monom, Double))
-    -&gt; Monom -&gt; Monom -&gt; Monom)
--&gt; ((Basis Monom -&gt; Double -&gt; Bool) -&gt; Monom -&gt; Monom)
--&gt; (Basis Monom -&gt; Monom -&gt; Double)
--&gt; (Monom -&gt; [(Basis Monom, Double)])
--&gt; LinSpace Monom
 Basis Monom -&gt; Double -&gt; Monom
 Basis Monom -&gt; Monom -&gt; Double
 Monom -&gt; Bool
@@ -240,56 +183,33 @@ Eq (Basis el)
 -&gt; (Basis el -&gt; el -&gt; Double)
 -&gt; (el -&gt; [(Basis el, Double)])
 -&gt; LinSpace el
-$czero :: Monom
-zero :: Monom
-$cisZero :: Monom -&gt; Bool
-isZero :: Monom -&gt; Bool
-$cmonom :: Basis Monom -&gt; Double -&gt; Monom
-monom :: Basis Monom -&gt; Double -&gt; Monom
-$cisMonom :: Monom -&gt; Bool
-isMonom :: Monom -&gt; Bool
-$cadd :: Monom -&gt; Monom -&gt; Monom
-add :: Monom -&gt; Monom -&gt; Monom
-$clmap :: (Basis Monom -&gt; Maybe (Basis Monom, Double)) -&gt; Monom -&gt; Monom
-lmap :: (Basis Monom -&gt; Maybe (Basis Monom, Double)) -&gt; Monom -&gt; Monom
-$clapp :: (Basis Monom -&gt; Basis Monom -&gt; Maybe (Basis Monom, Double))
--&gt; Monom -&gt; Monom -&gt; Monom
+assoc :: Monom -&gt; [(Basis Monom, Double)]
+$cassoc :: Monom -&gt; [(Basis Monom, Double)]
+coeff :: Basis Monom -&gt; Monom -&gt; Double
+$ccoeff :: Basis Monom -&gt; Monom -&gt; Double
+lfilter :: (Basis Monom -&gt; Double -&gt; Bool) -&gt; Monom -&gt; Monom
+$clfilter :: (Basis Monom -&gt; Double -&gt; Bool) -&gt; Monom -&gt; Monom
 lapp :: (Basis Monom -&gt; Basis Monom -&gt; Maybe (Basis Monom, Double))
 -&gt; Monom -&gt; Monom -&gt; Monom
-$clfilter :: (Basis Monom -&gt; Double -&gt; Bool) -&gt; Monom -&gt; Monom
-lfilter :: (Basis Monom -&gt; Double -&gt; Bool) -&gt; Monom -&gt; Monom
-$ccoeff :: Basis Monom -&gt; Monom -&gt; Double
-coeff :: Basis Monom -&gt; Monom -&gt; Double
-$cassoc :: Monom -&gt; [(Basis Monom, Double)]
-assoc :: Monom -&gt; [(Basis Monom, Double)]
-</span><a href="Algeometry.GeometricAlgebra.html#LinSpace"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">LinSpace</span></a></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679270239"><span id="local-6989586621679270245"><span id="local-6989586621679270251"><span id="local-6989586621679270257"><span id="local-6989586621679270263"><span id="local-6989586621679270269"><span id="local-6989586621679270275"><span id="local-6989586621679270281"><span id="local-6989586621679270287"><span id="local-6989586621679270293"><span id="local-6989586621679270299"><span id="local-6989586621679270305"><span id="local-6989586621679270311"><span id="local-6989586621679270317"><span id="local-6989586621679270323"><span id="local-6989586621679270329"><span id="local-6989586621679270335"><span id="local-6989586621679270341"><span class="annot"><span class="annottext">Eq Monom
+$clapp :: (Basis Monom -&gt; Basis Monom -&gt; Maybe (Basis Monom, Double))
+-&gt; Monom -&gt; Monom -&gt; Monom
+lmap :: (Basis Monom -&gt; Maybe (Basis Monom, Double)) -&gt; Monom -&gt; Monom
+$clmap :: (Basis Monom -&gt; Maybe (Basis Monom, Double)) -&gt; Monom -&gt; Monom
+add :: Monom -&gt; Monom -&gt; Monom
+$cadd :: Monom -&gt; Monom -&gt; Monom
+isMonom :: Monom -&gt; Bool
+$cisMonom :: Monom -&gt; Bool
+monom :: Basis Monom -&gt; Double -&gt; Monom
+$cmonom :: Basis Monom -&gt; Double -&gt; Monom
+isZero :: Monom -&gt; Bool
+$cisZero :: Monom -&gt; Bool
+zero :: Monom
+$czero :: Monom
+</span><a href="Algeometry.GeometricAlgebra.html#C%3ALinSpace"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">LinSpace</span></a></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679262887"><span id="local-6989586621679262893"><span id="local-6989586621679262899"><span id="local-6989586621679262905"><span id="local-6989586621679262911"><span id="local-6989586621679262917"><span id="local-6989586621679262923"><span id="local-6989586621679262929"><span id="local-6989586621679262935"><span id="local-6989586621679262941"><span id="local-6989586621679262947"><span id="local-6989586621679262953"><span id="local-6989586621679262959"><span id="local-6989586621679262965"><span id="local-6989586621679262971"><span id="local-6989586621679262977"><span id="local-6989586621679262983"><span id="local-6989586621679262989"><span class="annot"><span class="annottext">Eq Monom
 Ord (Generator Monom)
 [Monom]
 Basis Monom ~ [Generator Monom]
 LinSpace Monom
-Ord (Generator Monom)
--&gt; (Basis Monom ~ [Generator Monom])
--&gt; LinSpace Monom
--&gt; Eq Monom
--&gt; (Monom -&gt; (Int, Int, Int))
--&gt; (Monom -&gt; Generator Monom -&gt; Double)
--&gt; [Monom]
--&gt; (Monom -&gt; Int)
--&gt; (Monom -&gt; Monom -&gt; Monom)
--&gt; (Monom -&gt; Monom -&gt; Monom)
--&gt; (Monom -&gt; Monom -&gt; Monom)
--&gt; (Monom -&gt; Monom -&gt; Monom)
--&gt; (Monom -&gt; Monom -&gt; Monom)
--&gt; (Monom -&gt; Monom)
--&gt; (Monom -&gt; Monom)
--&gt; (Monom -&gt; Monom)
--&gt; (Monom -&gt; Monom)
--&gt; (Monom -&gt; Monom)
--&gt; (Monom -&gt; Monom)
--&gt; (Monom -&gt; (Double, Monom))
--&gt; (Monom -&gt; Double)
--&gt; (Monom -&gt; Monom)
--&gt; CliffAlgebra Monom
 Monom -&gt; Double
 Monom -&gt; Int
 Monom -&gt; (Double, Monom)
@@ -321,118 +241,94 @@ Ord (Generator mv)
 -&gt; (mv -&gt; Double)
 -&gt; (mv -&gt; mv)
 -&gt; CliffAlgebra mv
-$calgebraSignature :: Monom -&gt; (Int, Int, Int)
-algebraSignature :: Monom -&gt; (Int, Int, Int)
-$csquare :: Monom -&gt; Generator Monom -&gt; Double
-square :: Monom -&gt; Generator Monom -&gt; Double
-$cgenerators :: [Monom]
-generators :: [Monom]
-$cgrade :: Monom -&gt; Int
-grade :: Monom -&gt; Int
-$cgeom :: Monom -&gt; Monom -&gt; Monom
-geom :: Monom -&gt; Monom -&gt; Monom
-$couter :: Monom -&gt; Monom -&gt; Monom
-outer :: Monom -&gt; Monom -&gt; Monom
-$crcontract :: Monom -&gt; Monom -&gt; Monom
-rcontract :: Monom -&gt; Monom -&gt; Monom
-$clcontract :: Monom -&gt; Monom -&gt; Monom
-lcontract :: Monom -&gt; Monom -&gt; Monom
-$cinner :: Monom -&gt; Monom -&gt; Monom
-inner :: Monom -&gt; Monom -&gt; Monom
-$crev :: Monom -&gt; Monom
-rev :: Monom -&gt; Monom
-$cinv :: Monom -&gt; Monom
-inv :: Monom -&gt; Monom
-$cconj :: Monom -&gt; Monom
-conj :: Monom -&gt; Monom
-$cdual :: Monom -&gt; Monom
-dual :: Monom -&gt; Monom
-$crcompl :: Monom -&gt; Monom
-rcompl :: Monom -&gt; Monom
-$clcompl :: Monom -&gt; Monom
-lcompl :: Monom -&gt; Monom
-$cdecompose :: Monom -&gt; (Double, Monom)
-decompose :: Monom -&gt; (Double, Monom)
-$ctrace :: Monom -&gt; Double
-trace :: Monom -&gt; Double
-$cnonScalar :: Monom -&gt; Monom
 nonScalar :: Monom -&gt; Monom
-</span><a href="Algeometry.GeometricAlgebra.html#CliffAlgebra"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">CliffAlgebra</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+$cnonScalar :: Monom -&gt; Monom
+trace :: Monom -&gt; Double
+$ctrace :: Monom -&gt; Double
+decompose :: Monom -&gt; (Double, Monom)
+$cdecompose :: Monom -&gt; (Double, Monom)
+lcompl :: Monom -&gt; Monom
+$clcompl :: Monom -&gt; Monom
+rcompl :: Monom -&gt; Monom
+$crcompl :: Monom -&gt; Monom
+dual :: Monom -&gt; Monom
+$cdual :: Monom -&gt; Monom
+conj :: Monom -&gt; Monom
+$cconj :: Monom -&gt; Monom
+inv :: Monom -&gt; Monom
+$cinv :: Monom -&gt; Monom
+rev :: Monom -&gt; Monom
+$crev :: Monom -&gt; Monom
+inner :: Monom -&gt; Monom -&gt; Monom
+$cinner :: Monom -&gt; Monom -&gt; Monom
+lcontract :: Monom -&gt; Monom -&gt; Monom
+$clcontract :: Monom -&gt; Monom -&gt; Monom
+rcontract :: Monom -&gt; Monom -&gt; Monom
+$crcontract :: Monom -&gt; Monom -&gt; Monom
+outer :: Monom -&gt; Monom -&gt; Monom
+$couter :: Monom -&gt; Monom -&gt; Monom
+geom :: Monom -&gt; Monom -&gt; Monom
+$cgeom :: Monom -&gt; Monom -&gt; Monom
+grade :: Monom -&gt; Int
+$cgrade :: Monom -&gt; Int
+generators :: [Monom]
+$cgenerators :: [Monom]
+square :: Monom -&gt; Generator Monom -&gt; Double
+$csquare :: Monom -&gt; Generator Monom -&gt; Double
+algebraSignature :: Monom -&gt; (Int, Int, Int)
+$calgebraSignature :: Monom -&gt; (Int, Int, Int)
+</span><a href="Algeometry.GeometricAlgebra.html#C%3ACliffAlgebra"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">CliffAlgebra</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-56"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Basis"><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Basis"><span class="hs-identifier hs-var">Basis</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Monom"><span class="hs-identifier hs-type">Monom</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Basis"><span class="hs-identifier hs-type">Basis</span></a></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
 </span><span id="line-57"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Generator"><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Generator"><span class="hs-identifier hs-var">Generator</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Monom"><span class="hs-identifier hs-type">Monom</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Generator"><span class="hs-identifier hs-type">Generator</span></a></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
 </span><span id="line-58"></span><span>
 </span><span id="line-59"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Monom"><span class="hs-identifier hs-type">Monom</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-60"></span><span>  </span><span id="local-6989586621679270408"><span class="annot"><span class="annottext">arbitrary :: Gen Monom
-</span><a href="#local-6989586621679270408"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Monom] -&gt; Gen Monom
-forall a. [a] -&gt; Gen a
-</span><span class="hs-identifier hs-var">elements</span></span><span> </span><span class="annot"><span class="annottext">[Monom]
-forall mv. CliffAlgebra mv =&gt; [mv]
+</span><span id="line-60"></span><span>  </span><span id="local-6989586621679262820"><span class="annot"><span class="annottext">arbitrary :: Gen Monom
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. [a] -&gt; Gen a
+</span><span class="hs-identifier hs-var">elements</span></span><span> </span><span class="annot"><span class="annottext">forall mv. CliffAlgebra mv =&gt; [mv]
 </span><a href="Algeometry.GeometricAlgebra.html#basis"><span class="hs-identifier hs-var">basis</span></a></span><span>
-</span><span id="line-61"></span><span>  </span><span id="local-6989586621679270419"><span class="annot"><span class="annottext">shrink :: Monom -&gt; [Monom]
-</span><a href="#local-6989586621679270419"><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></a></span></span><span> </span><span id="local-6989586621679270421"><span class="annot"><span class="annottext">Monom
-</span><a href="#local-6989586621679270421"><span class="hs-identifier hs-var">mv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Monom
-[Generator Monom] -&gt; Monom
-forall mv. CliffAlgebra mv =&gt; [Generator mv] -&gt; mv
-</span><a href="Algeometry.GeometricAlgebra.html#e_"><span class="hs-identifier hs-var">e_</span></a></span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; Monom) -&gt; (Int -&gt; [Int]) -&gt; Int -&gt; Monom
-forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; [Int] -&gt; [Int]
-forall a. Eq a =&gt; a -&gt; [a] -&gt; [a]
+</span><span id="line-61"></span><span>  </span><span id="local-6989586621679262809"><span class="annot"><span class="annottext">shrink :: Monom -&gt; [Monom]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></span></span><span> </span><span id="local-6989586621679262807"><span class="annot"><span class="annottext">Monom
+</span><a href="#local-6989586621679262807"><span class="hs-identifier hs-var">mv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall mv. CliffAlgebra mv =&gt; [Generator mv] -&gt; mv
+</span><a href="Algeometry.GeometricAlgebra.html#e_"><span class="hs-identifier hs-var">e_</span></a></span><span> </span><span class="annot"><span class="annottext">forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">forall a. Eq a =&gt; a -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">`delete`</span></span><span> </span><span class="annot"><span class="annottext">[Int]
-</span><a href="#local-6989586621679270423"><span class="hs-identifier hs-var">ix</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Monom) -&gt; [Int] -&gt; [Monom]
-forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><a href="#local-6989586621679262805"><span class="hs-identifier hs-var">ix</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[Int]
-</span><a href="#local-6989586621679270423"><span class="hs-identifier hs-var">ix</span></a></span><span>
+</span><a href="#local-6989586621679262805"><span class="hs-identifier hs-var">ix</span></a></span><span>
 </span><span id="line-62"></span><span>    </span><span class="hs-keyword">where</span><span>
-</span><span id="line-63"></span><span>      </span><span id="local-6989586621679270423"><span class="annot"><span class="annottext">ix :: [Int]
-</span><a href="#local-6989586621679270423"><span class="hs-identifier hs-var hs-var">ix</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; [Int]) -&gt; [[Int]] -&gt; [Int]
-forall m a. Monoid m =&gt; (a -&gt; m) -&gt; [a] -&gt; m
-forall (t :: * -&gt; *) m a.
+</span><span id="line-63"></span><span>      </span><span id="local-6989586621679262805"><span class="annot"><span class="annottext">ix :: [Int]
+</span><a href="#local-6989586621679262805"><span class="hs-identifier hs-var hs-var">ix</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall (t :: * -&gt; *) m a.
 (Foldable t, Monoid m) =&gt;
 (a -&gt; m) -&gt; t a -&gt; m
-</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; [Int]
-forall a. [a] -&gt; [a]
-forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; [a]
-</span><span class="hs-identifier hs-var">toList</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Monom -&gt; [Basis Monom]
-forall el. LinSpace el =&gt; el -&gt; [Basis el]
+</span><span class="hs-identifier hs-var">foldMap</span></span><span> </span><span class="annot"><span class="annottext">forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; [a]
+</span><span class="hs-identifier hs-var">toList</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">forall el. LinSpace el =&gt; el -&gt; [Basis el]
 </span><a href="Algeometry.GeometricAlgebra.html#elems"><span class="hs-identifier hs-var">elems</span></a></span><span> </span><span class="annot"><span class="annottext">Monom
-</span><a href="#local-6989586621679270421"><span class="hs-identifier hs-var">mv</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679262807"><span class="hs-identifier hs-var">mv</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-64"></span><span>
 </span><span id="line-65"></span><span class="hs-comment">------------------------------------------------------------</span><span>
 </span><span id="line-66"></span><span>
-</span><span id="line-67"></span><span class="annot"><span class="hs-comment">-- | Wrapper for 1-vector.</span></span><span>
+</span><span id="line-67"></span><span class="hs-comment">-- | Wrapper for 1-vector.</span><span>
 </span><span id="line-68"></span><span class="hs-keyword">newtype</span><span> </span><span id="Vector"><span class="annot"><a href="Algeometry.Arbitrary.html#Vector"><span class="hs-identifier hs-var">Vector</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Vector"><span class="annot"><a href="Algeometry.Arbitrary.html#Vector"><span class="hs-identifier hs-var">Vector</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
-</span><span id="line-69"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679270429"><span id="local-6989586621679270436"><span id="local-6989586621679270440"><span class="annot"><span class="annottext">Int -&gt; Vector -&gt; ShowS
+</span><span id="line-69"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679262790"><span id="local-6989586621679262792"><span id="local-6989586621679262799"><span class="annot"><span class="annottext">Int -&gt; Vector -&gt; ShowS
 [Vector] -&gt; ShowS
 Vector -&gt; String
-(Int -&gt; Vector -&gt; ShowS)
--&gt; (Vector -&gt; String) -&gt; ([Vector] -&gt; ShowS) -&gt; Show Vector
 forall a.
 (Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
-$cshowsPrec :: Int -&gt; Vector -&gt; ShowS
-showsPrec :: Int -&gt; Vector -&gt; ShowS
-$cshow :: Vector -&gt; String
-show :: Vector -&gt; String
-$cshowList :: [Vector] -&gt; ShowS
 showList :: [Vector] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679270443"><span id="local-6989586621679270449"><span class="annot"><span class="annottext">Vector -&gt; Vector -&gt; Bool
-(Vector -&gt; Vector -&gt; Bool)
--&gt; (Vector -&gt; Vector -&gt; Bool) -&gt; Eq Vector
+$cshowList :: [Vector] -&gt; ShowS
+show :: Vector -&gt; String
+$cshow :: Vector -&gt; String
+showsPrec :: Int -&gt; Vector -&gt; ShowS
+$cshowsPrec :: Int -&gt; Vector -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679262782"><span id="local-6989586621679262788"><span class="annot"><span class="annottext">Vector -&gt; Vector -&gt; Bool
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
-$c== :: Vector -&gt; Vector -&gt; Bool
-== :: Vector -&gt; Vector -&gt; Bool
-$c/= :: Vector -&gt; Vector -&gt; Bool
 /= :: Vector -&gt; Vector -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679270462"><span id="local-6989586621679270468"><span id="local-6989586621679270474"><span id="local-6989586621679270480"><span id="local-6989586621679270486"><span id="local-6989586621679270492"><span id="local-6989586621679270498"><span class="annot"><span class="annottext">Integer -&gt; Vector
+$c/= :: Vector -&gt; Vector -&gt; Bool
+== :: Vector -&gt; Vector -&gt; Bool
+$c== :: Vector -&gt; Vector -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679262733"><span id="local-6989586621679262739"><span id="local-6989586621679262745"><span id="local-6989586621679262751"><span id="local-6989586621679262757"><span id="local-6989586621679262763"><span id="local-6989586621679262769"><span class="annot"><span class="annottext">Integer -&gt; Vector
 Vector -&gt; Vector
 Vector -&gt; Vector -&gt; Vector
-(Vector -&gt; Vector -&gt; Vector)
--&gt; (Vector -&gt; Vector -&gt; Vector)
--&gt; (Vector -&gt; Vector -&gt; Vector)
--&gt; (Vector -&gt; Vector)
--&gt; (Vector -&gt; Vector)
--&gt; (Vector -&gt; Vector)
--&gt; (Integer -&gt; Vector)
--&gt; Num Vector
 forall a.
 (a -&gt; a -&gt; a)
 -&gt; (a -&gt; a -&gt; a)
@@ -442,54 +338,35 @@ forall a.
 -&gt; (a -&gt; a)
 -&gt; (Integer -&gt; a)
 -&gt; Num a
-$c+ :: Vector -&gt; Vector -&gt; Vector
-+ :: Vector -&gt; Vector -&gt; Vector
-$c- :: Vector -&gt; Vector -&gt; Vector
-- :: Vector -&gt; Vector -&gt; Vector
-$c* :: Vector -&gt; Vector -&gt; Vector
-* :: Vector -&gt; Vector -&gt; Vector
-$cnegate :: Vector -&gt; Vector
-negate :: Vector -&gt; Vector
-$cabs :: Vector -&gt; Vector
-abs :: Vector -&gt; Vector
-$csignum :: Vector -&gt; Vector
-signum :: Vector -&gt; Vector
-$cfromInteger :: Integer -&gt; Vector
 fromInteger :: Integer -&gt; Vector
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679270528"><span id="local-6989586621679270534"><span id="local-6989586621679270540"><span class="annot"><span class="annottext">Num Vector
-Num Vector
--&gt; (Vector -&gt; Vector -&gt; Vector)
--&gt; (Vector -&gt; Vector)
--&gt; (Rational -&gt; Vector)
--&gt; Fractional Vector
+$cfromInteger :: Integer -&gt; Vector
+signum :: Vector -&gt; Vector
+$csignum :: Vector -&gt; Vector
+abs :: Vector -&gt; Vector
+$cabs :: Vector -&gt; Vector
+negate :: Vector -&gt; Vector
+$cnegate :: Vector -&gt; Vector
+* :: Vector -&gt; Vector -&gt; Vector
+$c* :: Vector -&gt; Vector -&gt; Vector
+- :: Vector -&gt; Vector -&gt; Vector
+$c- :: Vector -&gt; Vector -&gt; Vector
++ :: Vector -&gt; Vector -&gt; Vector
+$c+ :: Vector -&gt; Vector -&gt; Vector
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679262691"><span id="local-6989586621679262697"><span id="local-6989586621679262703"><span class="annot"><span class="annottext">Num Vector
 Rational -&gt; Vector
 Vector -&gt; Vector
 Vector -&gt; Vector -&gt; Vector
 forall a.
 Num a
 -&gt; (a -&gt; a -&gt; a) -&gt; (a -&gt; a) -&gt; (Rational -&gt; a) -&gt; Fractional a
-$c/ :: Vector -&gt; Vector -&gt; Vector
-/ :: Vector -&gt; Vector -&gt; Vector
-$crecip :: Vector -&gt; Vector
-recip :: Vector -&gt; Vector
-$cfromRational :: Rational -&gt; Vector
 fromRational :: Rational -&gt; Vector
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Fractional</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679270559"><span id="local-6989586621679270565"><span id="local-6989586621679270571"><span id="local-6989586621679270577"><span id="local-6989586621679270583"><span id="local-6989586621679270589"><span id="local-6989586621679270595"><span id="local-6989586621679270601"><span id="local-6989586621679270607"><span id="local-6989586621679270613"><span class="annot"><span class="annottext">Eq (Basis Vector)
+$cfromRational :: Rational -&gt; Vector
+recip :: Vector -&gt; Vector
+$crecip :: Vector -&gt; Vector
+/ :: Vector -&gt; Vector -&gt; Vector
+$c/ :: Vector -&gt; Vector -&gt; Vector
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Fractional</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679262618"><span id="local-6989586621679262624"><span id="local-6989586621679262630"><span id="local-6989586621679262636"><span id="local-6989586621679262642"><span id="local-6989586621679262648"><span id="local-6989586621679262654"><span id="local-6989586621679262660"><span id="local-6989586621679262666"><span id="local-6989586621679262672"><span class="annot"><span class="annottext">Eq (Basis Vector)
 Vector
-Eq (Basis Vector)
--&gt; Vector
--&gt; (Vector -&gt; Bool)
--&gt; (Basis Vector -&gt; Double -&gt; Vector)
--&gt; (Vector -&gt; Bool)
--&gt; (Vector -&gt; Vector -&gt; Vector)
--&gt; ((Basis Vector -&gt; Maybe (Basis Vector, Double))
-    -&gt; Vector -&gt; Vector)
--&gt; ((Basis Vector -&gt; Basis Vector -&gt; Maybe (Basis Vector, Double))
-    -&gt; Vector -&gt; Vector -&gt; Vector)
--&gt; ((Basis Vector -&gt; Double -&gt; Bool) -&gt; Vector -&gt; Vector)
--&gt; (Basis Vector -&gt; Vector -&gt; Double)
--&gt; (Vector -&gt; [(Basis Vector, Double)])
--&gt; LinSpace Vector
 Basis Vector -&gt; Double -&gt; Vector
 Basis Vector -&gt; Vector -&gt; Double
 Vector -&gt; Bool
@@ -513,56 +390,33 @@ Eq (Basis el)
 -&gt; (Basis el -&gt; el -&gt; Double)
 -&gt; (el -&gt; [(Basis el, Double)])
 -&gt; LinSpace el
-$czero :: Vector
-zero :: Vector
-$cisZero :: Vector -&gt; Bool
-isZero :: Vector -&gt; Bool
-$cmonom :: Basis Vector -&gt; Double -&gt; Vector
-monom :: Basis Vector -&gt; Double -&gt; Vector
-$cisMonom :: Vector -&gt; Bool
-isMonom :: Vector -&gt; Bool
-$cadd :: Vector -&gt; Vector -&gt; Vector
-add :: Vector -&gt; Vector -&gt; Vector
-$clmap :: (Basis Vector -&gt; Maybe (Basis Vector, Double)) -&gt; Vector -&gt; Vector
-lmap :: (Basis Vector -&gt; Maybe (Basis Vector, Double)) -&gt; Vector -&gt; Vector
-$clapp :: (Basis Vector -&gt; Basis Vector -&gt; Maybe (Basis Vector, Double))
--&gt; Vector -&gt; Vector -&gt; Vector
+assoc :: Vector -&gt; [(Basis Vector, Double)]
+$cassoc :: Vector -&gt; [(Basis Vector, Double)]
+coeff :: Basis Vector -&gt; Vector -&gt; Double
+$ccoeff :: Basis Vector -&gt; Vector -&gt; Double
+lfilter :: (Basis Vector -&gt; Double -&gt; Bool) -&gt; Vector -&gt; Vector
+$clfilter :: (Basis Vector -&gt; Double -&gt; Bool) -&gt; Vector -&gt; Vector
 lapp :: (Basis Vector -&gt; Basis Vector -&gt; Maybe (Basis Vector, Double))
 -&gt; Vector -&gt; Vector -&gt; Vector
-$clfilter :: (Basis Vector -&gt; Double -&gt; Bool) -&gt; Vector -&gt; Vector
-lfilter :: (Basis Vector -&gt; Double -&gt; Bool) -&gt; Vector -&gt; Vector
-$ccoeff :: Basis Vector -&gt; Vector -&gt; Double
-coeff :: Basis Vector -&gt; Vector -&gt; Double
-$cassoc :: Vector -&gt; [(Basis Vector, Double)]
-assoc :: Vector -&gt; [(Basis Vector, Double)]
-</span><a href="Algeometry.GeometricAlgebra.html#LinSpace"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">LinSpace</span></a></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679270631"><span id="local-6989586621679270637"><span id="local-6989586621679270643"><span id="local-6989586621679270649"><span id="local-6989586621679270655"><span id="local-6989586621679270661"><span id="local-6989586621679270667"><span id="local-6989586621679270673"><span id="local-6989586621679270679"><span id="local-6989586621679270685"><span id="local-6989586621679270691"><span id="local-6989586621679270697"><span id="local-6989586621679270703"><span id="local-6989586621679270709"><span id="local-6989586621679270715"><span id="local-6989586621679270721"><span id="local-6989586621679270727"><span id="local-6989586621679270733"><span class="annot"><span class="annottext">Eq Vector
+$clapp :: (Basis Vector -&gt; Basis Vector -&gt; Maybe (Basis Vector, Double))
+-&gt; Vector -&gt; Vector -&gt; Vector
+lmap :: (Basis Vector -&gt; Maybe (Basis Vector, Double)) -&gt; Vector -&gt; Vector
+$clmap :: (Basis Vector -&gt; Maybe (Basis Vector, Double)) -&gt; Vector -&gt; Vector
+add :: Vector -&gt; Vector -&gt; Vector
+$cadd :: Vector -&gt; Vector -&gt; Vector
+isMonom :: Vector -&gt; Bool
+$cisMonom :: Vector -&gt; Bool
+monom :: Basis Vector -&gt; Double -&gt; Vector
+$cmonom :: Basis Vector -&gt; Double -&gt; Vector
+isZero :: Vector -&gt; Bool
+$cisZero :: Vector -&gt; Bool
+zero :: Vector
+$czero :: Vector
+</span><a href="#local-6989586621679262618"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">LinSpace</span></a></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679262498"><span id="local-6989586621679262504"><span id="local-6989586621679262510"><span id="local-6989586621679262516"><span id="local-6989586621679262522"><span id="local-6989586621679262528"><span id="local-6989586621679262534"><span id="local-6989586621679262540"><span id="local-6989586621679262546"><span id="local-6989586621679262552"><span id="local-6989586621679262558"><span id="local-6989586621679262564"><span id="local-6989586621679262570"><span id="local-6989586621679262576"><span id="local-6989586621679262582"><span id="local-6989586621679262588"><span id="local-6989586621679262594"><span id="local-6989586621679262600"><span class="annot"><span class="annottext">Eq Vector
 Ord (Generator Vector)
 [Vector]
 Basis Vector ~ [Generator Vector]
 LinSpace Vector
-Ord (Generator Vector)
--&gt; (Basis Vector ~ [Generator Vector])
--&gt; LinSpace Vector
--&gt; Eq Vector
--&gt; (Vector -&gt; (Int, Int, Int))
--&gt; (Vector -&gt; Generator Vector -&gt; Double)
--&gt; [Vector]
--&gt; (Vector -&gt; Int)
--&gt; (Vector -&gt; Vector -&gt; Vector)
--&gt; (Vector -&gt; Vector -&gt; Vector)
--&gt; (Vector -&gt; Vector -&gt; Vector)
--&gt; (Vector -&gt; Vector -&gt; Vector)
--&gt; (Vector -&gt; Vector -&gt; Vector)
--&gt; (Vector -&gt; Vector)
--&gt; (Vector -&gt; Vector)
--&gt; (Vector -&gt; Vector)
--&gt; (Vector -&gt; Vector)
--&gt; (Vector -&gt; Vector)
--&gt; (Vector -&gt; Vector)
--&gt; (Vector -&gt; (Double, Vector))
--&gt; (Vector -&gt; Double)
--&gt; (Vector -&gt; Vector)
--&gt; CliffAlgebra Vector
 Vector -&gt; Double
 Vector -&gt; Int
 Vector -&gt; (Double, Vector)
@@ -594,104 +448,85 @@ Ord (Generator mv)
 -&gt; (mv -&gt; Double)
 -&gt; (mv -&gt; mv)
 -&gt; CliffAlgebra mv
-$calgebraSignature :: Vector -&gt; (Int, Int, Int)
-algebraSignature :: Vector -&gt; (Int, Int, Int)
-$csquare :: Vector -&gt; Generator Vector -&gt; Double
-square :: Vector -&gt; Generator Vector -&gt; Double
-$cgenerators :: [Vector]
-generators :: [Vector]
-$cgrade :: Vector -&gt; Int
-grade :: Vector -&gt; Int
-$cgeom :: Vector -&gt; Vector -&gt; Vector
-geom :: Vector -&gt; Vector -&gt; Vector
-$couter :: Vector -&gt; Vector -&gt; Vector
-outer :: Vector -&gt; Vector -&gt; Vector
-$crcontract :: Vector -&gt; Vector -&gt; Vector
-rcontract :: Vector -&gt; Vector -&gt; Vector
-$clcontract :: Vector -&gt; Vector -&gt; Vector
-lcontract :: Vector -&gt; Vector -&gt; Vector
-$cinner :: Vector -&gt; Vector -&gt; Vector
-inner :: Vector -&gt; Vector -&gt; Vector
-$crev :: Vector -&gt; Vector
-rev :: Vector -&gt; Vector
-$cinv :: Vector -&gt; Vector
-inv :: Vector -&gt; Vector
-$cconj :: Vector -&gt; Vector
-conj :: Vector -&gt; Vector
-$cdual :: Vector -&gt; Vector
-dual :: Vector -&gt; Vector
-$crcompl :: Vector -&gt; Vector
-rcompl :: Vector -&gt; Vector
-$clcompl :: Vector -&gt; Vector
-lcompl :: Vector -&gt; Vector
-$cdecompose :: Vector -&gt; (Double, Vector)
-decompose :: Vector -&gt; (Double, Vector)
-$ctrace :: Vector -&gt; Double
-trace :: Vector -&gt; Double
-$cnonScalar :: Vector -&gt; Vector
 nonScalar :: Vector -&gt; Vector
-</span><a href="Algeometry.GeometricAlgebra.html#CliffAlgebra"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">CliffAlgebra</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+$cnonScalar :: Vector -&gt; Vector
+trace :: Vector -&gt; Double
+$ctrace :: Vector -&gt; Double
+decompose :: Vector -&gt; (Double, Vector)
+$cdecompose :: Vector -&gt; (Double, Vector)
+lcompl :: Vector -&gt; Vector
+$clcompl :: Vector -&gt; Vector
+rcompl :: Vector -&gt; Vector
+$crcompl :: Vector -&gt; Vector
+dual :: Vector -&gt; Vector
+$cdual :: Vector -&gt; Vector
+conj :: Vector -&gt; Vector
+$cconj :: Vector -&gt; Vector
+inv :: Vector -&gt; Vector
+$cinv :: Vector -&gt; Vector
+rev :: Vector -&gt; Vector
+$crev :: Vector -&gt; Vector
+inner :: Vector -&gt; Vector -&gt; Vector
+$cinner :: Vector -&gt; Vector -&gt; Vector
+lcontract :: Vector -&gt; Vector -&gt; Vector
+$clcontract :: Vector -&gt; Vector -&gt; Vector
+rcontract :: Vector -&gt; Vector -&gt; Vector
+$crcontract :: Vector -&gt; Vector -&gt; Vector
+outer :: Vector -&gt; Vector -&gt; Vector
+$couter :: Vector -&gt; Vector -&gt; Vector
+geom :: Vector -&gt; Vector -&gt; Vector
+$cgeom :: Vector -&gt; Vector -&gt; Vector
+grade :: Vector -&gt; Int
+$cgrade :: Vector -&gt; Int
+generators :: [Vector]
+$cgenerators :: [Vector]
+square :: Vector -&gt; Generator Vector -&gt; Double
+$csquare :: Vector -&gt; Generator Vector -&gt; Double
+algebraSignature :: Vector -&gt; (Int, Int, Int)
+$calgebraSignature :: Vector -&gt; (Int, Int, Int)
+</span><a href="#local-6989586621679262498"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">CliffAlgebra</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-70"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Basis"><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Basis"><span class="hs-identifier hs-var">Basis</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Vector"><span class="hs-identifier hs-type">Vector</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Basis"><span class="hs-identifier hs-type">Basis</span></a></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
 </span><span id="line-71"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Generator"><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Generator"><span class="hs-identifier hs-var">Generator</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Vector"><span class="hs-identifier hs-type">Vector</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Generator"><span class="hs-identifier hs-type">Generator</span></a></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
 </span><span id="line-72"></span><span>
 </span><span id="line-73"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Vector"><span class="hs-identifier hs-type">Vector</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-74"></span><span>  </span><span id="local-6989586621679270802"><span class="annot"><span class="annottext">arbitrary :: Gen Vector
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([Vector] -&gt; [Vector]) -&gt; Gen Vector
-forall a. (Num a, CliffAlgebra a) =&gt; ([a] -&gt; [a]) -&gt; Gen a
-</span><a href="Algeometry.Arbitrary.html#abitraryMV"><span class="hs-identifier hs-var">abitraryMV</span></a></span><span> </span><span class="annot"><span class="annottext">(([Vector] -&gt; [Vector]) -&gt; Gen Vector)
--&gt; ([Vector] -&gt; [Vector]) -&gt; Gen Vector
-forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Vector -&gt; Bool) -&gt; [Vector] -&gt; [Vector]
-forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
-</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679270803"><span class="annot"><span class="annottext">Vector
-</span><a href="#local-6989586621679270803"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Vector -&gt; Int
-forall mv. CliffAlgebra mv =&gt; mv -&gt; Int
+</span><span id="line-74"></span><span>  </span><span id="local-6989586621679262429"><span class="annot"><span class="annottext">arbitrary :: Gen Vector
+</span><a href="#local-6989586621679262429"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. (Num a, CliffAlgebra a) =&gt; ([a] -&gt; [a]) -&gt; Gen a
+</span><a href="Algeometry.Arbitrary.html#abitraryMV"><span class="hs-identifier hs-var">abitraryMV</span></a></span><span> </span><span class="annot"><span class="annottext">forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679262428"><span class="annot"><span class="annottext">Vector
+</span><a href="#local-6989586621679262428"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">forall mv. CliffAlgebra mv =&gt; mv -&gt; Int
 </span><a href="Algeometry.GeometricAlgebra.html#grade"><span class="hs-identifier hs-var">grade</span></a></span><span> </span><span class="annot"><span class="annottext">Vector
-</span><a href="#local-6989586621679270803"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
-forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><a href="#local-6989586621679262428"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">1</span></span><span class="hs-special">)</span><span>
-</span><span id="line-75"></span><span>  </span><span id="local-6989586621679270807"><span class="annot"><span class="annottext">shrink :: Vector -&gt; [Vector]
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Vector -&gt; [Vector]
-forall a. (Num a, CliffAlgebra a) =&gt; a -&gt; [a]
+</span><span id="line-75"></span><span>  </span><span id="local-6989586621679262424"><span class="annot"><span class="annottext">shrink :: Vector -&gt; [Vector]
+</span><a href="#local-6989586621679262424"><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. (Num a, CliffAlgebra a) =&gt; a -&gt; [a]
 </span><a href="Algeometry.Arbitrary.html#shrinkMV"><span class="hs-identifier hs-var">shrinkMV</span></a></span><span>
 </span><span id="line-76"></span><span>
 </span><span id="line-77"></span><span class="hs-comment">------------------------------------------------------------</span><span>
 </span><span id="line-78"></span><span>
-</span><span id="line-79"></span><span class="annot"><span class="hs-comment">-- | Wrapper for 2-vector.</span></span><span>
+</span><span id="line-79"></span><span class="hs-comment">-- | Wrapper for 2-vector.</span><span>
 </span><span id="line-80"></span><span class="hs-keyword">newtype</span><span> </span><span id="Bivector"><span class="annot"><a href="Algeometry.Arbitrary.html#Bivector"><span class="hs-identifier hs-var">Bivector</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Bivector"><span class="annot"><a href="Algeometry.Arbitrary.html#Bivector"><span class="hs-identifier hs-var">Bivector</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
-</span><span id="line-81"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679270810"><span id="local-6989586621679270817"><span id="local-6989586621679270821"><span class="annot"><span class="annottext">Int -&gt; Bivector -&gt; ShowS
+</span><span id="line-81"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679262412"><span id="local-6989586621679262414"><span id="local-6989586621679262421"><span class="annot"><span class="annottext">Int -&gt; Bivector -&gt; ShowS
 [Bivector] -&gt; ShowS
 Bivector -&gt; String
-(Int -&gt; Bivector -&gt; ShowS)
--&gt; (Bivector -&gt; String) -&gt; ([Bivector] -&gt; ShowS) -&gt; Show Bivector
 forall a.
 (Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
-$cshowsPrec :: Int -&gt; Bivector -&gt; ShowS
-showsPrec :: Int -&gt; Bivector -&gt; ShowS
-$cshow :: Bivector -&gt; String
-show :: Bivector -&gt; String
-$cshowList :: [Bivector] -&gt; ShowS
 showList :: [Bivector] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679270824"><span id="local-6989586621679270830"><span class="annot"><span class="annottext">Bivector -&gt; Bivector -&gt; Bool
-(Bivector -&gt; Bivector -&gt; Bool)
--&gt; (Bivector -&gt; Bivector -&gt; Bool) -&gt; Eq Bivector
+$cshowList :: [Bivector] -&gt; ShowS
+show :: Bivector -&gt; String
+$cshow :: Bivector -&gt; String
+showsPrec :: Int -&gt; Bivector -&gt; ShowS
+$cshowsPrec :: Int -&gt; Bivector -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679262404"><span id="local-6989586621679262410"><span class="annot"><span class="annottext">Bivector -&gt; Bivector -&gt; Bool
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
-$c== :: Bivector -&gt; Bivector -&gt; Bool
-== :: Bivector -&gt; Bivector -&gt; Bool
-$c/= :: Bivector -&gt; Bivector -&gt; Bool
 /= :: Bivector -&gt; Bivector -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679270843"><span id="local-6989586621679270849"><span id="local-6989586621679270855"><span id="local-6989586621679270861"><span id="local-6989586621679270867"><span id="local-6989586621679270873"><span id="local-6989586621679270879"><span class="annot"><span class="annottext">Integer -&gt; Bivector
+$c/= :: Bivector -&gt; Bivector -&gt; Bool
+== :: Bivector -&gt; Bivector -&gt; Bool
+$c== :: Bivector -&gt; Bivector -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679262355"><span id="local-6989586621679262361"><span id="local-6989586621679262367"><span id="local-6989586621679262373"><span id="local-6989586621679262379"><span id="local-6989586621679262385"><span id="local-6989586621679262391"><span class="annot"><span class="annottext">Integer -&gt; Bivector
 Bivector -&gt; Bivector
 Bivector -&gt; Bivector -&gt; Bivector
-(Bivector -&gt; Bivector -&gt; Bivector)
--&gt; (Bivector -&gt; Bivector -&gt; Bivector)
--&gt; (Bivector -&gt; Bivector -&gt; Bivector)
--&gt; (Bivector -&gt; Bivector)
--&gt; (Bivector -&gt; Bivector)
--&gt; (Bivector -&gt; Bivector)
--&gt; (Integer -&gt; Bivector)
--&gt; Num Bivector
 forall a.
 (a -&gt; a -&gt; a)
 -&gt; (a -&gt; a -&gt; a)
@@ -701,55 +536,35 @@ forall a.
 -&gt; (a -&gt; a)
 -&gt; (Integer -&gt; a)
 -&gt; Num a
-$c+ :: Bivector -&gt; Bivector -&gt; Bivector
-+ :: Bivector -&gt; Bivector -&gt; Bivector
-$c- :: Bivector -&gt; Bivector -&gt; Bivector
-- :: Bivector -&gt; Bivector -&gt; Bivector
-$c* :: Bivector -&gt; Bivector -&gt; Bivector
-* :: Bivector -&gt; Bivector -&gt; Bivector
-$cnegate :: Bivector -&gt; Bivector
-negate :: Bivector -&gt; Bivector
-$cabs :: Bivector -&gt; Bivector
-abs :: Bivector -&gt; Bivector
-$csignum :: Bivector -&gt; Bivector
-signum :: Bivector -&gt; Bivector
-$cfromInteger :: Integer -&gt; Bivector
 fromInteger :: Integer -&gt; Bivector
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679270909"><span id="local-6989586621679270915"><span id="local-6989586621679270921"><span class="annot"><span class="annottext">Num Bivector
-Num Bivector
--&gt; (Bivector -&gt; Bivector -&gt; Bivector)
--&gt; (Bivector -&gt; Bivector)
--&gt; (Rational -&gt; Bivector)
--&gt; Fractional Bivector
+$cfromInteger :: Integer -&gt; Bivector
+signum :: Bivector -&gt; Bivector
+$csignum :: Bivector -&gt; Bivector
+abs :: Bivector -&gt; Bivector
+$cabs :: Bivector -&gt; Bivector
+negate :: Bivector -&gt; Bivector
+$cnegate :: Bivector -&gt; Bivector
+* :: Bivector -&gt; Bivector -&gt; Bivector
+$c* :: Bivector -&gt; Bivector -&gt; Bivector
+- :: Bivector -&gt; Bivector -&gt; Bivector
+$c- :: Bivector -&gt; Bivector -&gt; Bivector
++ :: Bivector -&gt; Bivector -&gt; Bivector
+$c+ :: Bivector -&gt; Bivector -&gt; Bivector
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679262313"><span id="local-6989586621679262319"><span id="local-6989586621679262325"><span class="annot"><span class="annottext">Num Bivector
 Rational -&gt; Bivector
 Bivector -&gt; Bivector
 Bivector -&gt; Bivector -&gt; Bivector
 forall a.
 Num a
 -&gt; (a -&gt; a -&gt; a) -&gt; (a -&gt; a) -&gt; (Rational -&gt; a) -&gt; Fractional a
-$c/ :: Bivector -&gt; Bivector -&gt; Bivector
-/ :: Bivector -&gt; Bivector -&gt; Bivector
-$crecip :: Bivector -&gt; Bivector
-recip :: Bivector -&gt; Bivector
-$cfromRational :: Rational -&gt; Bivector
 fromRational :: Rational -&gt; Bivector
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Fractional</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679270940"><span id="local-6989586621679270946"><span id="local-6989586621679270952"><span id="local-6989586621679270958"><span id="local-6989586621679270964"><span id="local-6989586621679270970"><span id="local-6989586621679270976"><span id="local-6989586621679270982"><span id="local-6989586621679270988"><span id="local-6989586621679270994"><span class="annot"><span class="annottext">Eq (Basis Bivector)
+$cfromRational :: Rational -&gt; Bivector
+recip :: Bivector -&gt; Bivector
+$crecip :: Bivector -&gt; Bivector
+/ :: Bivector -&gt; Bivector -&gt; Bivector
+$c/ :: Bivector -&gt; Bivector -&gt; Bivector
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Fractional</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679262240"><span id="local-6989586621679262246"><span id="local-6989586621679262252"><span id="local-6989586621679262258"><span id="local-6989586621679262264"><span id="local-6989586621679262270"><span id="local-6989586621679262276"><span id="local-6989586621679262282"><span id="local-6989586621679262288"><span id="local-6989586621679262294"><span class="annot"><span class="annottext">Eq (Basis Bivector)
 Bivector
-Eq (Basis Bivector)
--&gt; Bivector
--&gt; (Bivector -&gt; Bool)
--&gt; (Basis Bivector -&gt; Double -&gt; Bivector)
--&gt; (Bivector -&gt; Bool)
--&gt; (Bivector -&gt; Bivector -&gt; Bivector)
--&gt; ((Basis Bivector -&gt; Maybe (Basis Bivector, Double))
-    -&gt; Bivector -&gt; Bivector)
--&gt; ((Basis Bivector
-     -&gt; Basis Bivector -&gt; Maybe (Basis Bivector, Double))
-    -&gt; Bivector -&gt; Bivector -&gt; Bivector)
--&gt; ((Basis Bivector -&gt; Double -&gt; Bool) -&gt; Bivector -&gt; Bivector)
--&gt; (Basis Bivector -&gt; Bivector -&gt; Double)
--&gt; (Bivector -&gt; [(Basis Bivector, Double)])
--&gt; LinSpace Bivector
 Basis Bivector -&gt; Double -&gt; Bivector
 Basis Bivector -&gt; Bivector -&gt; Double
 Bivector -&gt; Bool
@@ -775,60 +590,37 @@ Eq (Basis el)
 -&gt; (Basis el -&gt; el -&gt; Double)
 -&gt; (el -&gt; [(Basis el, Double)])
 -&gt; LinSpace el
-$czero :: Bivector
-zero :: Bivector
-$cisZero :: Bivector -&gt; Bool
-isZero :: Bivector -&gt; Bool
-$cmonom :: Basis Bivector -&gt; Double -&gt; Bivector
-monom :: Basis Bivector -&gt; Double -&gt; Bivector
-$cisMonom :: Bivector -&gt; Bool
-isMonom :: Bivector -&gt; Bool
-$cadd :: Bivector -&gt; Bivector -&gt; Bivector
-add :: Bivector -&gt; Bivector -&gt; Bivector
-$clmap :: (Basis Bivector -&gt; Maybe (Basis Bivector, Double))
--&gt; Bivector -&gt; Bivector
-lmap :: (Basis Bivector -&gt; Maybe (Basis Bivector, Double))
--&gt; Bivector -&gt; Bivector
-$clapp :: (Basis Bivector
- -&gt; Basis Bivector -&gt; Maybe (Basis Bivector, Double))
--&gt; Bivector -&gt; Bivector -&gt; Bivector
+assoc :: Bivector -&gt; [(Basis Bivector, Double)]
+$cassoc :: Bivector -&gt; [(Basis Bivector, Double)]
+coeff :: Basis Bivector -&gt; Bivector -&gt; Double
+$ccoeff :: Basis Bivector -&gt; Bivector -&gt; Double
+lfilter :: (Basis Bivector -&gt; Double -&gt; Bool) -&gt; Bivector -&gt; Bivector
+$clfilter :: (Basis Bivector -&gt; Double -&gt; Bool) -&gt; Bivector -&gt; Bivector
 lapp :: (Basis Bivector
  -&gt; Basis Bivector -&gt; Maybe (Basis Bivector, Double))
 -&gt; Bivector -&gt; Bivector -&gt; Bivector
-$clfilter :: (Basis Bivector -&gt; Double -&gt; Bool) -&gt; Bivector -&gt; Bivector
-lfilter :: (Basis Bivector -&gt; Double -&gt; Bool) -&gt; Bivector -&gt; Bivector
-$ccoeff :: Basis Bivector -&gt; Bivector -&gt; Double
-coeff :: Basis Bivector -&gt; Bivector -&gt; Double
-$cassoc :: Bivector -&gt; [(Basis Bivector, Double)]
-assoc :: Bivector -&gt; [(Basis Bivector, Double)]
-</span><a href="Algeometry.GeometricAlgebra.html#LinSpace"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">LinSpace</span></a></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679271012"><span id="local-6989586621679271018"><span id="local-6989586621679271024"><span id="local-6989586621679271030"><span id="local-6989586621679271036"><span id="local-6989586621679271042"><span id="local-6989586621679271048"><span id="local-6989586621679271054"><span id="local-6989586621679271060"><span id="local-6989586621679271066"><span id="local-6989586621679271072"><span id="local-6989586621679271078"><span id="local-6989586621679271084"><span id="local-6989586621679271090"><span id="local-6989586621679271096"><span id="local-6989586621679271102"><span id="local-6989586621679271108"><span id="local-6989586621679271114"><span class="annot"><span class="annottext">Eq Bivector
+$clapp :: (Basis Bivector
+ -&gt; Basis Bivector -&gt; Maybe (Basis Bivector, Double))
+-&gt; Bivector -&gt; Bivector -&gt; Bivector
+lmap :: (Basis Bivector -&gt; Maybe (Basis Bivector, Double))
+-&gt; Bivector -&gt; Bivector
+$clmap :: (Basis Bivector -&gt; Maybe (Basis Bivector, Double))
+-&gt; Bivector -&gt; Bivector
+add :: Bivector -&gt; Bivector -&gt; Bivector
+$cadd :: Bivector -&gt; Bivector -&gt; Bivector
+isMonom :: Bivector -&gt; Bool
+$cisMonom :: Bivector -&gt; Bool
+monom :: Basis Bivector -&gt; Double -&gt; Bivector
+$cmonom :: Basis Bivector -&gt; Double -&gt; Bivector
+isZero :: Bivector -&gt; Bool
+$cisZero :: Bivector -&gt; Bool
+zero :: Bivector
+$czero :: Bivector
+</span><a href="#local-6989586621679262240"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">LinSpace</span></a></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679262120"><span id="local-6989586621679262126"><span id="local-6989586621679262132"><span id="local-6989586621679262138"><span id="local-6989586621679262144"><span id="local-6989586621679262150"><span id="local-6989586621679262156"><span id="local-6989586621679262162"><span id="local-6989586621679262168"><span id="local-6989586621679262174"><span id="local-6989586621679262180"><span id="local-6989586621679262186"><span id="local-6989586621679262192"><span id="local-6989586621679262198"><span id="local-6989586621679262204"><span id="local-6989586621679262210"><span id="local-6989586621679262216"><span id="local-6989586621679262222"><span class="annot"><span class="annottext">Eq Bivector
 Ord (Generator Bivector)
 [Bivector]
 Basis Bivector ~ [Generator Bivector]
 LinSpace Bivector
-Ord (Generator Bivector)
--&gt; (Basis Bivector ~ [Generator Bivector])
--&gt; LinSpace Bivector
--&gt; Eq Bivector
--&gt; (Bivector -&gt; (Int, Int, Int))
--&gt; (Bivector -&gt; Generator Bivector -&gt; Double)
--&gt; [Bivector]
--&gt; (Bivector -&gt; Int)
--&gt; (Bivector -&gt; Bivector -&gt; Bivector)
--&gt; (Bivector -&gt; Bivector -&gt; Bivector)
--&gt; (Bivector -&gt; Bivector -&gt; Bivector)
--&gt; (Bivector -&gt; Bivector -&gt; Bivector)
--&gt; (Bivector -&gt; Bivector -&gt; Bivector)
--&gt; (Bivector -&gt; Bivector)
--&gt; (Bivector -&gt; Bivector)
--&gt; (Bivector -&gt; Bivector)
--&gt; (Bivector -&gt; Bivector)
--&gt; (Bivector -&gt; Bivector)
--&gt; (Bivector -&gt; Bivector)
--&gt; (Bivector -&gt; (Double, Bivector))
--&gt; (Bivector -&gt; Double)
--&gt; (Bivector -&gt; Bivector)
--&gt; CliffAlgebra Bivector
 Bivector -&gt; Double
 Bivector -&gt; Int
 Bivector -&gt; (Double, Bivector)
@@ -860,106 +652,85 @@ Ord (Generator mv)
 -&gt; (mv -&gt; Double)
 -&gt; (mv -&gt; mv)
 -&gt; CliffAlgebra mv
-$calgebraSignature :: Bivector -&gt; (Int, Int, Int)
-algebraSignature :: Bivector -&gt; (Int, Int, Int)
-$csquare :: Bivector -&gt; Generator Bivector -&gt; Double
-square :: Bivector -&gt; Generator Bivector -&gt; Double
-$cgenerators :: [Bivector]
-generators :: [Bivector]
-$cgrade :: Bivector -&gt; Int
-grade :: Bivector -&gt; Int
-$cgeom :: Bivector -&gt; Bivector -&gt; Bivector
-geom :: Bivector -&gt; Bivector -&gt; Bivector
-$couter :: Bivector -&gt; Bivector -&gt; Bivector
-outer :: Bivector -&gt; Bivector -&gt; Bivector
-$crcontract :: Bivector -&gt; Bivector -&gt; Bivector
-rcontract :: Bivector -&gt; Bivector -&gt; Bivector
-$clcontract :: Bivector -&gt; Bivector -&gt; Bivector
-lcontract :: Bivector -&gt; Bivector -&gt; Bivector
-$cinner :: Bivector -&gt; Bivector -&gt; Bivector
-inner :: Bivector -&gt; Bivector -&gt; Bivector
-$crev :: Bivector -&gt; Bivector
-rev :: Bivector -&gt; Bivector
-$cinv :: Bivector -&gt; Bivector
-inv :: Bivector -&gt; Bivector
-$cconj :: Bivector -&gt; Bivector
-conj :: Bivector -&gt; Bivector
-$cdual :: Bivector -&gt; Bivector
-dual :: Bivector -&gt; Bivector
-$crcompl :: Bivector -&gt; Bivector
-rcompl :: Bivector -&gt; Bivector
-$clcompl :: Bivector -&gt; Bivector
-lcompl :: Bivector -&gt; Bivector
-$cdecompose :: Bivector -&gt; (Double, Bivector)
-decompose :: Bivector -&gt; (Double, Bivector)
-$ctrace :: Bivector -&gt; Double
-trace :: Bivector -&gt; Double
-$cnonScalar :: Bivector -&gt; Bivector
 nonScalar :: Bivector -&gt; Bivector
-</span><a href="Algeometry.GeometricAlgebra.html#CliffAlgebra"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">CliffAlgebra</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+$cnonScalar :: Bivector -&gt; Bivector
+trace :: Bivector -&gt; Double
+$ctrace :: Bivector -&gt; Double
+decompose :: Bivector -&gt; (Double, Bivector)
+$cdecompose :: Bivector -&gt; (Double, Bivector)
+lcompl :: Bivector -&gt; Bivector
+$clcompl :: Bivector -&gt; Bivector
+rcompl :: Bivector -&gt; Bivector
+$crcompl :: Bivector -&gt; Bivector
+dual :: Bivector -&gt; Bivector
+$cdual :: Bivector -&gt; Bivector
+conj :: Bivector -&gt; Bivector
+$cconj :: Bivector -&gt; Bivector
+inv :: Bivector -&gt; Bivector
+$cinv :: Bivector -&gt; Bivector
+rev :: Bivector -&gt; Bivector
+$crev :: Bivector -&gt; Bivector
+inner :: Bivector -&gt; Bivector -&gt; Bivector
+$cinner :: Bivector -&gt; Bivector -&gt; Bivector
+lcontract :: Bivector -&gt; Bivector -&gt; Bivector
+$clcontract :: Bivector -&gt; Bivector -&gt; Bivector
+rcontract :: Bivector -&gt; Bivector -&gt; Bivector
+$crcontract :: Bivector -&gt; Bivector -&gt; Bivector
+outer :: Bivector -&gt; Bivector -&gt; Bivector
+$couter :: Bivector -&gt; Bivector -&gt; Bivector
+geom :: Bivector -&gt; Bivector -&gt; Bivector
+$cgeom :: Bivector -&gt; Bivector -&gt; Bivector
+grade :: Bivector -&gt; Int
+$cgrade :: Bivector -&gt; Int
+generators :: [Bivector]
+$cgenerators :: [Bivector]
+square :: Bivector -&gt; Generator Bivector -&gt; Double
+$csquare :: Bivector -&gt; Generator Bivector -&gt; Double
+algebraSignature :: Bivector -&gt; (Int, Int, Int)
+$calgebraSignature :: Bivector -&gt; (Int, Int, Int)
+</span><a href="#local-6989586621679262120"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">CliffAlgebra</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-82"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Basis"><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Basis"><span class="hs-identifier hs-var">Basis</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Bivector"><span class="hs-identifier hs-type">Bivector</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Basis"><span class="hs-identifier hs-type">Basis</span></a></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
 </span><span id="line-83"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Generator"><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Generator"><span class="hs-identifier hs-var">Generator</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Bivector"><span class="hs-identifier hs-type">Bivector</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Generator"><span class="hs-identifier hs-type">Generator</span></a></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
 </span><span id="line-84"></span><span>
 </span><span id="line-85"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Bivector"><span class="hs-identifier hs-type">Bivector</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-86"></span><span>  </span><span id="local-6989586621679271182"><span class="annot"><span class="annottext">arbitrary :: Gen Bivector
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([Bivector] -&gt; [Bivector]) -&gt; Gen Bivector
-forall a. (Num a, CliffAlgebra a) =&gt; ([a] -&gt; [a]) -&gt; Gen a
-</span><a href="Algeometry.Arbitrary.html#abitraryMV"><span class="hs-identifier hs-var">abitraryMV</span></a></span><span> </span><span class="annot"><span class="annottext">(([Bivector] -&gt; [Bivector]) -&gt; Gen Bivector)
--&gt; ([Bivector] -&gt; [Bivector]) -&gt; Gen Bivector
-forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Bivector -&gt; Bool) -&gt; [Bivector] -&gt; [Bivector]
-forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
-</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679271183"><span class="annot"><span class="annottext">Bivector
-</span><a href="#local-6989586621679271183"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bivector -&gt; Int
-forall mv. CliffAlgebra mv =&gt; mv -&gt; Int
+</span><span id="line-86"></span><span>  </span><span id="local-6989586621679262052"><span class="annot"><span class="annottext">arbitrary :: Gen Bivector
+</span><a href="#local-6989586621679262052"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. (Num a, CliffAlgebra a) =&gt; ([a] -&gt; [a]) -&gt; Gen a
+</span><a href="Algeometry.Arbitrary.html#abitraryMV"><span class="hs-identifier hs-var">abitraryMV</span></a></span><span> </span><span class="annot"><span class="annottext">forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679262051"><span class="annot"><span class="annottext">Bivector
+</span><a href="#local-6989586621679262051"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">forall mv. CliffAlgebra mv =&gt; mv -&gt; Int
 </span><a href="Algeometry.GeometricAlgebra.html#grade"><span class="hs-identifier hs-var">grade</span></a></span><span> </span><span class="annot"><span class="annottext">Bivector
-</span><a href="#local-6989586621679271183"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
-forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><a href="#local-6989586621679262051"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">2</span></span><span class="hs-special">)</span><span>
-</span><span id="line-87"></span><span>  </span><span id="local-6989586621679271186"><span class="annot"><span class="annottext">shrink :: Bivector -&gt; [Bivector]
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bivector -&gt; [Bivector]
-forall a. (Num a, CliffAlgebra a) =&gt; a -&gt; [a]
+</span><span id="line-87"></span><span>  </span><span id="local-6989586621679262048"><span class="annot"><span class="annottext">shrink :: Bivector -&gt; [Bivector]
+</span><a href="#local-6989586621679262048"><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. (Num a, CliffAlgebra a) =&gt; a -&gt; [a]
 </span><a href="Algeometry.Arbitrary.html#shrinkMV"><span class="hs-identifier hs-var">shrinkMV</span></a></span><span>
 </span><span id="line-88"></span><span>
 </span><span id="line-89"></span><span class="hs-comment">------------------------------------------------------------</span><span>
 </span><span id="line-90"></span><span>
-</span><span id="line-91"></span><span class="annot"><span class="hs-comment">-- | Wrapper for 3-vector.</span></span><span>
+</span><span id="line-91"></span><span class="hs-comment">-- | Wrapper for 3-vector.</span><span>
 </span><span id="line-92"></span><span class="hs-keyword">newtype</span><span> </span><span id="Trivector"><span class="annot"><a href="Algeometry.Arbitrary.html#Trivector"><span class="hs-identifier hs-var">Trivector</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Trivector"><span class="annot"><a href="Algeometry.Arbitrary.html#Trivector"><span class="hs-identifier hs-var">Trivector</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
-</span><span id="line-93"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679271189"><span id="local-6989586621679271196"><span id="local-6989586621679271200"><span class="annot"><span class="annottext">Int -&gt; Trivector -&gt; ShowS
+</span><span id="line-93"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679262036"><span id="local-6989586621679262038"><span id="local-6989586621679262045"><span class="annot"><span class="annottext">Int -&gt; Trivector -&gt; ShowS
 [Trivector] -&gt; ShowS
 Trivector -&gt; String
-(Int -&gt; Trivector -&gt; ShowS)
--&gt; (Trivector -&gt; String)
--&gt; ([Trivector] -&gt; ShowS)
--&gt; Show Trivector
 forall a.
 (Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
-$cshowsPrec :: Int -&gt; Trivector -&gt; ShowS
-showsPrec :: Int -&gt; Trivector -&gt; ShowS
-$cshow :: Trivector -&gt; String
-show :: Trivector -&gt; String
-$cshowList :: [Trivector] -&gt; ShowS
 showList :: [Trivector] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679271203"><span id="local-6989586621679271209"><span class="annot"><span class="annottext">Trivector -&gt; Trivector -&gt; Bool
-(Trivector -&gt; Trivector -&gt; Bool)
--&gt; (Trivector -&gt; Trivector -&gt; Bool) -&gt; Eq Trivector
+$cshowList :: [Trivector] -&gt; ShowS
+show :: Trivector -&gt; String
+$cshow :: Trivector -&gt; String
+showsPrec :: Int -&gt; Trivector -&gt; ShowS
+$cshowsPrec :: Int -&gt; Trivector -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679262028"><span id="local-6989586621679262034"><span class="annot"><span class="annottext">Trivector -&gt; Trivector -&gt; Bool
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
-$c== :: Trivector -&gt; Trivector -&gt; Bool
-== :: Trivector -&gt; Trivector -&gt; Bool
-$c/= :: Trivector -&gt; Trivector -&gt; Bool
 /= :: Trivector -&gt; Trivector -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679271222"><span id="local-6989586621679271228"><span id="local-6989586621679271234"><span id="local-6989586621679271240"><span id="local-6989586621679271246"><span id="local-6989586621679271252"><span id="local-6989586621679271258"><span class="annot"><span class="annottext">Integer -&gt; Trivector
+$c/= :: Trivector -&gt; Trivector -&gt; Bool
+== :: Trivector -&gt; Trivector -&gt; Bool
+$c== :: Trivector -&gt; Trivector -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261979"><span id="local-6989586621679261985"><span id="local-6989586621679261991"><span id="local-6989586621679261997"><span id="local-6989586621679262003"><span id="local-6989586621679262009"><span id="local-6989586621679262015"><span class="annot"><span class="annottext">Integer -&gt; Trivector
 Trivector -&gt; Trivector
 Trivector -&gt; Trivector -&gt; Trivector
-(Trivector -&gt; Trivector -&gt; Trivector)
--&gt; (Trivector -&gt; Trivector -&gt; Trivector)
--&gt; (Trivector -&gt; Trivector -&gt; Trivector)
--&gt; (Trivector -&gt; Trivector)
--&gt; (Trivector -&gt; Trivector)
--&gt; (Trivector -&gt; Trivector)
--&gt; (Integer -&gt; Trivector)
--&gt; Num Trivector
 forall a.
 (a -&gt; a -&gt; a)
 -&gt; (a -&gt; a -&gt; a)
@@ -969,55 +740,35 @@ forall a.
 -&gt; (a -&gt; a)
 -&gt; (Integer -&gt; a)
 -&gt; Num a
-$c+ :: Trivector -&gt; Trivector -&gt; Trivector
-+ :: Trivector -&gt; Trivector -&gt; Trivector
-$c- :: Trivector -&gt; Trivector -&gt; Trivector
-- :: Trivector -&gt; Trivector -&gt; Trivector
-$c* :: Trivector -&gt; Trivector -&gt; Trivector
-* :: Trivector -&gt; Trivector -&gt; Trivector
-$cnegate :: Trivector -&gt; Trivector
-negate :: Trivector -&gt; Trivector
-$cabs :: Trivector -&gt; Trivector
-abs :: Trivector -&gt; Trivector
-$csignum :: Trivector -&gt; Trivector
-signum :: Trivector -&gt; Trivector
-$cfromInteger :: Integer -&gt; Trivector
 fromInteger :: Integer -&gt; Trivector
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679271288"><span id="local-6989586621679271294"><span id="local-6989586621679271300"><span class="annot"><span class="annottext">Num Trivector
-Num Trivector
--&gt; (Trivector -&gt; Trivector -&gt; Trivector)
--&gt; (Trivector -&gt; Trivector)
--&gt; (Rational -&gt; Trivector)
--&gt; Fractional Trivector
+$cfromInteger :: Integer -&gt; Trivector
+signum :: Trivector -&gt; Trivector
+$csignum :: Trivector -&gt; Trivector
+abs :: Trivector -&gt; Trivector
+$cabs :: Trivector -&gt; Trivector
+negate :: Trivector -&gt; Trivector
+$cnegate :: Trivector -&gt; Trivector
+* :: Trivector -&gt; Trivector -&gt; Trivector
+$c* :: Trivector -&gt; Trivector -&gt; Trivector
+- :: Trivector -&gt; Trivector -&gt; Trivector
+$c- :: Trivector -&gt; Trivector -&gt; Trivector
++ :: Trivector -&gt; Trivector -&gt; Trivector
+$c+ :: Trivector -&gt; Trivector -&gt; Trivector
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261937"><span id="local-6989586621679261943"><span id="local-6989586621679261949"><span class="annot"><span class="annottext">Num Trivector
 Rational -&gt; Trivector
 Trivector -&gt; Trivector
 Trivector -&gt; Trivector -&gt; Trivector
 forall a.
 Num a
 -&gt; (a -&gt; a -&gt; a) -&gt; (a -&gt; a) -&gt; (Rational -&gt; a) -&gt; Fractional a
-$c/ :: Trivector -&gt; Trivector -&gt; Trivector
-/ :: Trivector -&gt; Trivector -&gt; Trivector
-$crecip :: Trivector -&gt; Trivector
-recip :: Trivector -&gt; Trivector
-$cfromRational :: Rational -&gt; Trivector
 fromRational :: Rational -&gt; Trivector
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Fractional</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679271319"><span id="local-6989586621679271325"><span id="local-6989586621679271331"><span id="local-6989586621679271337"><span id="local-6989586621679271343"><span id="local-6989586621679271349"><span id="local-6989586621679271355"><span id="local-6989586621679271361"><span id="local-6989586621679271367"><span id="local-6989586621679271373"><span class="annot"><span class="annottext">Eq (Basis Trivector)
+$cfromRational :: Rational -&gt; Trivector
+recip :: Trivector -&gt; Trivector
+$crecip :: Trivector -&gt; Trivector
+/ :: Trivector -&gt; Trivector -&gt; Trivector
+$c/ :: Trivector -&gt; Trivector -&gt; Trivector
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Fractional</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261864"><span id="local-6989586621679261870"><span id="local-6989586621679261876"><span id="local-6989586621679261882"><span id="local-6989586621679261888"><span id="local-6989586621679261894"><span id="local-6989586621679261900"><span id="local-6989586621679261906"><span id="local-6989586621679261912"><span id="local-6989586621679261918"><span class="annot"><span class="annottext">Eq (Basis Trivector)
 Trivector
-Eq (Basis Trivector)
--&gt; Trivector
--&gt; (Trivector -&gt; Bool)
--&gt; (Basis Trivector -&gt; Double -&gt; Trivector)
--&gt; (Trivector -&gt; Bool)
--&gt; (Trivector -&gt; Trivector -&gt; Trivector)
--&gt; ((Basis Trivector -&gt; Maybe (Basis Trivector, Double))
-    -&gt; Trivector -&gt; Trivector)
--&gt; ((Basis Trivector
-     -&gt; Basis Trivector -&gt; Maybe (Basis Trivector, Double))
-    -&gt; Trivector -&gt; Trivector -&gt; Trivector)
--&gt; ((Basis Trivector -&gt; Double -&gt; Bool) -&gt; Trivector -&gt; Trivector)
--&gt; (Basis Trivector -&gt; Trivector -&gt; Double)
--&gt; (Trivector -&gt; [(Basis Trivector, Double)])
--&gt; LinSpace Trivector
 Basis Trivector -&gt; Double -&gt; Trivector
 Basis Trivector -&gt; Trivector -&gt; Double
 Trivector -&gt; Bool
@@ -1043,60 +794,37 @@ Eq (Basis el)
 -&gt; (Basis el -&gt; el -&gt; Double)
 -&gt; (el -&gt; [(Basis el, Double)])
 -&gt; LinSpace el
-$czero :: Trivector
-zero :: Trivector
-$cisZero :: Trivector -&gt; Bool
-isZero :: Trivector -&gt; Bool
-$cmonom :: Basis Trivector -&gt; Double -&gt; Trivector
-monom :: Basis Trivector -&gt; Double -&gt; Trivector
-$cisMonom :: Trivector -&gt; Bool
-isMonom :: Trivector -&gt; Bool
-$cadd :: Trivector -&gt; Trivector -&gt; Trivector
-add :: Trivector -&gt; Trivector -&gt; Trivector
-$clmap :: (Basis Trivector -&gt; Maybe (Basis Trivector, Double))
--&gt; Trivector -&gt; Trivector
-lmap :: (Basis Trivector -&gt; Maybe (Basis Trivector, Double))
--&gt; Trivector -&gt; Trivector
-$clapp :: (Basis Trivector
- -&gt; Basis Trivector -&gt; Maybe (Basis Trivector, Double))
--&gt; Trivector -&gt; Trivector -&gt; Trivector
+assoc :: Trivector -&gt; [(Basis Trivector, Double)]
+$cassoc :: Trivector -&gt; [(Basis Trivector, Double)]
+coeff :: Basis Trivector -&gt; Trivector -&gt; Double
+$ccoeff :: Basis Trivector -&gt; Trivector -&gt; Double
+lfilter :: (Basis Trivector -&gt; Double -&gt; Bool) -&gt; Trivector -&gt; Trivector
+$clfilter :: (Basis Trivector -&gt; Double -&gt; Bool) -&gt; Trivector -&gt; Trivector
 lapp :: (Basis Trivector
  -&gt; Basis Trivector -&gt; Maybe (Basis Trivector, Double))
 -&gt; Trivector -&gt; Trivector -&gt; Trivector
-$clfilter :: (Basis Trivector -&gt; Double -&gt; Bool) -&gt; Trivector -&gt; Trivector
-lfilter :: (Basis Trivector -&gt; Double -&gt; Bool) -&gt; Trivector -&gt; Trivector
-$ccoeff :: Basis Trivector -&gt; Trivector -&gt; Double
-coeff :: Basis Trivector -&gt; Trivector -&gt; Double
-$cassoc :: Trivector -&gt; [(Basis Trivector, Double)]
-assoc :: Trivector -&gt; [(Basis Trivector, Double)]
-</span><a href="Algeometry.GeometricAlgebra.html#LinSpace"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">LinSpace</span></a></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679271391"><span id="local-6989586621679271397"><span id="local-6989586621679271403"><span id="local-6989586621679271409"><span id="local-6989586621679271415"><span id="local-6989586621679271421"><span id="local-6989586621679271427"><span id="local-6989586621679271433"><span id="local-6989586621679271439"><span id="local-6989586621679271445"><span id="local-6989586621679271451"><span id="local-6989586621679271457"><span id="local-6989586621679271463"><span id="local-6989586621679271469"><span id="local-6989586621679271475"><span id="local-6989586621679271481"><span id="local-6989586621679271487"><span id="local-6989586621679271493"><span class="annot"><span class="annottext">Eq Trivector
+$clapp :: (Basis Trivector
+ -&gt; Basis Trivector -&gt; Maybe (Basis Trivector, Double))
+-&gt; Trivector -&gt; Trivector -&gt; Trivector
+lmap :: (Basis Trivector -&gt; Maybe (Basis Trivector, Double))
+-&gt; Trivector -&gt; Trivector
+$clmap :: (Basis Trivector -&gt; Maybe (Basis Trivector, Double))
+-&gt; Trivector -&gt; Trivector
+add :: Trivector -&gt; Trivector -&gt; Trivector
+$cadd :: Trivector -&gt; Trivector -&gt; Trivector
+isMonom :: Trivector -&gt; Bool
+$cisMonom :: Trivector -&gt; Bool
+monom :: Basis Trivector -&gt; Double -&gt; Trivector
+$cmonom :: Basis Trivector -&gt; Double -&gt; Trivector
+isZero :: Trivector -&gt; Bool
+$cisZero :: Trivector -&gt; Bool
+zero :: Trivector
+$czero :: Trivector
+</span><a href="#local-6989586621679261864"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">LinSpace</span></a></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261744"><span id="local-6989586621679261750"><span id="local-6989586621679261756"><span id="local-6989586621679261762"><span id="local-6989586621679261768"><span id="local-6989586621679261774"><span id="local-6989586621679261780"><span id="local-6989586621679261786"><span id="local-6989586621679261792"><span id="local-6989586621679261798"><span id="local-6989586621679261804"><span id="local-6989586621679261810"><span id="local-6989586621679261816"><span id="local-6989586621679261822"><span id="local-6989586621679261828"><span id="local-6989586621679261834"><span id="local-6989586621679261840"><span id="local-6989586621679261846"><span class="annot"><span class="annottext">Eq Trivector
 Ord (Generator Trivector)
 [Trivector]
 Basis Trivector ~ [Generator Trivector]
 LinSpace Trivector
-Ord (Generator Trivector)
--&gt; (Basis Trivector ~ [Generator Trivector])
--&gt; LinSpace Trivector
--&gt; Eq Trivector
--&gt; (Trivector -&gt; (Int, Int, Int))
--&gt; (Trivector -&gt; Generator Trivector -&gt; Double)
--&gt; [Trivector]
--&gt; (Trivector -&gt; Int)
--&gt; (Trivector -&gt; Trivector -&gt; Trivector)
--&gt; (Trivector -&gt; Trivector -&gt; Trivector)
--&gt; (Trivector -&gt; Trivector -&gt; Trivector)
--&gt; (Trivector -&gt; Trivector -&gt; Trivector)
--&gt; (Trivector -&gt; Trivector -&gt; Trivector)
--&gt; (Trivector -&gt; Trivector)
--&gt; (Trivector -&gt; Trivector)
--&gt; (Trivector -&gt; Trivector)
--&gt; (Trivector -&gt; Trivector)
--&gt; (Trivector -&gt; Trivector)
--&gt; (Trivector -&gt; Trivector)
--&gt; (Trivector -&gt; (Double, Trivector))
--&gt; (Trivector -&gt; Double)
--&gt; (Trivector -&gt; Trivector)
--&gt; CliffAlgebra Trivector
 Trivector -&gt; Double
 Trivector -&gt; Int
 Trivector -&gt; (Double, Trivector)
@@ -1128,106 +856,85 @@ Ord (Generator mv)
 -&gt; (mv -&gt; Double)
 -&gt; (mv -&gt; mv)
 -&gt; CliffAlgebra mv
-$calgebraSignature :: Trivector -&gt; (Int, Int, Int)
-algebraSignature :: Trivector -&gt; (Int, Int, Int)
-$csquare :: Trivector -&gt; Generator Trivector -&gt; Double
-square :: Trivector -&gt; Generator Trivector -&gt; Double
-$cgenerators :: [Trivector]
-generators :: [Trivector]
-$cgrade :: Trivector -&gt; Int
-grade :: Trivector -&gt; Int
-$cgeom :: Trivector -&gt; Trivector -&gt; Trivector
-geom :: Trivector -&gt; Trivector -&gt; Trivector
-$couter :: Trivector -&gt; Trivector -&gt; Trivector
-outer :: Trivector -&gt; Trivector -&gt; Trivector
-$crcontract :: Trivector -&gt; Trivector -&gt; Trivector
-rcontract :: Trivector -&gt; Trivector -&gt; Trivector
-$clcontract :: Trivector -&gt; Trivector -&gt; Trivector
-lcontract :: Trivector -&gt; Trivector -&gt; Trivector
-$cinner :: Trivector -&gt; Trivector -&gt; Trivector
-inner :: Trivector -&gt; Trivector -&gt; Trivector
-$crev :: Trivector -&gt; Trivector
-rev :: Trivector -&gt; Trivector
-$cinv :: Trivector -&gt; Trivector
-inv :: Trivector -&gt; Trivector
-$cconj :: Trivector -&gt; Trivector
-conj :: Trivector -&gt; Trivector
-$cdual :: Trivector -&gt; Trivector
-dual :: Trivector -&gt; Trivector
-$crcompl :: Trivector -&gt; Trivector
-rcompl :: Trivector -&gt; Trivector
-$clcompl :: Trivector -&gt; Trivector
-lcompl :: Trivector -&gt; Trivector
-$cdecompose :: Trivector -&gt; (Double, Trivector)
-decompose :: Trivector -&gt; (Double, Trivector)
-$ctrace :: Trivector -&gt; Double
-trace :: Trivector -&gt; Double
-$cnonScalar :: Trivector -&gt; Trivector
 nonScalar :: Trivector -&gt; Trivector
-</span><a href="Algeometry.GeometricAlgebra.html#CliffAlgebra"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">CliffAlgebra</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+$cnonScalar :: Trivector -&gt; Trivector
+trace :: Trivector -&gt; Double
+$ctrace :: Trivector -&gt; Double
+decompose :: Trivector -&gt; (Double, Trivector)
+$cdecompose :: Trivector -&gt; (Double, Trivector)
+lcompl :: Trivector -&gt; Trivector
+$clcompl :: Trivector -&gt; Trivector
+rcompl :: Trivector -&gt; Trivector
+$crcompl :: Trivector -&gt; Trivector
+dual :: Trivector -&gt; Trivector
+$cdual :: Trivector -&gt; Trivector
+conj :: Trivector -&gt; Trivector
+$cconj :: Trivector -&gt; Trivector
+inv :: Trivector -&gt; Trivector
+$cinv :: Trivector -&gt; Trivector
+rev :: Trivector -&gt; Trivector
+$crev :: Trivector -&gt; Trivector
+inner :: Trivector -&gt; Trivector -&gt; Trivector
+$cinner :: Trivector -&gt; Trivector -&gt; Trivector
+lcontract :: Trivector -&gt; Trivector -&gt; Trivector
+$clcontract :: Trivector -&gt; Trivector -&gt; Trivector
+rcontract :: Trivector -&gt; Trivector -&gt; Trivector
+$crcontract :: Trivector -&gt; Trivector -&gt; Trivector
+outer :: Trivector -&gt; Trivector -&gt; Trivector
+$couter :: Trivector -&gt; Trivector -&gt; Trivector
+geom :: Trivector -&gt; Trivector -&gt; Trivector
+$cgeom :: Trivector -&gt; Trivector -&gt; Trivector
+grade :: Trivector -&gt; Int
+$cgrade :: Trivector -&gt; Int
+generators :: [Trivector]
+$cgenerators :: [Trivector]
+square :: Trivector -&gt; Generator Trivector -&gt; Double
+$csquare :: Trivector -&gt; Generator Trivector -&gt; Double
+algebraSignature :: Trivector -&gt; (Int, Int, Int)
+$calgebraSignature :: Trivector -&gt; (Int, Int, Int)
+</span><a href="#local-6989586621679261744"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">CliffAlgebra</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-94"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Basis"><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Basis"><span class="hs-identifier hs-var">Basis</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Trivector"><span class="hs-identifier hs-type">Trivector</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Basis"><span class="hs-identifier hs-type">Basis</span></a></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
 </span><span id="line-95"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Generator"><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Generator"><span class="hs-identifier hs-var">Generator</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Trivector"><span class="hs-identifier hs-type">Trivector</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Generator"><span class="hs-identifier hs-type">Generator</span></a></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
 </span><span id="line-96"></span><span>
 </span><span id="line-97"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Trivector"><span class="hs-identifier hs-type">Trivector</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-98"></span><span>  </span><span id="local-6989586621679271561"><span class="annot"><span class="annottext">arbitrary :: Gen Trivector
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([Trivector] -&gt; [Trivector]) -&gt; Gen Trivector
-forall a. (Num a, CliffAlgebra a) =&gt; ([a] -&gt; [a]) -&gt; Gen a
-</span><a href="Algeometry.Arbitrary.html#abitraryMV"><span class="hs-identifier hs-var">abitraryMV</span></a></span><span> </span><span class="annot"><span class="annottext">(([Trivector] -&gt; [Trivector]) -&gt; Gen Trivector)
--&gt; ([Trivector] -&gt; [Trivector]) -&gt; Gen Trivector
-forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Trivector -&gt; Bool) -&gt; [Trivector] -&gt; [Trivector]
-forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
-</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679271562"><span class="annot"><span class="annottext">Trivector
-</span><a href="#local-6989586621679271562"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Trivector -&gt; Int
-forall mv. CliffAlgebra mv =&gt; mv -&gt; Int
+</span><span id="line-98"></span><span>  </span><span id="local-6989586621679261676"><span class="annot"><span class="annottext">arbitrary :: Gen Trivector
+</span><a href="#local-6989586621679261676"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. (Num a, CliffAlgebra a) =&gt; ([a] -&gt; [a]) -&gt; Gen a
+</span><a href="Algeometry.Arbitrary.html#abitraryMV"><span class="hs-identifier hs-var">abitraryMV</span></a></span><span> </span><span class="annot"><span class="annottext">forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679261675"><span class="annot"><span class="annottext">Trivector
+</span><a href="#local-6989586621679261675"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">forall mv. CliffAlgebra mv =&gt; mv -&gt; Int
 </span><a href="Algeometry.GeometricAlgebra.html#grade"><span class="hs-identifier hs-var">grade</span></a></span><span> </span><span class="annot"><span class="annottext">Trivector
-</span><a href="#local-6989586621679271562"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
-forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><a href="#local-6989586621679261675"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">3</span></span><span class="hs-special">)</span><span>
-</span><span id="line-99"></span><span>  </span><span id="local-6989586621679271565"><span class="annot"><span class="annottext">shrink :: Trivector -&gt; [Trivector]
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Trivector -&gt; [Trivector]
-forall a. (Num a, CliffAlgebra a) =&gt; a -&gt; [a]
+</span><span id="line-99"></span><span>  </span><span id="local-6989586621679261672"><span class="annot"><span class="annottext">shrink :: Trivector -&gt; [Trivector]
+</span><a href="#local-6989586621679261672"><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. (Num a, CliffAlgebra a) =&gt; a -&gt; [a]
 </span><a href="Algeometry.Arbitrary.html#shrinkMV"><span class="hs-identifier hs-var">shrinkMV</span></a></span><span>
 </span><span id="line-100"></span><span>
 </span><span id="line-101"></span><span class="hs-comment">------------------------------------------------------------</span><span>
 </span><span id="line-102"></span><span>
-</span><span id="line-103"></span><span class="annot"><span class="hs-comment">-- | Wrapper for a general multivector.</span></span><span>
+</span><span id="line-103"></span><span class="hs-comment">-- | Wrapper for a general multivector.</span><span>
 </span><span id="line-104"></span><span class="hs-keyword">newtype</span><span> </span><span id="Multivector"><span class="annot"><a href="Algeometry.Arbitrary.html#Multivector"><span class="hs-identifier hs-var">Multivector</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Multivector"><span class="annot"><a href="Algeometry.Arbitrary.html#Multivector"><span class="hs-identifier hs-var">Multivector</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
-</span><span id="line-105"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679271568"><span id="local-6989586621679271575"><span id="local-6989586621679271579"><span class="annot"><span class="annottext">Int -&gt; Multivector -&gt; ShowS
+</span><span id="line-105"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679261660"><span id="local-6989586621679261662"><span id="local-6989586621679261669"><span class="annot"><span class="annottext">Int -&gt; Multivector -&gt; ShowS
 [Multivector] -&gt; ShowS
 Multivector -&gt; String
-(Int -&gt; Multivector -&gt; ShowS)
--&gt; (Multivector -&gt; String)
--&gt; ([Multivector] -&gt; ShowS)
--&gt; Show Multivector
 forall a.
 (Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
-$cshowsPrec :: Int -&gt; Multivector -&gt; ShowS
-showsPrec :: Int -&gt; Multivector -&gt; ShowS
-$cshow :: Multivector -&gt; String
-show :: Multivector -&gt; String
-$cshowList :: [Multivector] -&gt; ShowS
 showList :: [Multivector] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679271582"><span id="local-6989586621679271588"><span class="annot"><span class="annottext">Multivector -&gt; Multivector -&gt; Bool
-(Multivector -&gt; Multivector -&gt; Bool)
--&gt; (Multivector -&gt; Multivector -&gt; Bool) -&gt; Eq Multivector
+$cshowList :: [Multivector] -&gt; ShowS
+show :: Multivector -&gt; String
+$cshow :: Multivector -&gt; String
+showsPrec :: Int -&gt; Multivector -&gt; ShowS
+$cshowsPrec :: Int -&gt; Multivector -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261652"><span id="local-6989586621679261658"><span class="annot"><span class="annottext">Multivector -&gt; Multivector -&gt; Bool
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
-$c== :: Multivector -&gt; Multivector -&gt; Bool
-== :: Multivector -&gt; Multivector -&gt; Bool
-$c/= :: Multivector -&gt; Multivector -&gt; Bool
 /= :: Multivector -&gt; Multivector -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679271601"><span id="local-6989586621679271607"><span id="local-6989586621679271613"><span id="local-6989586621679271619"><span id="local-6989586621679271625"><span id="local-6989586621679271631"><span id="local-6989586621679271637"><span class="annot"><span class="annottext">Integer -&gt; Multivector
+$c/= :: Multivector -&gt; Multivector -&gt; Bool
+== :: Multivector -&gt; Multivector -&gt; Bool
+$c== :: Multivector -&gt; Multivector -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261603"><span id="local-6989586621679261609"><span id="local-6989586621679261615"><span id="local-6989586621679261621"><span id="local-6989586621679261627"><span id="local-6989586621679261633"><span id="local-6989586621679261639"><span class="annot"><span class="annottext">Integer -&gt; Multivector
 Multivector -&gt; Multivector
 Multivector -&gt; Multivector -&gt; Multivector
-(Multivector -&gt; Multivector -&gt; Multivector)
--&gt; (Multivector -&gt; Multivector -&gt; Multivector)
--&gt; (Multivector -&gt; Multivector -&gt; Multivector)
--&gt; (Multivector -&gt; Multivector)
--&gt; (Multivector -&gt; Multivector)
--&gt; (Multivector -&gt; Multivector)
--&gt; (Integer -&gt; Multivector)
--&gt; Num Multivector
 forall a.
 (a -&gt; a -&gt; a)
 -&gt; (a -&gt; a -&gt; a)
@@ -1237,56 +944,35 @@ forall a.
 -&gt; (a -&gt; a)
 -&gt; (Integer -&gt; a)
 -&gt; Num a
-$c+ :: Multivector -&gt; Multivector -&gt; Multivector
-+ :: Multivector -&gt; Multivector -&gt; Multivector
-$c- :: Multivector -&gt; Multivector -&gt; Multivector
-- :: Multivector -&gt; Multivector -&gt; Multivector
-$c* :: Multivector -&gt; Multivector -&gt; Multivector
-* :: Multivector -&gt; Multivector -&gt; Multivector
-$cnegate :: Multivector -&gt; Multivector
-negate :: Multivector -&gt; Multivector
-$cabs :: Multivector -&gt; Multivector
-abs :: Multivector -&gt; Multivector
-$csignum :: Multivector -&gt; Multivector
-signum :: Multivector -&gt; Multivector
-$cfromInteger :: Integer -&gt; Multivector
 fromInteger :: Integer -&gt; Multivector
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679271667"><span id="local-6989586621679271673"><span id="local-6989586621679271679"><span class="annot"><span class="annottext">Num Multivector
-Num Multivector
--&gt; (Multivector -&gt; Multivector -&gt; Multivector)
--&gt; (Multivector -&gt; Multivector)
--&gt; (Rational -&gt; Multivector)
--&gt; Fractional Multivector
+$cfromInteger :: Integer -&gt; Multivector
+signum :: Multivector -&gt; Multivector
+$csignum :: Multivector -&gt; Multivector
+abs :: Multivector -&gt; Multivector
+$cabs :: Multivector -&gt; Multivector
+negate :: Multivector -&gt; Multivector
+$cnegate :: Multivector -&gt; Multivector
+* :: Multivector -&gt; Multivector -&gt; Multivector
+$c* :: Multivector -&gt; Multivector -&gt; Multivector
+- :: Multivector -&gt; Multivector -&gt; Multivector
+$c- :: Multivector -&gt; Multivector -&gt; Multivector
++ :: Multivector -&gt; Multivector -&gt; Multivector
+$c+ :: Multivector -&gt; Multivector -&gt; Multivector
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261561"><span id="local-6989586621679261567"><span id="local-6989586621679261573"><span class="annot"><span class="annottext">Num Multivector
 Rational -&gt; Multivector
 Multivector -&gt; Multivector
 Multivector -&gt; Multivector -&gt; Multivector
 forall a.
 Num a
 -&gt; (a -&gt; a -&gt; a) -&gt; (a -&gt; a) -&gt; (Rational -&gt; a) -&gt; Fractional a
-$c/ :: Multivector -&gt; Multivector -&gt; Multivector
-/ :: Multivector -&gt; Multivector -&gt; Multivector
-$crecip :: Multivector -&gt; Multivector
-recip :: Multivector -&gt; Multivector
-$cfromRational :: Rational -&gt; Multivector
 fromRational :: Rational -&gt; Multivector
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Fractional</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679271698"><span id="local-6989586621679271704"><span id="local-6989586621679271710"><span id="local-6989586621679271716"><span id="local-6989586621679271722"><span id="local-6989586621679271728"><span id="local-6989586621679271734"><span id="local-6989586621679271740"><span id="local-6989586621679271746"><span id="local-6989586621679271752"><span class="annot"><span class="annottext">Eq (Basis Multivector)
+$cfromRational :: Rational -&gt; Multivector
+recip :: Multivector -&gt; Multivector
+$crecip :: Multivector -&gt; Multivector
+/ :: Multivector -&gt; Multivector -&gt; Multivector
+$c/ :: Multivector -&gt; Multivector -&gt; Multivector
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Fractional</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261488"><span id="local-6989586621679261494"><span id="local-6989586621679261500"><span id="local-6989586621679261506"><span id="local-6989586621679261512"><span id="local-6989586621679261518"><span id="local-6989586621679261524"><span id="local-6989586621679261530"><span id="local-6989586621679261536"><span id="local-6989586621679261542"><span class="annot"><span class="annottext">Eq (Basis Multivector)
 Multivector
-Eq (Basis Multivector)
--&gt; Multivector
--&gt; (Multivector -&gt; Bool)
--&gt; (Basis Multivector -&gt; Double -&gt; Multivector)
--&gt; (Multivector -&gt; Bool)
--&gt; (Multivector -&gt; Multivector -&gt; Multivector)
--&gt; ((Basis Multivector -&gt; Maybe (Basis Multivector, Double))
-    -&gt; Multivector -&gt; Multivector)
--&gt; ((Basis Multivector
-     -&gt; Basis Multivector -&gt; Maybe (Basis Multivector, Double))
-    -&gt; Multivector -&gt; Multivector -&gt; Multivector)
--&gt; ((Basis Multivector -&gt; Double -&gt; Bool)
-    -&gt; Multivector -&gt; Multivector)
--&gt; (Basis Multivector -&gt; Multivector -&gt; Double)
--&gt; (Multivector -&gt; [(Basis Multivector, Double)])
--&gt; LinSpace Multivector
 Basis Multivector -&gt; Double -&gt; Multivector
 Basis Multivector -&gt; Multivector -&gt; Double
 Multivector -&gt; Bool
@@ -1312,60 +998,37 @@ Eq (Basis el)
 -&gt; (Basis el -&gt; el -&gt; Double)
 -&gt; (el -&gt; [(Basis el, Double)])
 -&gt; LinSpace el
-$czero :: Multivector
-zero :: Multivector
-$cisZero :: Multivector -&gt; Bool
-isZero :: Multivector -&gt; Bool
-$cmonom :: Basis Multivector -&gt; Double -&gt; Multivector
-monom :: Basis Multivector -&gt; Double -&gt; Multivector
-$cisMonom :: Multivector -&gt; Bool
-isMonom :: Multivector -&gt; Bool
-$cadd :: Multivector -&gt; Multivector -&gt; Multivector
-add :: Multivector -&gt; Multivector -&gt; Multivector
-$clmap :: (Basis Multivector -&gt; Maybe (Basis Multivector, Double))
--&gt; Multivector -&gt; Multivector
-lmap :: (Basis Multivector -&gt; Maybe (Basis Multivector, Double))
--&gt; Multivector -&gt; Multivector
-$clapp :: (Basis Multivector
- -&gt; Basis Multivector -&gt; Maybe (Basis Multivector, Double))
--&gt; Multivector -&gt; Multivector -&gt; Multivector
+assoc :: Multivector -&gt; [(Basis Multivector, Double)]
+$cassoc :: Multivector -&gt; [(Basis Multivector, Double)]
+coeff :: Basis Multivector -&gt; Multivector -&gt; Double
+$ccoeff :: Basis Multivector -&gt; Multivector -&gt; Double
+lfilter :: (Basis Multivector -&gt; Double -&gt; Bool) -&gt; Multivector -&gt; Multivector
+$clfilter :: (Basis Multivector -&gt; Double -&gt; Bool) -&gt; Multivector -&gt; Multivector
 lapp :: (Basis Multivector
  -&gt; Basis Multivector -&gt; Maybe (Basis Multivector, Double))
 -&gt; Multivector -&gt; Multivector -&gt; Multivector
-$clfilter :: (Basis Multivector -&gt; Double -&gt; Bool) -&gt; Multivector -&gt; Multivector
-lfilter :: (Basis Multivector -&gt; Double -&gt; Bool) -&gt; Multivector -&gt; Multivector
-$ccoeff :: Basis Multivector -&gt; Multivector -&gt; Double
-coeff :: Basis Multivector -&gt; Multivector -&gt; Double
-$cassoc :: Multivector -&gt; [(Basis Multivector, Double)]
-assoc :: Multivector -&gt; [(Basis Multivector, Double)]
-</span><a href="Algeometry.GeometricAlgebra.html#LinSpace"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">LinSpace</span></a></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679271770"><span id="local-6989586621679271776"><span id="local-6989586621679271782"><span id="local-6989586621679271788"><span id="local-6989586621679271794"><span id="local-6989586621679271800"><span id="local-6989586621679271806"><span id="local-6989586621679271812"><span id="local-6989586621679271818"><span id="local-6989586621679271824"><span id="local-6989586621679271830"><span id="local-6989586621679271836"><span id="local-6989586621679271842"><span id="local-6989586621679271848"><span id="local-6989586621679271854"><span id="local-6989586621679271860"><span id="local-6989586621679271866"><span id="local-6989586621679271872"><span class="annot"><span class="annottext">Eq Multivector
+$clapp :: (Basis Multivector
+ -&gt; Basis Multivector -&gt; Maybe (Basis Multivector, Double))
+-&gt; Multivector -&gt; Multivector -&gt; Multivector
+lmap :: (Basis Multivector -&gt; Maybe (Basis Multivector, Double))
+-&gt; Multivector -&gt; Multivector
+$clmap :: (Basis Multivector -&gt; Maybe (Basis Multivector, Double))
+-&gt; Multivector -&gt; Multivector
+add :: Multivector -&gt; Multivector -&gt; Multivector
+$cadd :: Multivector -&gt; Multivector -&gt; Multivector
+isMonom :: Multivector -&gt; Bool
+$cisMonom :: Multivector -&gt; Bool
+monom :: Basis Multivector -&gt; Double -&gt; Multivector
+$cmonom :: Basis Multivector -&gt; Double -&gt; Multivector
+isZero :: Multivector -&gt; Bool
+$cisZero :: Multivector -&gt; Bool
+zero :: Multivector
+$czero :: Multivector
+</span><a href="#local-6989586621679261488"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">LinSpace</span></a></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261368"><span id="local-6989586621679261374"><span id="local-6989586621679261380"><span id="local-6989586621679261386"><span id="local-6989586621679261392"><span id="local-6989586621679261398"><span id="local-6989586621679261404"><span id="local-6989586621679261410"><span id="local-6989586621679261416"><span id="local-6989586621679261422"><span id="local-6989586621679261428"><span id="local-6989586621679261434"><span id="local-6989586621679261440"><span id="local-6989586621679261446"><span id="local-6989586621679261452"><span id="local-6989586621679261458"><span id="local-6989586621679261464"><span id="local-6989586621679261470"><span class="annot"><span class="annottext">Eq Multivector
 Ord (Generator Multivector)
 [Multivector]
 Basis Multivector ~ [Generator Multivector]
 LinSpace Multivector
-Ord (Generator Multivector)
--&gt; (Basis Multivector ~ [Generator Multivector])
--&gt; LinSpace Multivector
--&gt; Eq Multivector
--&gt; (Multivector -&gt; (Int, Int, Int))
--&gt; (Multivector -&gt; Generator Multivector -&gt; Double)
--&gt; [Multivector]
--&gt; (Multivector -&gt; Int)
--&gt; (Multivector -&gt; Multivector -&gt; Multivector)
--&gt; (Multivector -&gt; Multivector -&gt; Multivector)
--&gt; (Multivector -&gt; Multivector -&gt; Multivector)
--&gt; (Multivector -&gt; Multivector -&gt; Multivector)
--&gt; (Multivector -&gt; Multivector -&gt; Multivector)
--&gt; (Multivector -&gt; Multivector)
--&gt; (Multivector -&gt; Multivector)
--&gt; (Multivector -&gt; Multivector)
--&gt; (Multivector -&gt; Multivector)
--&gt; (Multivector -&gt; Multivector)
--&gt; (Multivector -&gt; Multivector)
--&gt; (Multivector -&gt; (Double, Multivector))
--&gt; (Multivector -&gt; Double)
--&gt; (Multivector -&gt; Multivector)
--&gt; CliffAlgebra Multivector
 Multivector -&gt; Double
 Multivector -&gt; Int
 Multivector -&gt; (Double, Multivector)
@@ -1397,96 +1060,79 @@ Ord (Generator mv)
 -&gt; (mv -&gt; Double)
 -&gt; (mv -&gt; mv)
 -&gt; CliffAlgebra mv
-$calgebraSignature :: Multivector -&gt; (Int, Int, Int)
-algebraSignature :: Multivector -&gt; (Int, Int, Int)
-$csquare :: Multivector -&gt; Generator Multivector -&gt; Double
-square :: Multivector -&gt; Generator Multivector -&gt; Double
-$cgenerators :: [Multivector]
-generators :: [Multivector]
-$cgrade :: Multivector -&gt; Int
-grade :: Multivector -&gt; Int
-$cgeom :: Multivector -&gt; Multivector -&gt; Multivector
-geom :: Multivector -&gt; Multivector -&gt; Multivector
-$couter :: Multivector -&gt; Multivector -&gt; Multivector
-outer :: Multivector -&gt; Multivector -&gt; Multivector
-$crcontract :: Multivector -&gt; Multivector -&gt; Multivector
-rcontract :: Multivector -&gt; Multivector -&gt; Multivector
-$clcontract :: Multivector -&gt; Multivector -&gt; Multivector
-lcontract :: Multivector -&gt; Multivector -&gt; Multivector
-$cinner :: Multivector -&gt; Multivector -&gt; Multivector
-inner :: Multivector -&gt; Multivector -&gt; Multivector
-$crev :: Multivector -&gt; Multivector
-rev :: Multivector -&gt; Multivector
-$cinv :: Multivector -&gt; Multivector
-inv :: Multivector -&gt; Multivector
-$cconj :: Multivector -&gt; Multivector
-conj :: Multivector -&gt; Multivector
-$cdual :: Multivector -&gt; Multivector
-dual :: Multivector -&gt; Multivector
-$crcompl :: Multivector -&gt; Multivector
-rcompl :: Multivector -&gt; Multivector
-$clcompl :: Multivector -&gt; Multivector
-lcompl :: Multivector -&gt; Multivector
-$cdecompose :: Multivector -&gt; (Double, Multivector)
-decompose :: Multivector -&gt; (Double, Multivector)
-$ctrace :: Multivector -&gt; Double
-trace :: Multivector -&gt; Double
-$cnonScalar :: Multivector -&gt; Multivector
 nonScalar :: Multivector -&gt; Multivector
-</span><a href="Algeometry.GeometricAlgebra.html#CliffAlgebra"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">CliffAlgebra</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+$cnonScalar :: Multivector -&gt; Multivector
+trace :: Multivector -&gt; Double
+$ctrace :: Multivector -&gt; Double
+decompose :: Multivector -&gt; (Double, Multivector)
+$cdecompose :: Multivector -&gt; (Double, Multivector)
+lcompl :: Multivector -&gt; Multivector
+$clcompl :: Multivector -&gt; Multivector
+rcompl :: Multivector -&gt; Multivector
+$crcompl :: Multivector -&gt; Multivector
+dual :: Multivector -&gt; Multivector
+$cdual :: Multivector -&gt; Multivector
+conj :: Multivector -&gt; Multivector
+$cconj :: Multivector -&gt; Multivector
+inv :: Multivector -&gt; Multivector
+$cinv :: Multivector -&gt; Multivector
+rev :: Multivector -&gt; Multivector
+$crev :: Multivector -&gt; Multivector
+inner :: Multivector -&gt; Multivector -&gt; Multivector
+$cinner :: Multivector -&gt; Multivector -&gt; Multivector
+lcontract :: Multivector -&gt; Multivector -&gt; Multivector
+$clcontract :: Multivector -&gt; Multivector -&gt; Multivector
+rcontract :: Multivector -&gt; Multivector -&gt; Multivector
+$crcontract :: Multivector -&gt; Multivector -&gt; Multivector
+outer :: Multivector -&gt; Multivector -&gt; Multivector
+$couter :: Multivector -&gt; Multivector -&gt; Multivector
+geom :: Multivector -&gt; Multivector -&gt; Multivector
+$cgeom :: Multivector -&gt; Multivector -&gt; Multivector
+grade :: Multivector -&gt; Int
+$cgrade :: Multivector -&gt; Int
+generators :: [Multivector]
+$cgenerators :: [Multivector]
+square :: Multivector -&gt; Generator Multivector -&gt; Double
+$csquare :: Multivector -&gt; Generator Multivector -&gt; Double
+algebraSignature :: Multivector -&gt; (Int, Int, Int)
+$calgebraSignature :: Multivector -&gt; (Int, Int, Int)
+</span><a href="#local-6989586621679261368"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">CliffAlgebra</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-106"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Basis"><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Basis"><span class="hs-identifier hs-var">Basis</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Multivector"><span class="hs-identifier hs-type">Multivector</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Basis"><span class="hs-identifier hs-type">Basis</span></a></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
 </span><span id="line-107"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Generator"><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Generator"><span class="hs-identifier hs-var">Generator</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Multivector"><span class="hs-identifier hs-type">Multivector</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Generator"><span class="hs-identifier hs-type">Generator</span></a></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
 </span><span id="line-108"></span><span>
 </span><span id="line-109"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Multivector"><span class="hs-identifier hs-type">Multivector</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-110"></span><span>  </span><span id="local-6989586621679271937"><span class="annot"><span class="annottext">arbitrary :: Gen Multivector
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([Multivector] -&gt; [Multivector]) -&gt; Gen Multivector
-forall a. (Num a, CliffAlgebra a) =&gt; ([a] -&gt; [a]) -&gt; Gen a
-</span><a href="Algeometry.Arbitrary.html#abitraryMV"><span class="hs-identifier hs-var">abitraryMV</span></a></span><span> </span><span class="annot"><span class="annottext">[Multivector] -&gt; [Multivector]
-forall a. a -&gt; a
+</span><span id="line-110"></span><span>  </span><span id="local-6989586621679261303"><span class="annot"><span class="annottext">arbitrary :: Gen Multivector
+</span><a href="#local-6989586621679261303"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. (Num a, CliffAlgebra a) =&gt; ([a] -&gt; [a]) -&gt; Gen a
+</span><a href="Algeometry.Arbitrary.html#abitraryMV"><span class="hs-identifier hs-var">abitraryMV</span></a></span><span> </span><span class="annot"><span class="annottext">forall a. a -&gt; a
 </span><span class="hs-identifier hs-var">id</span></span><span>
-</span><span id="line-111"></span><span>  </span><span id="local-6989586621679271941"><span class="annot"><span class="annottext">shrink :: Multivector -&gt; [Multivector]
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Multivector -&gt; [Multivector]
-forall a. (Num a, CliffAlgebra a) =&gt; a -&gt; [a]
+</span><span id="line-111"></span><span>  </span><span id="local-6989586621679261299"><span class="annot"><span class="annottext">shrink :: Multivector -&gt; [Multivector]
+</span><a href="#local-6989586621679261299"><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. (Num a, CliffAlgebra a) =&gt; a -&gt; [a]
 </span><a href="Algeometry.Arbitrary.html#shrinkMV"><span class="hs-identifier hs-var">shrinkMV</span></a></span><span>
 </span><span id="line-112"></span><span>
 </span><span id="line-113"></span><span class="hs-comment">------------------------------------------------------------</span><span>
 </span><span id="line-114"></span><span>
-</span><span id="line-115"></span><span class="annot"><span class="hs-comment">-- | Wrapper for a k-vector.</span></span><span>
+</span><span id="line-115"></span><span class="hs-comment">-- | Wrapper for a k-vector.</span><span>
 </span><span id="line-116"></span><span class="hs-keyword">newtype</span><span> </span><span id="Homogeneous"><span class="annot"><a href="Algeometry.Arbitrary.html#Homogeneous"><span class="hs-identifier hs-var">Homogeneous</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Homogeneous"><span class="annot"><a href="Algeometry.Arbitrary.html#Homogeneous"><span class="hs-identifier hs-var">Homogeneous</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
-</span><span id="line-117"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679271944"><span id="local-6989586621679271951"><span id="local-6989586621679271955"><span class="annot"><span class="annottext">Int -&gt; Homogeneous -&gt; ShowS
+</span><span id="line-117"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679261287"><span id="local-6989586621679261289"><span id="local-6989586621679261296"><span class="annot"><span class="annottext">Int -&gt; Homogeneous -&gt; ShowS
 [Homogeneous] -&gt; ShowS
 Homogeneous -&gt; String
-(Int -&gt; Homogeneous -&gt; ShowS)
--&gt; (Homogeneous -&gt; String)
--&gt; ([Homogeneous] -&gt; ShowS)
--&gt; Show Homogeneous
 forall a.
 (Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
-$cshowsPrec :: Int -&gt; Homogeneous -&gt; ShowS
-showsPrec :: Int -&gt; Homogeneous -&gt; ShowS
-$cshow :: Homogeneous -&gt; String
-show :: Homogeneous -&gt; String
-$cshowList :: [Homogeneous] -&gt; ShowS
 showList :: [Homogeneous] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679271958"><span id="local-6989586621679271964"><span class="annot"><span class="annottext">Homogeneous -&gt; Homogeneous -&gt; Bool
-(Homogeneous -&gt; Homogeneous -&gt; Bool)
--&gt; (Homogeneous -&gt; Homogeneous -&gt; Bool) -&gt; Eq Homogeneous
+$cshowList :: [Homogeneous] -&gt; ShowS
+show :: Homogeneous -&gt; String
+$cshow :: Homogeneous -&gt; String
+showsPrec :: Int -&gt; Homogeneous -&gt; ShowS
+$cshowsPrec :: Int -&gt; Homogeneous -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261279"><span id="local-6989586621679261285"><span class="annot"><span class="annottext">Homogeneous -&gt; Homogeneous -&gt; Bool
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
-$c== :: Homogeneous -&gt; Homogeneous -&gt; Bool
-== :: Homogeneous -&gt; Homogeneous -&gt; Bool
-$c/= :: Homogeneous -&gt; Homogeneous -&gt; Bool
 /= :: Homogeneous -&gt; Homogeneous -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679271977"><span id="local-6989586621679271983"><span id="local-6989586621679271989"><span id="local-6989586621679271995"><span id="local-6989586621679272001"><span id="local-6989586621679272007"><span id="local-6989586621679272013"><span class="annot"><span class="annottext">Integer -&gt; Homogeneous
+$c/= :: Homogeneous -&gt; Homogeneous -&gt; Bool
+== :: Homogeneous -&gt; Homogeneous -&gt; Bool
+$c== :: Homogeneous -&gt; Homogeneous -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261230"><span id="local-6989586621679261236"><span id="local-6989586621679261242"><span id="local-6989586621679261248"><span id="local-6989586621679261254"><span id="local-6989586621679261260"><span id="local-6989586621679261266"><span class="annot"><span class="annottext">Integer -&gt; Homogeneous
 Homogeneous -&gt; Homogeneous
 Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-(Homogeneous -&gt; Homogeneous -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; Homogeneous -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; Homogeneous -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; Homogeneous)
--&gt; (Integer -&gt; Homogeneous)
--&gt; Num Homogeneous
 forall a.
 (a -&gt; a -&gt; a)
 -&gt; (a -&gt; a -&gt; a)
@@ -1496,56 +1142,35 @@ forall a.
 -&gt; (a -&gt; a)
 -&gt; (Integer -&gt; a)
 -&gt; Num a
-$c+ :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-+ :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-$c- :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-- :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-$c* :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-* :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-$cnegate :: Homogeneous -&gt; Homogeneous
-negate :: Homogeneous -&gt; Homogeneous
-$cabs :: Homogeneous -&gt; Homogeneous
-abs :: Homogeneous -&gt; Homogeneous
-$csignum :: Homogeneous -&gt; Homogeneous
-signum :: Homogeneous -&gt; Homogeneous
-$cfromInteger :: Integer -&gt; Homogeneous
 fromInteger :: Integer -&gt; Homogeneous
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679272043"><span id="local-6989586621679272049"><span id="local-6989586621679272055"><span class="annot"><span class="annottext">Num Homogeneous
-Num Homogeneous
--&gt; (Homogeneous -&gt; Homogeneous -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; Homogeneous)
--&gt; (Rational -&gt; Homogeneous)
--&gt; Fractional Homogeneous
+$cfromInteger :: Integer -&gt; Homogeneous
+signum :: Homogeneous -&gt; Homogeneous
+$csignum :: Homogeneous -&gt; Homogeneous
+abs :: Homogeneous -&gt; Homogeneous
+$cabs :: Homogeneous -&gt; Homogeneous
+negate :: Homogeneous -&gt; Homogeneous
+$cnegate :: Homogeneous -&gt; Homogeneous
+* :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+$c* :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+- :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+$c- :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
++ :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+$c+ :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Num</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261188"><span id="local-6989586621679261194"><span id="local-6989586621679261200"><span class="annot"><span class="annottext">Num Homogeneous
 Rational -&gt; Homogeneous
 Homogeneous -&gt; Homogeneous
 Homogeneous -&gt; Homogeneous -&gt; Homogeneous
 forall a.
 Num a
 -&gt; (a -&gt; a -&gt; a) -&gt; (a -&gt; a) -&gt; (Rational -&gt; a) -&gt; Fractional a
-$c/ :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-/ :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-$crecip :: Homogeneous -&gt; Homogeneous
-recip :: Homogeneous -&gt; Homogeneous
-$cfromRational :: Rational -&gt; Homogeneous
 fromRational :: Rational -&gt; Homogeneous
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Fractional</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679272074"><span id="local-6989586621679272080"><span id="local-6989586621679272086"><span id="local-6989586621679272092"><span id="local-6989586621679272098"><span id="local-6989586621679272104"><span id="local-6989586621679272110"><span id="local-6989586621679272116"><span id="local-6989586621679272122"><span id="local-6989586621679272128"><span class="annot"><span class="annottext">Eq (Basis Homogeneous)
+$cfromRational :: Rational -&gt; Homogeneous
+recip :: Homogeneous -&gt; Homogeneous
+$crecip :: Homogeneous -&gt; Homogeneous
+/ :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+$c/ :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Fractional</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261115"><span id="local-6989586621679261121"><span id="local-6989586621679261127"><span id="local-6989586621679261133"><span id="local-6989586621679261139"><span id="local-6989586621679261145"><span id="local-6989586621679261151"><span id="local-6989586621679261157"><span id="local-6989586621679261163"><span id="local-6989586621679261169"><span class="annot"><span class="annottext">Eq (Basis Homogeneous)
 Homogeneous
-Eq (Basis Homogeneous)
--&gt; Homogeneous
--&gt; (Homogeneous -&gt; Bool)
--&gt; (Basis Homogeneous -&gt; Double -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; Bool)
--&gt; (Homogeneous -&gt; Homogeneous -&gt; Homogeneous)
--&gt; ((Basis Homogeneous -&gt; Maybe (Basis Homogeneous, Double))
-    -&gt; Homogeneous -&gt; Homogeneous)
--&gt; ((Basis Homogeneous
-     -&gt; Basis Homogeneous -&gt; Maybe (Basis Homogeneous, Double))
-    -&gt; Homogeneous -&gt; Homogeneous -&gt; Homogeneous)
--&gt; ((Basis Homogeneous -&gt; Double -&gt; Bool)
-    -&gt; Homogeneous -&gt; Homogeneous)
--&gt; (Basis Homogeneous -&gt; Homogeneous -&gt; Double)
--&gt; (Homogeneous -&gt; [(Basis Homogeneous, Double)])
--&gt; LinSpace Homogeneous
 Basis Homogeneous -&gt; Double -&gt; Homogeneous
 Basis Homogeneous -&gt; Homogeneous -&gt; Double
 Homogeneous -&gt; Bool
@@ -1571,60 +1196,37 @@ Eq (Basis el)
 -&gt; (Basis el -&gt; el -&gt; Double)
 -&gt; (el -&gt; [(Basis el, Double)])
 -&gt; LinSpace el
-$czero :: Homogeneous
-zero :: Homogeneous
-$cisZero :: Homogeneous -&gt; Bool
-isZero :: Homogeneous -&gt; Bool
-$cmonom :: Basis Homogeneous -&gt; Double -&gt; Homogeneous
-monom :: Basis Homogeneous -&gt; Double -&gt; Homogeneous
-$cisMonom :: Homogeneous -&gt; Bool
-isMonom :: Homogeneous -&gt; Bool
-$cadd :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-add :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-$clmap :: (Basis Homogeneous -&gt; Maybe (Basis Homogeneous, Double))
--&gt; Homogeneous -&gt; Homogeneous
-lmap :: (Basis Homogeneous -&gt; Maybe (Basis Homogeneous, Double))
--&gt; Homogeneous -&gt; Homogeneous
-$clapp :: (Basis Homogeneous
- -&gt; Basis Homogeneous -&gt; Maybe (Basis Homogeneous, Double))
--&gt; Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+assoc :: Homogeneous -&gt; [(Basis Homogeneous, Double)]
+$cassoc :: Homogeneous -&gt; [(Basis Homogeneous, Double)]
+coeff :: Basis Homogeneous -&gt; Homogeneous -&gt; Double
+$ccoeff :: Basis Homogeneous -&gt; Homogeneous -&gt; Double
+lfilter :: (Basis Homogeneous -&gt; Double -&gt; Bool) -&gt; Homogeneous -&gt; Homogeneous
+$clfilter :: (Basis Homogeneous -&gt; Double -&gt; Bool) -&gt; Homogeneous -&gt; Homogeneous
 lapp :: (Basis Homogeneous
  -&gt; Basis Homogeneous -&gt; Maybe (Basis Homogeneous, Double))
 -&gt; Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-$clfilter :: (Basis Homogeneous -&gt; Double -&gt; Bool) -&gt; Homogeneous -&gt; Homogeneous
-lfilter :: (Basis Homogeneous -&gt; Double -&gt; Bool) -&gt; Homogeneous -&gt; Homogeneous
-$ccoeff :: Basis Homogeneous -&gt; Homogeneous -&gt; Double
-coeff :: Basis Homogeneous -&gt; Homogeneous -&gt; Double
-$cassoc :: Homogeneous -&gt; [(Basis Homogeneous, Double)]
-assoc :: Homogeneous -&gt; [(Basis Homogeneous, Double)]
-</span><a href="Algeometry.GeometricAlgebra.html#LinSpace"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">LinSpace</span></a></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679272146"><span id="local-6989586621679272152"><span id="local-6989586621679272158"><span id="local-6989586621679272164"><span id="local-6989586621679272170"><span id="local-6989586621679272176"><span id="local-6989586621679272182"><span id="local-6989586621679272188"><span id="local-6989586621679272194"><span id="local-6989586621679272200"><span id="local-6989586621679272206"><span id="local-6989586621679272212"><span id="local-6989586621679272218"><span id="local-6989586621679272224"><span id="local-6989586621679272230"><span id="local-6989586621679272236"><span id="local-6989586621679272242"><span id="local-6989586621679272248"><span class="annot"><span class="annottext">Eq Homogeneous
+$clapp :: (Basis Homogeneous
+ -&gt; Basis Homogeneous -&gt; Maybe (Basis Homogeneous, Double))
+-&gt; Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+lmap :: (Basis Homogeneous -&gt; Maybe (Basis Homogeneous, Double))
+-&gt; Homogeneous -&gt; Homogeneous
+$clmap :: (Basis Homogeneous -&gt; Maybe (Basis Homogeneous, Double))
+-&gt; Homogeneous -&gt; Homogeneous
+add :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+$cadd :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+isMonom :: Homogeneous -&gt; Bool
+$cisMonom :: Homogeneous -&gt; Bool
+monom :: Basis Homogeneous -&gt; Double -&gt; Homogeneous
+$cmonom :: Basis Homogeneous -&gt; Double -&gt; Homogeneous
+isZero :: Homogeneous -&gt; Bool
+$cisZero :: Homogeneous -&gt; Bool
+zero :: Homogeneous
+$czero :: Homogeneous
+</span><a href="#local-6989586621679261115"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">LinSpace</span></a></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679260995"><span id="local-6989586621679261001"><span id="local-6989586621679261007"><span id="local-6989586621679261013"><span id="local-6989586621679261019"><span id="local-6989586621679261025"><span id="local-6989586621679261031"><span id="local-6989586621679261037"><span id="local-6989586621679261043"><span id="local-6989586621679261049"><span id="local-6989586621679261055"><span id="local-6989586621679261061"><span id="local-6989586621679261067"><span id="local-6989586621679261073"><span id="local-6989586621679261079"><span id="local-6989586621679261085"><span id="local-6989586621679261091"><span id="local-6989586621679261097"><span class="annot"><span class="annottext">Eq Homogeneous
 Ord (Generator Homogeneous)
 [Homogeneous]
 Basis Homogeneous ~ [Generator Homogeneous]
 LinSpace Homogeneous
-Ord (Generator Homogeneous)
--&gt; (Basis Homogeneous ~ [Generator Homogeneous])
--&gt; LinSpace Homogeneous
--&gt; Eq Homogeneous
--&gt; (Homogeneous -&gt; (Int, Int, Int))
--&gt; (Homogeneous -&gt; Generator Homogeneous -&gt; Double)
--&gt; [Homogeneous]
--&gt; (Homogeneous -&gt; Int)
--&gt; (Homogeneous -&gt; Homogeneous -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; Homogeneous -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; Homogeneous -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; Homogeneous -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; Homogeneous -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; Homogeneous)
--&gt; (Homogeneous -&gt; (Double, Homogeneous))
--&gt; (Homogeneous -&gt; Double)
--&gt; (Homogeneous -&gt; Homogeneous)
--&gt; CliffAlgebra Homogeneous
 Homogeneous -&gt; Double
 Homogeneous -&gt; Int
 Homogeneous -&gt; (Double, Homogeneous)
@@ -1656,74 +1258,66 @@ Ord (Generator mv)
 -&gt; (mv -&gt; Double)
 -&gt; (mv -&gt; mv)
 -&gt; CliffAlgebra mv
-$calgebraSignature :: Homogeneous -&gt; (Int, Int, Int)
-algebraSignature :: Homogeneous -&gt; (Int, Int, Int)
-$csquare :: Homogeneous -&gt; Generator Homogeneous -&gt; Double
-square :: Homogeneous -&gt; Generator Homogeneous -&gt; Double
-$cgenerators :: [Homogeneous]
-generators :: [Homogeneous]
-$cgrade :: Homogeneous -&gt; Int
-grade :: Homogeneous -&gt; Int
-$cgeom :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-geom :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-$couter :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-outer :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-$crcontract :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-rcontract :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-$clcontract :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-lcontract :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-$cinner :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-inner :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
-$crev :: Homogeneous -&gt; Homogeneous
-rev :: Homogeneous -&gt; Homogeneous
-$cinv :: Homogeneous -&gt; Homogeneous
-inv :: Homogeneous -&gt; Homogeneous
-$cconj :: Homogeneous -&gt; Homogeneous
-conj :: Homogeneous -&gt; Homogeneous
-$cdual :: Homogeneous -&gt; Homogeneous
-dual :: Homogeneous -&gt; Homogeneous
-$crcompl :: Homogeneous -&gt; Homogeneous
-rcompl :: Homogeneous -&gt; Homogeneous
-$clcompl :: Homogeneous -&gt; Homogeneous
-lcompl :: Homogeneous -&gt; Homogeneous
-$cdecompose :: Homogeneous -&gt; (Double, Homogeneous)
-decompose :: Homogeneous -&gt; (Double, Homogeneous)
-$ctrace :: Homogeneous -&gt; Double
-trace :: Homogeneous -&gt; Double
-$cnonScalar :: Homogeneous -&gt; Homogeneous
 nonScalar :: Homogeneous -&gt; Homogeneous
-</span><a href="Algeometry.GeometricAlgebra.html#CliffAlgebra"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">CliffAlgebra</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+$cnonScalar :: Homogeneous -&gt; Homogeneous
+trace :: Homogeneous -&gt; Double
+$ctrace :: Homogeneous -&gt; Double
+decompose :: Homogeneous -&gt; (Double, Homogeneous)
+$cdecompose :: Homogeneous -&gt; (Double, Homogeneous)
+lcompl :: Homogeneous -&gt; Homogeneous
+$clcompl :: Homogeneous -&gt; Homogeneous
+rcompl :: Homogeneous -&gt; Homogeneous
+$crcompl :: Homogeneous -&gt; Homogeneous
+dual :: Homogeneous -&gt; Homogeneous
+$cdual :: Homogeneous -&gt; Homogeneous
+conj :: Homogeneous -&gt; Homogeneous
+$cconj :: Homogeneous -&gt; Homogeneous
+inv :: Homogeneous -&gt; Homogeneous
+$cinv :: Homogeneous -&gt; Homogeneous
+rev :: Homogeneous -&gt; Homogeneous
+$crev :: Homogeneous -&gt; Homogeneous
+inner :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+$cinner :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+lcontract :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+$clcontract :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+rcontract :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+$crcontract :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+outer :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+$couter :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+geom :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+$cgeom :: Homogeneous -&gt; Homogeneous -&gt; Homogeneous
+grade :: Homogeneous -&gt; Int
+$cgrade :: Homogeneous -&gt; Int
+generators :: [Homogeneous]
+$cgenerators :: [Homogeneous]
+square :: Homogeneous -&gt; Generator Homogeneous -&gt; Double
+$csquare :: Homogeneous -&gt; Generator Homogeneous -&gt; Double
+algebraSignature :: Homogeneous -&gt; (Int, Int, Int)
+$calgebraSignature :: Homogeneous -&gt; (Int, Int, Int)
+</span><a href="#local-6989586621679260995"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">CliffAlgebra</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-118"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Basis"><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Basis"><span class="hs-identifier hs-var">Basis</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Homogeneous"><span class="hs-identifier hs-type">Homogeneous</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Basis"><span class="hs-identifier hs-type">Basis</span></a></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
 </span><span id="line-119"></span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="Generator"><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Generator"><span class="hs-identifier hs-var">Generator</span></a></span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Homogeneous"><span class="hs-identifier hs-type">Homogeneous</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Algeometry.GeometricAlgebra.html#Generator"><span class="hs-identifier hs-type">Generator</span></a></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#MV"><span class="hs-identifier hs-type">MV</span></a></span><span>
 </span><span id="line-120"></span><span>
 </span><span id="line-121"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Arbitrary</span></span><span> </span><span class="annot"><a href="Algeometry.Arbitrary.html#Homogeneous"><span class="hs-identifier hs-type">Homogeneous</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-122"></span><span>  </span><span id="local-6989586621679272320"><span class="annot"><span class="annottext">arbitrary :: Gen Homogeneous
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-123"></span><span>    </span><span id="local-6989586621679272321"><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679272321"><span class="hs-identifier hs-var">k</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Int, Int) -&gt; Gen Int
-forall a. Random a =&gt; (a, a) -&gt; Gen a
+</span><span id="line-122"></span><span>  </span><span id="local-6989586621679260923"><span class="annot"><span class="annottext">arbitrary :: Gen Homogeneous
+</span><a href="#local-6989586621679260923"><span class="hs-identifier hs-var hs-var hs-var hs-var">arbitrary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-123"></span><span>    </span><span id="local-6989586621679260922"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679260922"><span class="hs-identifier hs-var">k</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">forall a. Random a =&gt; (a, a) -&gt; Gen a
 </span><span class="hs-identifier hs-var">choose</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">1</span></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">5</span></span><span class="hs-special">)</span><span>
-</span><span id="line-124"></span><span>    </span><span class="annot"><span class="annottext">([Homogeneous] -&gt; [Homogeneous]) -&gt; Gen Homogeneous
-forall a. (Num a, CliffAlgebra a) =&gt; ([a] -&gt; [a]) -&gt; Gen a
-</span><a href="Algeometry.Arbitrary.html#abitraryMV"><span class="hs-identifier hs-var">abitraryMV</span></a></span><span> </span><span class="annot"><span class="annottext">(([Homogeneous] -&gt; [Homogeneous]) -&gt; Gen Homogeneous)
--&gt; ([Homogeneous] -&gt; [Homogeneous]) -&gt; Gen Homogeneous
-forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Homogeneous -&gt; Bool) -&gt; [Homogeneous] -&gt; [Homogeneous]
-forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
-</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679272322"><span class="annot"><span class="annottext">Homogeneous
-</span><a href="#local-6989586621679272322"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Homogeneous -&gt; Int
-forall mv. CliffAlgebra mv =&gt; mv -&gt; Int
+</span><span id="line-124"></span><span>    </span><span class="annot"><span class="annottext">forall a. (Num a, CliffAlgebra a) =&gt; ([a] -&gt; [a]) -&gt; Gen a
+</span><a href="Algeometry.Arbitrary.html#abitraryMV"><span class="hs-identifier hs-var">abitraryMV</span></a></span><span> </span><span class="annot"><span class="annottext">forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679260921"><span class="annot"><span class="annottext">Homogeneous
+</span><a href="#local-6989586621679260921"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">forall mv. CliffAlgebra mv =&gt; mv -&gt; Int
 </span><a href="Algeometry.GeometricAlgebra.html#grade"><span class="hs-identifier hs-var">grade</span></a></span><span> </span><span class="annot"><span class="annottext">Homogeneous
-</span><a href="#local-6989586621679272322"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
-forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><a href="#local-6989586621679260921"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679272321"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679260922"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-125"></span><span>        </span><span>
-</span><span id="line-126"></span><span>  </span><span id="local-6989586621679272325"><span class="annot"><span class="annottext">shrink :: Homogeneous -&gt; [Homogeneous]
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Homogeneous -&gt; [Homogeneous]
-forall a. (Num a, CliffAlgebra a) =&gt; a -&gt; [a]
+</span><span id="line-126"></span><span>  </span><span id="local-6989586621679260918"><span class="annot"><span class="annottext">shrink :: Homogeneous -&gt; [Homogeneous]
+</span><a href="#local-6989586621679260918"><span class="hs-identifier hs-var hs-var hs-var hs-var">shrink</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a. (Num a, CliffAlgebra a) =&gt; a -&gt; [a]
 </span><a href="Algeometry.Arbitrary.html#shrinkMV"><span class="hs-identifier hs-var">shrinkMV</span></a></span><span>
 </span><span id="line-127"></span><span>
 </span><span id="line-128"></span></pre></body></html>

@@ -3,7 +3,8 @@ Module      : Algeometry.Types
 Description : Definitions for exact geometric algebras.
 Stability   : experimental
 -}
-{-# LANGUAGE UndecidableInstances
+{-# LANGUAGE
+    UndecidableInstances
   , FlexibleInstances
   , FlexibleContexts
   , KindSignatures
@@ -30,10 +31,10 @@ import Algeometry.GeometricAlgebra
 import Algeometry.GeometricNum
 import qualified Data.Map.Strict as M
 import qualified Data.Array as A
-import Data.Maybe
-import Data.Proxy
-import GHC.TypeLits
-import Data.Coerce
+import Data.Maybe ( fromMaybe, listToMaybe, maybeToList )
+import Data.Proxy ( Proxy(..) )
+import GHC.TypeLits ( KnownNat, Nat, natVal )
+import Data.Coerce ( coerce )
 import Language.Haskell.TH
 import Language.Haskell.TH.Lib.Internal (Decs)
 

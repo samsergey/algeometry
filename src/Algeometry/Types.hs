@@ -11,17 +11,15 @@ Stability   : experimental
   , DerivingVia
   , GeneralizedNewtypeDeriving
   , FunctionalDependencies
-  , TypeFamilies, DataKinds
-  , TemplateHaskell #-}
+  , TypeFamilies, DataKinds, ScopedTypeVariables
+  , TemplateHaskell, TypeOperators  #-}
 
 module Algeometry.Types
   ( CA (..), Dual (..)
   , Outer (..), Outer'
   , VGA (..), VGA'
   , PGA (..), PGA'
-  , GeometricNum
-  , Tabulated (..)
-  , TabulatedGA (..)
+  , Tabulated (..), TabulatedGA (..)
   , MapLS
   , defineElements
   , tabulateGA
@@ -29,176 +27,24 @@ module Algeometry.Types
 where
 
 import Algeometry.GeometricAlgebra
+import Algeometry.GeometricNum
 import qualified Data.Map.Strict as M
 import qualified Data.Array as A
 import Data.Maybe
-import Data.List
 import Data.Proxy
 import GHC.TypeLits
 import Data.Coerce
 import Language.Haskell.TH
 import Language.Haskell.TH.Lib.Internal (Decs)
 
- 
-------------------------------------------------------------
--- geometric numbers
-------------------------------------------------------------
-
-newtype GeometricNum a = GeometricNum a
-
-deriving instance LinSpace e a => LinSpace e (GeometricNum a)
-deriving instance CliffAlgebra b a => CliffAlgebra b (GeometricNum a)
-
-instance CliffAlgebra b a => Eq (GeometricNum a) where
-  a == b = isZero (a - b)
-  
-instance CliffAlgebra b a => Num (GeometricNum a) where
-  fromInteger 0 = zero
-  fromInteger n = scalar (fromInteger n)
-  (+) = add
-  (*) = geom
-  negate = scale (-1)
-  abs = error "GeometricNum: abs is undefined!"
-  signum 0 = 0
-  signum x = scalar (signum (head (reverse (coefs x))))
-
-instance CliffAlgebra b a => Fractional (GeometricNum a) where
-  fromRational = scalar . fromRational 
-  recip  = reciprocal
-
-instance CliffAlgebra Int a => Show (GeometricNum a) where
-  show m = if isZero m then "0" else strip $ sscal <> svecs
-    where
-      trms mv = sortOn (length . fst) $ assoc mv
-      strip x = tail $ fromMaybe x $ stripPrefix " +" x
-      scal = getGrade 0 m
-      sscal = let c = trace scal
-              in if c == 0 then "" else ssig c <> show (abs c)
-      svecs = do (b, c) <- trms (nonScalar m)
-                 ssig c <> snum c <> showBlade b
-      ssig n = if n < 0 then " - " else " + "
-      snum n = if abs n == 1 then "" else show (abs n)
-
-      showBlade b = if null b then "1" else 'e':foldMap showIx b
-        where
-          showIx k | k < 0 = '₋' : index (-k)
-                   | otherwise = index k
-          index k = ["₀₁₂₃₄₅₆₇₈₉" !! k]
-
-instance CliffAlgebra Int a => Floating (GeometricNum a) where
-  pi = scalar pi
-
-  exp x
-    | isScalar x = scalar $ exp $ trace x
-    | isHomogeneous v =
-        scale (exp x0) $
-        case trace (v*v) `compare` 0 of
-          LT -> scalar (cos n) + scale (sin n / n) v
-          EQ -> 1 + v
-          GT -> scalar (cosh n) + scale (sinh n / n) v
-    | otherwise = series expS x
-    where
-      (x0, v) = decompose x
-      n = norm v
-        
-  log x
-    | isScalar x = scalar $ log $ trace x
-    | isHomogeneous x' = case trace (x'*x') `compare` 0 of
-        LT -> scalar (log n) + scale (atan2 n' x0 / n') x'
-        EQ -> error $ "log of vanishing multivector " ++ show x
-        GT -> scalar (log n) + scale (atanh (n'/x0) / n') x'
-    | otherwise = logSeries x
-    where
-      (x0, x') = decompose x
-      n' = norm x'
-      n = norm x
-
-  sqrt x
-    | isScalar x = scalar $ sqrt $ trace x
-    | not (isSquare x) = error $ "sqrt is not defined for " ++ show x
-    | isScalar x2 =
-        if trace x2 < 0
-        then scale (sqrt (n/2)) (1 + scale (1/n) x)
-        else scale (sqrt n / 2) $ (i + scale (1/n) x) * (1 - i)
-    | isHomogeneous x = sqrt a * (1 + b / (2*a))
-    | otherwise = exp (0.5 * log x)
-    where x2 = x*x
-          n = norm x
-          i = pseudoScalar
-          a = weight a
-          b = bulk a
-  
-  sin x
-    | isScalar x = scalar $ sin $ trace x
-    | otherwise = series sinS x
-             
-  cos x
-    | isScalar x = scalar $ cos $ trace x
-    | otherwise = series cosS x
-    
-  sinh x
-    | isScalar x = scalar $ sinh $ trace x
-    | isHomogeneous x = nonScalar (exp x)
-    | otherwise = series sinhS x
-    
-  cosh x
-    | isScalar x = scalar $ cosh $ trace x
-    | isHomogeneous x = scalar $ trace (exp x)
-    | otherwise = series coshS x
-  
-  asin = scalar . asin . trace
-  acos = scalar . acos . trace
-  atan = scalar . atan . trace
-  asinh = scalar . asinh . trace
-  acosh = scalar . acosh . trace
-  atanh = scalar . atanh . trace
-
---expSeries x = foldr (\i r -> 1 + scale (1/i) x*r) 0 [1..100]
-series step x = converge $ scanl (+) 0 $ take 1000 $ step x
-
-logSeries x
-  | n < 1 = x' * foldr (\i r -> scalar ((-1)**(i-1)/i) + x'*r) 0 [1..200]
-  | otherwise = - logSeries (1/x)
-  where
-    x' = x-1
-    n = norm x
-
-test = let x = 3 - 4*e_[1] - 2*e_[2] :: CA 3 0 0
-       in (exp(log x), x)
-
-converge [] = error "converge: empty list"
-converge xs = fromMaybe empty (convergeBy checkPeriodic Just xs) 
-    where
-      empty = error "converge: error in implementation"
-      checkPeriodic (a:b:c:_)
-          | a == b = Just a
-          | a == c = Just a
-      checkPeriodic _ = Nothing
-
-convergeBy :: ([a] -> Maybe b) -> (a -> Maybe b) -> [a] -> Maybe b
-convergeBy f end = listToMaybe . catMaybes . map f' . tails
-    where 
-        f' xs = case f xs of
-            Nothing -> end' xs
-            other   -> other
-        end' [x] = end x
-        end'  _  = Nothing
-
-expS x = map snd $ iterate (\(n,b) -> (n + 1, (scale (1/fromInteger n) (x*b)))) (1,1)
-
-coshS x = thinOut $ expS x
-sinhS x = thinOut $ tail $ expS x
-cosS x = zipWith (*) (cycle [1,-1]) $ coshS x
-sinS x = zipWith (*) (cycle [1,-1]) $ sinhS x
-
-thinOut (x:y:t) = x: thinOut t
-thinOut x = x
-        
+       
 ------------------------------------------------------------
 -- map-based linear space
 ------------------------------------------------------------
 
-instance Ord e => LinSpace e (M.Map e Double) where
+type instance Basis (M.Map e Double) = e
+
+instance Ord e => LinSpace (M.Map e Double) where
   zero = mempty
   isZero m = M.null $ clean m
   monom = M.singleton
@@ -224,22 +70,25 @@ clean = M.filter (\x -> abs x >= 1e-10)
 -- | Wrapper which represents dual algebra for a given one. 
 newtype Dual a = Dual { getDual :: a }
 
-deriving via GeometricNum a
-  instance CliffAlgebra e a => Eq (Dual a)
-deriving via GeometricNum a
-  instance CliffAlgebra e a => Num (Dual a)
-deriving via GeometricNum a
-  instance CliffAlgebra Int a => Fractional (Dual a)
-deriving via GeometricNum a
-  instance CliffAlgebra Int a => Floating (Dual a)
-deriving via GeometricNum a
-  instance CliffAlgebra Int a => Show (Dual a)
-deriving via GeometricNum a
-  instance LinSpace [Int] a => LinSpace [Int] (Dual a)
-deriving via GeometricNum a
-  instance CliffAlgebra Int a => CliffAlgebra Int (Dual a)
+type instance Basis (Dual a) = Basis a
+type instance Generator (Dual a) = Generator a
 
-instance GeomAlgebra Int a => GeomAlgebra Int (Dual a) where
+deriving via GeometricNum a
+  instance CliffAlgebra a => Eq (Dual a)
+deriving via GeometricNum a
+  instance CliffAlgebra a => Num (Dual a)
+deriving via GeometricNum a
+  instance CliffAlgebra a => Fractional (Dual a)
+deriving via GeometricNum a
+  instance (Generator a ~ Int, CliffAlgebra a) => Floating (Dual a)
+deriving via GeometricNum a
+  instance (Generator a ~ Int, CliffAlgebra a) => Show (Dual a)
+deriving via GeometricNum a
+  instance LinSpace a => LinSpace (Dual a)
+deriving via GeometricNum a
+  instance CliffAlgebra a => CliffAlgebra (Dual a)
+
+instance GeomAlgebra a => GeomAlgebra (Dual a) where
   point = Dual . dual . point
   coord = coord . dual . getDual
   spaceDim = spaceDim . getDual
@@ -249,14 +98,22 @@ instance GeomAlgebra Int a => GeomAlgebra Int (Dual a) where
 
 -- | Representation of linear space as a map, indexed by integer indexes.
 type MapLS = M.Map [Int] Double
+type instance Basis MapLS = [Int]
+type instance Generator MapLS = Int
 
 -- | Outer (Grassmann) algebra of given dimension.
 newtype Outer (n :: Nat) = Outer MapLS
+  deriving LinSpace via MapLS
+  deriving ( Show, Num, Eq, Fractional, Floating )
+     via GeometricNum (Outer n)
+
+type instance Basis (Outer n) = [Int]
+type instance Generator (Outer n) = Int
 
 -- | Dual outer (Grassmann) algebra of given dimension.
 type Outer' n = Dual (Outer n)
 
-instance KnownNat n => CliffAlgebra Int (Outer n) where
+instance KnownNat n => CliffAlgebra (Outer n) where
   algebraSignature x = (0, fromIntegral $ natVal x, 0)
   square _ _ = 0
   generators = res
@@ -267,21 +124,7 @@ instance KnownNat n => CliffAlgebra Int (Outer n) where
     where
       (s, v) = M.partitionWithKey (\k a -> length k == 0) mv
 
-      
-deriving via MapLS instance LinSpace [Int] (Outer n)
-
-deriving via GeometricNum (Outer n)
-  instance KnownNat n => Eq (Outer n)
-deriving via GeometricNum (Outer n)
-  instance KnownNat n => Show (Outer n)
-deriving via GeometricNum (Outer n)
-  instance KnownNat n => Num (Outer n)
-deriving via GeometricNum (Outer n)
-  instance KnownNat n => Fractional (Outer n)
-deriving via GeometricNum (Outer n)
-  instance KnownNat n => Floating (Outer n)
-
-instance KnownNat n => GeomAlgebra Int (Outer n) where
+instance KnownNat n => GeomAlgebra (Outer n) where
   point = kvec 1
   coord mv = [coeff [k] mv | k <- [1..spaceDim mv] ]
   spaceDim = fromIntegral . natVal
@@ -289,46 +132,16 @@ instance KnownNat n => GeomAlgebra Int (Outer n) where
 
 ------------------------------------------------------------
 
--- | Affine vector geometric algebra of given dimension.
-newtype VGA (n :: Nat) = VGA (CA n 0 0)
-  deriving (Num, Eq, Fractional, Floating)
-
--- | Dual affine vector geometric algebra of given dimension.
-type VGA' n = Dual (VGA n)
-
-deriving via CA n 0 0 instance LinSpace [Int] (VGA n)
-deriving via CA n 0 0 instance KnownNat n => CliffAlgebra Int (VGA n)
-deriving via CA n 0 0 instance KnownNat n => Show (VGA n)
-deriving via Outer n instance KnownNat n => GeomAlgebra Int (VGA n)
-
-------------------------------------------------------------
-
--- | Projective geometric algebra of given dimension.
-newtype PGA (n :: Nat) = PGA (CA n 1 0)
-  deriving (Num, Eq, Fractional, Floating)
-
--- | Dual projective geometric algebra of given dimension.
-type PGA' n = Dual (PGA n)
-
-deriving via CA n 1 0 instance LinSpace [Int] (PGA n)
-deriving via CA n 1 0 instance KnownNat n => CliffAlgebra Int (PGA n)
-deriving via CA n 1 0 instance KnownNat n => Show (PGA n)
-
-instance KnownNat n => GeomAlgebra Int (PGA n) where
-  spaceDim = fromIntegral . natVal
-  dim x = grade x - 1
-  point x = kvec 1 (1:x)
-  coord mv =
-    if h == 0 then [] else [coeff [k] mv / h | k <- [1..spaceDim mv] ]
-    where
-      h = coeff [0] mv
-
-------------------------------------------------------------
-
 newtype CA (p :: Nat) (q :: Nat) (r :: Nat) = CA MapLS
+  deriving ( Show, Num, Eq, Fractional, Floating
+            ) via GeometricNum (CA p q r)
+  deriving LinSpace via MapLS
+
+type instance Basis (CA p q r) = [Int]
+type instance Generator (CA p q r) = Int
 
 instance (KnownNat p, KnownNat q, KnownNat r)
-         => CliffAlgebra Int (CA p q r) where
+         => CliffAlgebra (CA p q r) where
   algebraSignature x = 
     ( fromIntegral $ natVal (Proxy :: Proxy p)
     , fromIntegral $ natVal (Proxy :: Proxy q)
@@ -348,79 +161,106 @@ instance (KnownNat p, KnownNat q, KnownNat r)
     where
       (s, v) = M.partitionWithKey (\k a -> length k == 0) mv
 
-deriving via MapLS instance LinSpace [Int] (CA p q r)
+------------------------------------------------------------
 
-deriving via GeometricNum (CA p q r)
-  instance (KnownNat p, KnownNat q, KnownNat r) => Eq (CA p q r)
-deriving via GeometricNum (CA p q r)
-  instance (KnownNat p, KnownNat q, KnownNat r) => Show (CA p q r)
-deriving via GeometricNum (CA p q r)
-  instance (KnownNat p, KnownNat q, KnownNat r) => Num (CA p q r)
-deriving via GeometricNum (CA p q r)
-  instance (KnownNat p, KnownNat q, KnownNat r) => Fractional (CA p q r)
-deriving via GeometricNum (CA p q r)
-  instance (KnownNat p, KnownNat q, KnownNat r) => Floating (CA p q r)
+-- | Affine vector geometric algebra of given dimension.
+newtype VGA (n :: Nat) = VGA (CA n 0 0)
+  deriving ( Show, Num, Eq, Fractional, Floating
+           , LinSpace, CliffAlgebra)
+
+type instance Basis (VGA n) = [Int]
+type instance Generator (VGA n) = Int
+
+-- | Dual affine vector geometric algebra of given dimension.
+type VGA' n = Dual (VGA n)
+
+deriving via Outer n instance KnownNat n => GeomAlgebra (VGA n)
+
+------------------------------------------------------------
+
+-- | Projective geometric algebra of given dimension.
+newtype PGA (n :: Nat) = PGA (CA n 1 0)
+  deriving ( Show, Num, Eq, Fractional, Floating
+           , LinSpace, CliffAlgebra)
+
+type instance Basis (PGA n) = [Int]
+type instance Generator (PGA n) = Int
+
+-- | Dual projective geometric algebra of given dimension.
+type PGA' n = Dual (PGA n)
+
+instance KnownNat n => GeomAlgebra (PGA n) where
+  spaceDim = fromIntegral . natVal
+  dim x = grade x - 1
+  point x = kvec 1 (1:x)
+  coord mv =
+    if h == 0 then [] else [coeff [k] mv / h | k <- [1..spaceDim mv] ]
+    where
+      h = coeff [0] mv
 
 ------------------------------------------------------------
 -- tabulated instance
 ------------------------------------------------------------
 
-newtype Table e a i = Table (A.Array i (Maybe ([e], Double)))
-newtype IndexMap e a = IndexMap (M.Map e Int)
+newtype Table a i = Table (A.Array i (Maybe ([Generator a], Double)))
+newtype IndexMap a = IndexMap (M.Map [Generator a] Int)
 
-class Tabulated e a | a -> e where
-  squareT     :: a -> e -> Double
+class CliffAlgebra a => Tabulated a where
+  squareT     :: a -> Generator a -> Double
   signatureT  :: a -> (Int,Int,Int)
   generatorsT :: [a]
-  indexT      :: IndexMap [e] a
-  geomT       :: Table e a (Int,Int)
-  outerT      :: Table e a (Int,Int)
-  innerT      :: Table e a (Int,Int)
-  lcontractT  :: Table e a (Int,Int)
-  rcontractT  :: Table e a (Int,Int)
-  revT        :: Table e a Int
-  invT        :: Table e a Int
-  conjT       :: Table e a Int
-  dualT       :: Table e a Int
-  rcomplT     :: Table e a Int
-  lcomplT     :: Table e a Int
+  indexT      :: IndexMap a
+  geomT       :: Table a (Int,Int)
+  outerT      :: Table a (Int,Int)
+  innerT      :: Table a (Int,Int)
+  lcontractT  :: Table a (Int,Int)
+  rcontractT  :: Table a (Int,Int)
+  revT        :: Table a Int
+  invT        :: Table a Int
+  conjT       :: Table a Int
+  dualT       :: Table a Int
+  rcomplT     :: Table a Int
+  lcomplT     :: Table a Int
   
-mkTable2 :: CliffAlgebra e a
-         => (a -> a -> a) -> [a] -> Table e b (Int, Int)
+mkTable2 :: (Generator b ~ Generator a, CliffAlgebra a)
+         => (a -> a -> a) -> [a] -> Table b (Int, Int)
 mkTable2 op b = mkArray $ f <$> b <*> b
   where
     mkArray = Table . A.listArray ((0,0),(n-1,n-1))
     f x = listToMaybe . assoc . op x
     n = length b
 
-mkTable :: CliffAlgebra e a
-        => (a -> a) -> [a] -> Table e b Int
+mkTable :: (Generator b ~ Generator a, CliffAlgebra a)
+        => (a -> a) -> [a] -> Table b Int
 mkTable op b = mkArray $ f <$> b
   where
     mkArray = Table . A.listArray (0,n-1)
     f = listToMaybe . assoc . op
     n = length b
 
-mkIndexMap :: (Ord e, LinSpace [e] a) => [a] -> IndexMap [e] a
+mkIndexMap :: (Ord (Basis a), CliffAlgebra a) => [a] -> IndexMap a
 mkIndexMap b = IndexMap $ M.fromList $ zip (b >>= elems) [0..]
 
-lookup1 :: CliffAlgebra e a
-        => Table e a Int -> IndexMap [e] a -> a -> a
+lookup1 :: CliffAlgebra a
+        => Table a Int -> IndexMap a -> a -> a
 lookup1 (Table tbl) (IndexMap ix) =
   lmap (\x -> tbl A.! (ix M.! x))
 
-lookup2 :: CliffAlgebra e a
-        => Table e a (Int,Int) -> IndexMap [e] a -> a -> a -> a
+lookup2 :: CliffAlgebra a
+        => Table a (Int,Int) -> IndexMap a -> a -> a -> a
 lookup2 (Table tbl) (IndexMap ix) =
   lapp (\a b -> tbl A.! (ix M.! a, ix M.! b))
 
-newtype TabulatedGA a = TabulatedGA a
-  deriving Eq
+---------------------------------------------------------------------
 
-deriving instance LinSpace e a => LinSpace e (TabulatedGA a)
- 
-instance (CliffAlgebra e a, Tabulated e a ) =>
-         CliffAlgebra e (TabulatedGA a) where
+newtype TabulatedGA a = TabulatedGA a
+  deriving (Eq, LinSpace)
+
+type instance Basis (TabulatedGA a) = Basis a
+type instance Generator (TabulatedGA a) = Generator a
+
+instance (CliffAlgebra a, Tabulated a ) =>
+         CliffAlgebra (TabulatedGA a) where
   algebraSignature (TabulatedGA a) = signatureT a
   square (TabulatedGA x) = squareT x
   generators = TabulatedGA <$> generatorsT
@@ -446,7 +286,8 @@ tab2 f (TabulatedGA a) (TabulatedGA b) = TabulatedGA $ f a b
 ------------------------------------------------------------
 
 -- | Template which generates aliases for given basis of Clifford algebra. 
-defineElements :: CliffAlgebra Int a => [a] -> Q [Dec]
+defineElements :: (Generator a ~ Int, CliffAlgebra a)
+               => [a] -> Q [Dec]
 defineElements b = concat <$> (mapM go $ tail $ b >>= elems)
   where
     go lst = do
@@ -455,8 +296,13 @@ defineElements b = concat <$> (mapM go $ tail $ b >>= elems)
           t = mkName "CliffAlgebra"
       expr <- [| e_ lst |]
       int <- [t| Int |]
+      gen <- [t| Generator |]
       return $
-        [ SigD name (ForallT [] [AppT (AppT (ConT t) int) (VarT a)] (VarT a))
+        [ SigD name
+          (ForallT []
+            [ AppT (ConT t) (VarT a)
+            , AppT (AppT EqualityT (AppT gen (VarT a))) int ]
+            (VarT a))
         , ValD (VarP name) (NormalB expr) []]
 
 newtypeGA :: Name -> Q [Dec]
@@ -476,15 +322,17 @@ tabulateGA ga n tga = let
   t = mkName $ tga
   tt = conT t
   ot = appT (conT o) (litT (numTyLit n))
-  in [d|deriving via $ot instance Eq $tt 
+  in [d|type instance Basis $tt = [Int]
+        type instance Generator $tt = Int
+        deriving via $ot instance Eq $tt 
         deriving via $ot instance Num $tt
         deriving via $ot instance Fractional $tt
         deriving via $ot instance Floating $tt
         deriving via $ot instance Show $tt
-        deriving via $ot instance LinSpace [Int] $tt
-        deriving via $ot instance GeomAlgebra Int $tt
-        deriving via TabulatedGA $tt instance CliffAlgebra Int $tt
-        instance Tabulated Int $tt where
+        deriving via $ot instance LinSpace $tt
+        deriving via $ot instance GeomAlgebra $tt
+        deriving via TabulatedGA $tt instance CliffAlgebra $tt
+        instance Tabulated $tt where
           squareT _ = fromIntegral . signum
           signatureT _ = algebraSignature (1 :: $ot)
           indexT = mkIndexMap (coerce <$> (basis :: [$ot]))
@@ -500,5 +348,3 @@ tabulateGA ga n tga = let
           dualT = mkTable dual (basis :: [$ot])
           rcomplT = mkTable rcompl (basis :: [$ot])
           lcomplT = mkTable lcompl (basis :: [$ot]) |] 
-
-

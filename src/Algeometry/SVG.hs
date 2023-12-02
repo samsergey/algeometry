@@ -160,35 +160,35 @@ infix 1 <@
 -- geometric objects
 
 -- | Returns multivector, which represents the origin.
-origin :: GeomAlgebra b a => a
+origin :: GeomAlgebra a => a
 origin = point []
 
 -- | Returns a label with given value.
-display :: (Show s,  GeomAlgebra b a) => [Double] -> s -> Figure a a
+display :: (Show s,  GeomAlgebra a) => [Double] -> s -> Figure a a
 display p s = label p $ show s
 
 -- | Returns a label at given position.
-label :: (GeomAlgebra b a) => [Double] -> String -> Figure a a
+label :: (GeomAlgebra a) => [Double] -> String -> Figure a a
 label p s = point p @ [ id_ (pack s), class_ "label"]
 
 -- | Returns multivector, which represents a normalized line.
-nline :: GeomAlgebra b a => [Double] -> [Double] -> a
+nline :: GeomAlgebra a => [Double] -> [Double] -> a
 nline a b = point a `join` point b
 
 -- | Returns multivector, which represents a line.
-line :: GeomAlgebra b a => [Double] -> [Double] -> a
+line :: GeomAlgebra a => [Double] -> [Double] -> a
 line a b = point a ∨ point b
 
 -- | Returns multivector, which represents a vector (line passing through the origin).
-vect :: GeomAlgebra b a => [Double] -> a
+vect :: GeomAlgebra a => [Double] -> a
 vect = line []
 
 -- | Returns multivector, which represents a normalized vector (line passing through the origin).
-nvect :: GeomAlgebra b a => [Double] -> a
+nvect :: GeomAlgebra a => [Double] -> a
 nvect = nline []
 
 -- | Returns a graphic object, which represents a polygon.
-polygon :: GeomAlgebra e a => [a] -> Figure a [a]
+polygon :: GeomAlgebra a => [a] -> Figure a [a]
 polygon pts = res `with` [class_ "polygon"]
   where
     res = case pts of
@@ -199,32 +199,32 @@ polygon pts = res `with` [class_ "polygon"]
       _ -> puts pts
 
 -- | Returns a graphic object, which represents a polyline.
-polyline :: GeomAlgebra e a => [a] -> Figure a [a]
+polyline :: GeomAlgebra a => [a] -> Figure a [a]
 polyline pts = polygon pts `with` [class_ "polyline"]
 
 -- | Returns a graphic object, which represents a regular polygon.
-regularPoly :: GeomAlgebra e a => Double -> Figure a [a]
+regularPoly :: GeomAlgebra a => Double -> Figure a [a]
 regularPoly n = polygon [ point ([cos (2*pi*t), sin (2*pi*t)])
                         | t <- [0, 1/n .. n-1/n] ]
 
 -- | Returns a graphic object, which represents a segment? given by two points.
-segment :: GeomAlgebra e a => a -> a -> Figure a [a]
+segment :: GeomAlgebra a => a -> a -> Figure a [a]
 segment p1 p2 = polyline [p1, p2]
 
 -- | Returns a graphic object, which represents a segment given by coordinates.
 segm
-  :: GeomAlgebra b a
+  :: GeomAlgebra a
   => [Double] -> [Double] -> Figure a [a]
 segm a b = segment (point a) (point b)
 
 -- | Returns multivector, which represents a plane passing through three points.
-plane :: GeomAlgebra b a
+plane :: GeomAlgebra a
       => [Double] -> [Double] -> [Double] -> a
 plane a b c = point a `join` point b `join` point c
 
 -- | Returns graphic object, which represents a plane passing through a point and a line.
 plane2
-  :: (Fractional a, GeomAlgebra e a)
+  :: (Fractional a, GeomAlgebra a)
   => a -> a -> (Double, Double)
   -> Figure a a
 plane2 p l (a, b) = do
@@ -239,7 +239,7 @@ plane2 p l (a, b) = do
 
 -- | Returns graphic object, which represents a plane passing through a point, orthogonal to a line.
 orthoPlane
-  :: (Fractional a, GeomAlgebra e a)
+  :: (Fractional a, GeomAlgebra a)
   => a -> a -> (Double, Double) 
   -> Figure a a
 orthoPlane p o = plane2 p l
@@ -249,13 +249,13 @@ orthoPlane p o = plane2 p l
 
 -- | Returns graphic object, which represents a plane passing through three points.
 plane3
-  :: (Fractional a, GeomAlgebra e a)
+  :: (Fractional a, GeomAlgebra a)
   => a -> a -> a -> (Double, Double)
   -> Figure a a
 plane3 p1 p2 p3 = plane2 p1 (p2 `join` p3)
 
 -- rplane
---   :: (Fractional a, GeomAlgebra e a)
+--   :: (Fractional a, GeomAlgebra a)
 --   => a -> Double -> String -> String
 --   -> Figure a a
 -- rplane p r col lab = do
@@ -294,7 +294,7 @@ grid = do
     attr = [stroke_ "lightgray", stroke_width_ "0.2"]
 
 -- | Adds 2D background rectangle to a Figure
-background :: GeomAlgebra e a => String -> Figure a [a]
+background :: GeomAlgebra a => String -> Figure a [a]
 background col = polygon [] `with` [ class_ "bg", fill_ (pack col)] 
     
 ------------------------------------------------------------

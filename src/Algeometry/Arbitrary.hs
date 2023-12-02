@@ -9,6 +9,8 @@ Stability   : experimental
 , GeneralisedNewtypeDeriving
 , MultiParamTypeClasses
 , DataKinds
+, TypeFamilies
+, UndecidableInstances
 #-}
 
 module Algeometry.Arbitrary
@@ -27,7 +29,7 @@ import Data.Foldable
 
 ------------------------------------------------------------
 
-abitraryMV :: (Num a, CliffAlgebra e a) => ([a] -> [a]) -> Gen a
+abitraryMV :: (Num a, CliffAlgebra a) => ([a] -> [a]) -> Gen a
 abitraryMV f = res `suchThat` (not . isScalar)
   where
     res = do
@@ -37,7 +39,7 @@ abitraryMV f = res `suchThat` (not . isScalar)
       cs <- traverse (const coeff) vs
       return $ sum $ zipWith scale cs vs
 
-shrinkMV :: (Num a, CliffAlgebra e a) => a -> [a]
+shrinkMV :: (Num a, CliffAlgebra a) => a -> [a]
 shrinkMV v | isScalar v = []
            | isMonom v = []
            | otherwise = (v -) <$> terms v
@@ -46,12 +48,13 @@ shrinkMV v | isScalar v = []
 
 type MV = Cl 3 1 3
 
+------------------------------------------------------------
+
 -- | Wrapper for algebra basis elements.
 newtype Monom = Monom MV
-  deriving ( Show, Eq, Num, Fractional)
-
-deriving via MV instance LinSpace [Int] Monom
-deriving via MV instance CliffAlgebra Int Monom
+  deriving (Show, Eq, Num, Fractional, LinSpace, CliffAlgebra)
+type instance Basis Monom = Basis MV
+type instance Generator Monom = Generator MV
 
 instance Arbitrary Monom where
   arbitrary = elements basis
@@ -63,10 +66,9 @@ instance Arbitrary Monom where
 
 -- | Wrapper for 1-vector.
 newtype Vector = Vector MV
-  deriving ( Show, Eq, Num, Fractional)
-
-deriving via MV instance LinSpace [Int] Vector
-deriving via MV instance CliffAlgebra Int Vector
+  deriving (Show, Eq, Num, Fractional, LinSpace, CliffAlgebra)
+type instance Basis Vector = Basis MV
+type instance Generator Vector = Generator MV
 
 instance Arbitrary Vector where
   arbitrary = abitraryMV $ filter (\x -> grade x == 1)
@@ -76,10 +78,9 @@ instance Arbitrary Vector where
 
 -- | Wrapper for 2-vector.
 newtype Bivector = Bivector MV
-  deriving ( Show, Eq, Num, Fractional)
-
-deriving via MV instance LinSpace [Int] Bivector
-deriving via MV instance CliffAlgebra Int Bivector
+  deriving (Show, Eq, Num, Fractional, LinSpace, CliffAlgebra)
+type instance Basis Bivector = Basis MV
+type instance Generator Bivector = Generator MV
 
 instance Arbitrary Bivector where
   arbitrary = abitraryMV $ filter (\x -> grade x == 2)
@@ -89,10 +90,9 @@ instance Arbitrary Bivector where
 
 -- | Wrapper for 3-vector.
 newtype Trivector = Trivector MV
-  deriving ( Show, Eq, Num, Fractional)
-
-deriving via MV instance LinSpace [Int] Trivector
-deriving via MV instance CliffAlgebra Int Trivector
+  deriving (Show, Eq, Num, Fractional, LinSpace, CliffAlgebra)
+type instance Basis Trivector = Basis MV
+type instance Generator Trivector = Generator MV
 
 instance Arbitrary Trivector where
   arbitrary = abitraryMV $ filter (\x -> grade x == 3)
@@ -102,10 +102,9 @@ instance Arbitrary Trivector where
 
 -- | Wrapper for a general multivector.
 newtype Multivector = Multivector MV
-  deriving ( Show, Eq, Num, Fractional)
-
-deriving via MV instance LinSpace [Int] Multivector
-deriving via MV instance CliffAlgebra Int Multivector
+  deriving (Show, Eq, Num, Fractional, LinSpace, CliffAlgebra)
+type instance Basis Multivector = Basis MV
+type instance Generator Multivector = Generator MV
 
 instance Arbitrary Multivector where
   arbitrary = abitraryMV id
@@ -115,10 +114,9 @@ instance Arbitrary Multivector where
 
 -- | Wrapper for a k-vector.
 newtype Homogeneous = Homogeneous MV
-  deriving ( Show, Eq, Num, Fractional)
-
-deriving via MV instance LinSpace [Int] Homogeneous
-deriving via MV instance CliffAlgebra Int Homogeneous
+  deriving (Show, Eq, Num, Fractional, LinSpace, CliffAlgebra)
+type instance Basis Homogeneous = Basis MV
+type instance Generator Homogeneous = Generator MV
 
 instance Arbitrary Homogeneous where
   arbitrary = do

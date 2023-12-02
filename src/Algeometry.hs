@@ -11,13 +11,16 @@ Stability   : experimental
 , MultiParamTypeClasses
 , FlexibleInstances
 , TemplateHaskell
-, FlexibleContexts #-}
+, FlexibleContexts
+, UndecidableInstances
+, TypeOperators #-}
 
 module Algeometry
   ( -- * Classes
 
     -- ** Linear space
     LinSpace (..)
+  , Basis
   , scale
   , elems
   , coefs
@@ -26,6 +29,7 @@ module Algeometry
 
   -- ** Clifford algebras
   , CliffAlgebra (..)
+  , Generator
   , (∧)
   , (|-)
   , (-|)
@@ -88,17 +92,11 @@ module Algeometry
   , stretch  
   
   -- * Types
-  , Dual
   , Cl (..)
-  , Outer (..), Outer'
-  , VGA (..), VGA'
-  , PGA (..), PGA'
+  , Dual, Outer (..), Outer'
+  , VGA (..), VGA', PGA (..), PGA'
   -- ** Effective realisations of geometric algebras
-  , VGA2 (..)
-  , VGA3 (..)
-  , PGA2 (..)
-  , PGA3 (..)
-  , PGA4 (..)
+  , VGA2 (..), VGA3 (..), PGA2 (..), PGA3 (..), PGA4 (..)
   , defineElements
   , tabulateGA
   -- ** Basis elements for geometric algebras. 

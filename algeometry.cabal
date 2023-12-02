@@ -28,6 +28,7 @@ library
       Algeometry
       Algeometry.Arbitrary
       Algeometry.GeometricAlgebra
+      Algeometry.GeometricNum
       Algeometry.SVG
       Algeometry.Types
   other-modules:

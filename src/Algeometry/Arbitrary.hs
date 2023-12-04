@@ -54,8 +54,6 @@ type MV = Cl 3 1 3
 newtype Monom = Monom MV
   deriving ( Show, Eq, Num, Fractional, Floating
            , LinSpace, CliffAlgebra)
-type instance Basis Monom = Basis MV
-type instance Generator Monom = Generator MV
 
 instance Arbitrary Monom where
   arbitrary = elements basis
@@ -69,8 +67,6 @@ instance Arbitrary Monom where
 newtype Vector = Vector MV
   deriving ( Show, Eq, Num, Fractional, Floating
            , LinSpace, CliffAlgebra)
-type instance Basis Vector = Basis MV
-type instance Generator Vector = Generator MV
 
 instance Arbitrary Vector where
   arbitrary = abitraryMV $ filter (\x -> grade x == 1)
@@ -82,8 +78,6 @@ instance Arbitrary Vector where
 newtype Bivector = Bivector MV
   deriving ( Show, Eq, Num, Fractional, Floating
            , LinSpace, CliffAlgebra)
-type instance Basis Bivector = Basis MV
-type instance Generator Bivector = Generator MV
 
 instance Arbitrary Bivector where
   arbitrary = abitraryMV $ filter (\x -> grade x == 2)
@@ -95,8 +89,6 @@ instance Arbitrary Bivector where
 newtype Trivector = Trivector MV
   deriving ( Show, Eq, Num, Fractional, Floating
            , LinSpace, CliffAlgebra)
-type instance Basis Trivector = Basis MV
-type instance Generator Trivector = Generator MV
 
 instance Arbitrary Trivector where
   arbitrary = abitraryMV $ filter (\x -> grade x == 3)
@@ -108,8 +100,6 @@ instance Arbitrary Trivector where
 newtype Multivector = Multivector MV
   deriving ( Show, Eq, Num, Fractional, Floating
            , LinSpace, CliffAlgebra)
-type instance Basis Multivector = Basis MV
-type instance Generator Multivector = Generator MV
 
 instance Arbitrary Multivector where
   arbitrary = abitraryMV id
@@ -121,8 +111,6 @@ instance Arbitrary Multivector where
 newtype Homogeneous = Homogeneous MV
   deriving ( Show, Eq, Num, Fractional, Floating
            , LinSpace, CliffAlgebra)
-type instance Basis Homogeneous = Basis MV
-type instance Generator Homogeneous = Generator MV
 
 instance Arbitrary Homogeneous where
   arbitrary = do

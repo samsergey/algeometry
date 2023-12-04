@@ -97,6 +97,7 @@ module Algeometry
   , VGA (..), VGA', PGA (..), PGA'
   -- ** Effective realisations of geometric algebras
   , VGA2 (..), VGA3 (..), PGA2 (..), PGA3 (..), PGA4 (..)
+  , Tabulated (..), TabulatedGA (..)
   , defineElements
   , tabulateGA
   -- ** Basis elements for geometric algebras. 
@@ -118,31 +119,29 @@ type family Cl (p :: Nat) (q :: Nat) (r :: Nat) where
   Cl 0 0 0 = Double
   Cl 0 n 0 = Outer n
   Cl n 0 0 = VGA n
-  Cl 2 1 0 = PGA 2
-  Cl 3 1 0 = PGA 3
   Cl n 1 0 = PGA n
   Cl p q r = CA p q r
 
 ------------------------------------------------------------
 
 -- | Tabulated 2D affine geometric algebra.
-newtype VGA2 = VGA2 MapLS
+newtype VGA2 = VGA2 ListLS
 $(tabulateGA "VGA'" 2 "VGA2")
 
 -- | Tabulated 3D affine geometric algebra.
-newtype VGA3 = VGA3 MapLS
+newtype VGA3 = VGA3 ListLS
 $(tabulateGA "VGA'" 3 "VGA3")
 
 -- | Tabulated 2D projective geometric algebra.
-newtype PGA2 = PGA2 MapLS
+newtype PGA2 = PGA2 ListLS
 $(tabulateGA "PGA'" 2 "PGA2")
 
 -- | Tabulated 3D projective geometric algebra.
-newtype PGA3 = PGA3 MapLS
+newtype PGA3 = PGA3 ListLS
 $(tabulateGA "PGA'" 3 "PGA3")
 
 -- | Tabulated 4D projective geometric algebra.
-newtype PGA4 = PGA4 MapLS
+newtype PGA4 = PGA4 ListLS
 $(tabulateGA "PGA'" 4 "PGA4")
 
 $(defineElements (basis :: [PGA 4]))

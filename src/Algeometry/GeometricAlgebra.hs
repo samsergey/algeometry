@@ -13,7 +13,7 @@ Stability   : experimental
 , TypeFamilies
 , TypeFamilyDependencies
 , DataKinds
-, TypeOperators #-}
+, BangPatterns #-}
 
 module Algeometry.GeometricAlgebra
 ( Basis, Generator, LinSpace (..)
@@ -39,11 +39,11 @@ import Data.List ( maximumBy, (\\), nub, sort, sortOn, union )
 import Data.Ord ( comparing )
 import Control.Monad ( filterM, foldM )
 
--- | Type family for basis element  of LinearSpace
-type family Basis a
+type Basis = [Int]
+type Generator = Int
 
 {- | The class representing a general linear space. -}
-class Eq (Basis el) => LinSpace el where
+class LinSpace el where
   {-# MINIMAL zero, isZero, monom, add, lmap, lapp, lfilter, assoc #-}
   -- | The zero element.
   zero :: el
@@ -52,7 +52,7 @@ class Eq (Basis el) => LinSpace el where
   isZero :: el -> Bool
 
   -- | Constructor for the monom.
-  monom :: Basis el -> Double -> el
+  monom :: Basis -> Double -> el
 
   -- | Predicate for the monom.
   isMonom :: el -> Bool
@@ -62,28 +62,28 @@ class Eq (Basis el) => LinSpace el where
   add :: el -> el -> el
 
   -- | Mapping of partial unary linear function through an element.
-  lmap :: (Basis el -> Maybe (Basis el, Double)) -> el -> el
+  lmap :: (Basis -> Maybe (Basis, Double)) -> el -> el
 
   -- | Distribution of partial binary linear function through two elements.
-  lapp :: (Basis el -> Basis el -> Maybe (Basis el, Double)) -> el -> el -> el
+  lapp :: (Basis -> Basis -> Maybe (Basis, Double)) -> el -> el -> el
 
   -- | Extraction of elements with given predicate.
-  lfilter :: (Basis el -> Double -> Bool) -> el -> el
+  lfilter :: (Basis -> Double -> Bool) -> el -> el
 
   -- | Scalar coefficient of an element 
-  coeff :: Basis el -> el -> Double
+  coeff :: Basis -> el -> Double
   coeff x mv = fromMaybe 0 $ lookup x (assoc mv)
 
   -- | Representation of an element as assoclist.
-  assoc :: el -> [(Basis el, Double)]
+  assoc :: el -> [(Basis, Double)]
 
 -- | Returns an element of a linear space, scaled by given factor.
 scale :: LinSpace el => Double -> el -> el
 scale a m | a == 0 = zero
-          | otherwise = lmap (\k -> Just (k, a)) m
+          | otherwise = lmap (\k -> pure (k, a)) m
 
 -- | Returns list of basis elements for an element.
-elems :: LinSpace el => el -> [Basis el]
+elems :: LinSpace el => el -> [Basis]
 elems = fmap fst . assoc
 
 -- | Returns list of coefficients for an element.
@@ -100,19 +100,13 @@ lerp a b t = a `add` scale t (b `add` scale (-1) a)
 
 ------------------------------------------------------------
 
--- | Type family for generator of Clifford algebra
-type family Generator a
-
 {- | The class representing Clifford algebra. -}
-class ( Ord (Generator mv)
-      , Basis mv ~ [Generator mv]
-      , LinSpace mv
-      , Eq mv ) => CliffAlgebra mv where
+class ( LinSpace mv, Eq mv ) => CliffAlgebra mv where
   -- | The signature of Clifford algebra. The first argument is proxy needed to specify the class.
   algebraSignature :: mv -> (Int,Int,Int)
 
   -- | Squares of the generators, which define the Clifford algebra. The first argument is proxy needed to resolve the dependence for `Generator` type instance.
-  square :: mv -> Generator mv -> Double
+  square :: mv -> Generator -> Double
 
   -- | List of generators of the Clifford algebra.
   generators :: [mv]
@@ -133,15 +127,15 @@ class ( Ord (Generator mv)
   outer :: mv -> mv -> mv
   outer = lapp (composeBlades (const 0) (const 1))
 
+  -- | The left contraction (same as `(-|)`).
+  {-# INLINE lcontract #-}
+  lcontract :: mv -> mv -> mv
+  lcontract m = lapp (composeBlades (square m) (const 0)) m
+
   -- | The right contraction (same as `(|-)`).
   {-# INLINE rcontract #-}
   rcontract :: mv -> mv -> mv
   rcontract a b = rev (rev b `lcontract` rev a)
-
-  -- | The left contraction (same as `(-|)`).
-  {-# INLINE lcontract #-}
-  lcontract :: mv -> mv -> mv
-  lcontract m1 = lapp (composeBlades (square m1) (const 0)) m1
 
   -- | The inner product  (same as `(·)`).
   {-# INLINE inner #-}
@@ -154,12 +148,12 @@ class ( Ord (Generator mv)
   {-# INLINE rev #-}
   -- | The reverse of a multivector.
   rev :: mv -> mv
-  rev = lmap $ \b -> Just (b, (-1)^(length b `div` 2))
+  rev = lmap $ \b -> pure (b, (-1)^(length b `div` 2))
 
   {-# INLINE inv #-}
   -- | The inversion of a multivector.
   inv :: mv -> mv
-  inv = lmap $ \b -> Just (b, (-1)^length b)
+  inv = lmap $ \b -> pure (b, (-1)^length b)
 
   {-# INLINE conj #-}
   -- | The conjugate of a multivector
@@ -169,7 +163,7 @@ class ( Ord (Generator mv)
   {-# INLINE dual #-}
   -- | The dual of a multivector.
   dual :: mv -> mv
-  dual a = lmap (\b -> Just (ps \\ b, 1)) a
+  dual a = lmap (\b -> pure (ps \\ b, 1)) a
     where
       ps = head $ head $ elems <$> [pseudoScalar, a]
 
@@ -197,21 +191,22 @@ class ( Ord (Generator mv)
   -- | Extracts a non-scalar part from a multivector.
   nonScalar :: mv -> mv
   nonScalar = snd . decompose 
-  
+
+{-# INLINE composeBlades #-} 
 composeBlades
-  :: Ord b =>
-  (b -> Double) -> (b -> Double) -> [b] -> [b] -> Maybe ([b], Double)
+  :: (Generator -> Double) -> (Generator -> Double)
+  -> Basis -> Basis -> Maybe (Basis, Double)
 composeBlades g h x y = foldM f (y, (-1)^(length x `div` 2)) x
   where
     f (b, p) i = case span (< i) b of
       (l, k:r) | i == k ->
         if g i == 0
         then Nothing
-        else Just (l <> r, p*(-1)^length l * g i)
+        else pure (l <> r, p*(-1)^length l * g i)
       (l, r) ->
         if h i == 0
         then Nothing
-        else Just (l <> (i:r), p*(-1)^length l * h i)
+        else pure (l <> (i:r), p*(-1)^length l * h i)
 
 ------------------------------------------------------------
 
@@ -234,20 +229,24 @@ class CliffAlgebra mv => GeomAlgebra mv where
 infixr 9 ∧
 
 -- | The infix operator for the `outer` product
+{-# INLINE (∧) #-}
 (∧) :: CliffAlgebra mv => mv -> mv -> mv
 (∧) = outer
 
 infix 8 -|, |-, ∙
 
 -- | The infix operator for the `lcontract`.
+{-# INLINE (-|) #-}
 (-|) :: CliffAlgebra mv => mv -> mv -> mv
 (-|) = lcontract
 
 -- | The infix operator for `rcontract`.
+{-# INLINE (|-) #-}
 (|-) :: CliffAlgebra mv => mv -> mv -> mv
 (|-) = rcontract
 
 -- | The infix operator for the `inner` product
+{-# INLINE (∙) #-}
 (∙) :: CliffAlgebra mv => mv -> mv -> mv
 (∙) = inner
 
@@ -257,6 +256,7 @@ infix 9 •
 a • b = trace (inner a b)
 
 -- | Extracts k-blade from a multivector.
+{-# INLINE getGrade #-}
 getGrade :: CliffAlgebra mv => Int -> mv -> mv
 getGrade k = lfilter (\b _ -> length b == k)
 
@@ -272,12 +272,12 @@ bulk a = lfilter (const . all ((0 /=) . square a)) a
 -- constructors
 
 -- | Returns a generator of the algebra.
-e :: CliffAlgebra mv => Generator mv -> mv
+e :: CliffAlgebra mv => Generator -> mv
 e k = if res `elem` generators then res else zero
   where res = monom [k] 1
       
 -- | Returns a monomial element of the algebra (outer product of generators).
-e_ :: CliffAlgebra mv => [Generator mv] -> mv
+e_ :: CliffAlgebra mv => [Generator] -> mv
 e_ ks = foldl outer (scalar 1) $ e <$> ks
 
 {- | Returns a scalar element of the algebra.
@@ -419,14 +419,17 @@ isPlane x = dim x == 2
 
 infixr 9 ∨
 -- | Regressive product of two multivectors.
+{-# INLINE (∨) #-}
 (∨) :: GeomAlgebra mv => mv -> mv -> mv
 a ∨ b = dual (dual a ∧ dual b)
 
 -- | Normalized outer product of two multivectors.
+{-# INLINE meet #-}
 meet :: GeomAlgebra mv => mv -> mv -> mv
 meet a b = normalize $ a ∧ b
 
 -- | Normalized regressive product of two multivectors.
+{-# INLINE join #-}
 join :: GeomAlgebra mv => mv -> mv -> mv
 join a b = normalize $ a ∨ b
 
@@ -448,26 +451,32 @@ clipPoly pts mv = let
 ------------------------------------------------------------
 
 -- | Returns reflection of object @a@ against object @b@.
+{-# INLINE reflectAt #-}
 reflectAt :: GeomAlgebra mv => mv -> mv -> mv
 reflectAt a b = b `geom` inv a `geom` reciprocal b
 
 -- | Returns projection of object @a@ on object @b@.
+{-# INLINE projectOn #-}
 projectOn :: GeomAlgebra mv => mv -> mv -> mv
 projectOn a b = (a `inner` b) `geom` reciprocal b
 
 -- | Infix operator for projection.
+{-# INLINE (->|) #-}
 (->|) :: GeomAlgebra mv => mv -> mv -> mv
 (->|) = projectOn
 
 -- | Returns antiprojection of object @a@ on object @b@.
+{-# INLINE antiprojectTo #-}
 antiprojectTo :: GeomAlgebra mv => mv -> mv -> mv
 antiprojectTo a b = (a `inner` b) `geom` reciprocal a
 
 -- | Infix operator for antiprojection.
+{-# INLINE (<-|) #-}
 (<-|) :: GeomAlgebra mv => mv -> mv -> mv
 (<-|) = antiprojectTo
 
 -- | Rotates object @x@ against the object @p@ by given angle.
+{-# INLINE rotateAt #-}
 rotateAt :: GeomAlgebra mv => mv -> Double -> mv -> mv
 rotateAt p ang x
   | sin ang == 0 && cos ang == 1 = x
@@ -476,6 +485,7 @@ rotateAt p ang x
     r = scalar (cos (ang/2)) `add` scale (sin (ang/2)) p
 
 -- | Translates object @x@ along the object @l@ by given distance @d@.
+{-# INLINE shiftAlong' #-}
 shiftAlong' :: GeomAlgebra mv => mv -> Double -> mv -> mv
 shiftAlong' l d x
   | isZero l = x
@@ -484,20 +494,21 @@ shiftAlong' l d x
         q = q' `geom` q'
 
 -- | Translates an object along the object @l@ by distance, given by norm of @l@.
+{-# INLINE shiftAlong #-}
 shiftAlong :: GeomAlgebra mv => mv -> mv -> mv
 shiftAlong l = shiftAlong' l 1
 
 -- | Rescales an object @a@ by given value.
+{-# INLINE rescale #-}
 rescale :: CliffAlgebra mv => Double -> mv -> mv
 rescale s a = scale s (weight a) `add` bulk a
 
 -- | Rescales magnitude of object @a@ by given value.
+{-# INLINE stretch #-}
 stretch :: CliffAlgebra mv => Double -> mv -> mv
 stretch s a = weight a `add` scale s (bulk a)
 
 ------------------------------------------------------------
-
-type instance Basis Double = [()]
 
 instance LinSpace Double where
   zero = 0
@@ -511,7 +522,8 @@ instance LinSpace Double where
   coeff _ x = x
   assoc x = [([],x)]
 
-type instance Generator Double = ()
+maybe' z f [] = z
+maybe' z f [x] = f x
 
 instance CliffAlgebra Double where
   algebraSignature _ = (0,0,0)

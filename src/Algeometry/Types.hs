@@ -13,7 +13,7 @@ Stability   : experimental
   , GeneralizedNewtypeDeriving
   , FunctionalDependencies
   , TypeFamilies, DataKinds, ScopedTypeVariables
-  , TemplateHaskell, TypeOperators  #-}
+  , TemplateHaskell, BangPatterns  #-}
 
 module Algeometry.Types
   ( CA (..), Dual (..)
@@ -21,7 +21,7 @@ module Algeometry.Types
   , VGA (..), VGA'
   , PGA (..), PGA'
   , Tabulated (..), TabulatedGA (..)
-  , MapLS
+  , ListLS, MapLS
   , defineElements
   , tabulateGA
   )
@@ -43,36 +43,80 @@ import Language.Haskell.TH.Lib.Internal (Decs)
 -- map-based linear space
 ------------------------------------------------------------
 
-type instance Basis (M.Map e Double) = e
+-- | Representation of linear space as a map, indexed by integer indexes.
+type MapLS = M.Map [Int] Double
 
-instance Ord e => LinSpace (M.Map e Double) where
+instance LinSpace MapLS where
   zero = mempty
   isZero m = M.null $ clean m
   monom = M.singleton
-  add m1 = clean . M.unionWith (+) m1
   coeff k = fromMaybe 0 . M.lookup k
   assoc = M.toList
+
+  {-# INLINE add #-}
+  add m1 = clean . M.unionWith (+) m1
+
+  {-# INLINE lfilter #-}
   lfilter = M.filterWithKey
 
+  {-# INLINE lmap #-}
   lmap f m = clean $ M.fromListWith (+) $ do
     (x, a) <- M.toList m
     maybeToList (fmap (a *) <$> f x)
 
+  {-# INLINE lapp #-}
   lapp f m1 m2 = clean $ M.fromListWith (+) $ do
     (x, a) <- M.toList m1
     (y, b) <- M.toList m2
     maybeToList (fmap ((a * b) *) <$> f x y)
 
-clean :: M.Map k Double -> M.Map k Double
+{-# INLINE clean #-}
+clean :: MapLS -> MapLS
 clean = M.filter (\x -> abs x >= 1e-10)
+
+------------------------------------------------------------
+-- list-based linear space
+------------------------------------------------------------
+
+-- | Representation of linear space as an assoclist, indexed by integer indexes.
+type ListLS = [([Int],Double)]
+
+instance LinSpace ListLS where
+  zero = mempty
+  isZero m = null m
+  monom b c = [(b,c)]
+  coeff k = fromMaybe 0 . lookup k
+  assoc = id
+
+  {-# INLINE add #-}
+  add !l !m = filter (\(_,x) -> abs x >= 1e-10) $ foldr add' l m
+    where
+      add' (k,v) lst = case lst of
+        [] -> [(k,v)]
+        (x,u):r -> case compare k x of
+          LT -> (k, v) : lst
+          EQ -> (k, v+u) : r
+          GT -> (x, u) : add' (k,v) r
+
+  {-# INLINE lfilter #-}
+  lfilter p = filter (uncurry p)
+
+  {-# INLINE lmap #-}
+  lmap f m = add [] $ do
+    (x, a) <- m
+    maybeToList (fmap (a *) <$> f x)
+
+  {-# INLINE lapp #-}
+  lapp f m1 m2 = add [] $ do
+    (x, a) <- m1
+    (y, b) <- m2
+    maybeToList (fmap ((a * b) *) <$> f x y)
+
 
 ------------------------------------------------------------
 
 -- | Wrapper which represents dual algebra for a given one. 
 newtype Dual a = Dual { getDual :: a }
-
-type instance Basis (Dual a) = Basis a
-type instance Generator (Dual a) = Generator a
 
 deriving via GeometricNum a
   instance CliffAlgebra a => Eq (Dual a)
@@ -81,9 +125,9 @@ deriving via GeometricNum a
 deriving via GeometricNum a
   instance CliffAlgebra a => Fractional (Dual a)
 deriving via GeometricNum a
-  instance (Generator a ~ Int, CliffAlgebra a) => Floating (Dual a)
+  instance CliffAlgebra a => Floating (Dual a)
 deriving via GeometricNum a
-  instance (Generator a ~ Int, CliffAlgebra a) => Show (Dual a)
+  instance CliffAlgebra a => Show (Dual a)
 deriving via GeometricNum a
   instance LinSpace a => LinSpace (Dual a)
 deriving via GeometricNum a
@@ -97,19 +141,11 @@ instance GeomAlgebra a => GeomAlgebra (Dual a) where
 
 ------------------------------------------------------------
 
--- | Representation of linear space as a map, indexed by integer indexes.
-type MapLS = M.Map [Int] Double
-type instance Basis MapLS = [Int]
-type instance Generator MapLS = Int
-
 -- | Outer (Grassmann) algebra of given dimension.
-newtype Outer (n :: Nat) = Outer MapLS
-  deriving LinSpace via MapLS
+newtype Outer (n :: Nat) = Outer ListLS
+  deriving LinSpace via ListLS
   deriving ( Show, Num, Eq, Fractional, Floating )
      via GeometricNum (Outer n)
-
-type instance Basis (Outer n) = [Int]
-type instance Generator (Outer n) = Int
 
 -- | Dual outer (Grassmann) algebra of given dimension.
 type Outer' n = Dual (Outer n)
@@ -121,9 +157,9 @@ instance KnownNat n => CliffAlgebra (Outer n) where
     where
       res = (\x -> monom [x] 1) <$> ix
       ix = [1 .. fromIntegral $ natVal (head res)]
-  decompose (Outer mv) = (fromMaybe 0 $ s M.!? [], Outer v)
-    where
-      (s, v) = M.partitionWithKey (\k a -> length k == 0) mv
+--  decompose (Outer mv) = (fromMaybe 0 $ s M.!? [], Outer v)
+--    where
+--      (s, v) = M.partitionWithKey (\k a -> length k == 0) mv
 
 instance KnownNat n => GeomAlgebra (Outer n) where
   point = kvec 1
@@ -133,13 +169,10 @@ instance KnownNat n => GeomAlgebra (Outer n) where
 
 ------------------------------------------------------------
 
-newtype CA (p :: Nat) (q :: Nat) (r :: Nat) = CA MapLS
+newtype CA (p :: Nat) (q :: Nat) (r :: Nat) = CA ListLS
   deriving ( Show, Num, Eq, Fractional, Floating
             ) via GeometricNum (CA p q r)
-  deriving LinSpace via MapLS
-
-type instance Basis (CA p q r) = [Int]
-type instance Generator (CA p q r) = Int
+  deriving LinSpace via ListLS
 
 instance (KnownNat p, KnownNat q, KnownNat r)
          => CliffAlgebra (CA p q r) where
@@ -148,7 +181,7 @@ instance (KnownNat p, KnownNat q, KnownNat r)
     , fromIntegral $ natVal (Proxy :: Proxy q)
     , fromIntegral $ natVal (Proxy :: Proxy r))
 
-  square _ i = fromIntegral (signum i)
+  square _ = fromIntegral . signum
 
   generators = res
     where
@@ -158,9 +191,9 @@ instance (KnownNat p, KnownNat q, KnownNat r)
       zeros = [0  | q > 0]
       negs  = [-k | r > 0, k <- [1..r]]
 
-  decompose (CA mv) = (fromMaybe 0 $ s M.!? [], CA v)
-    where
-      (s, v) = M.partitionWithKey (\k a -> length k == 0) mv
+  -- decompose (CA mv) = (fromMaybe 0 $ s M.!? [], CA v)
+  --   where
+  --     (s, v) = M.partitionWithKey (\k a -> length k == 0) mv
 
 ------------------------------------------------------------
 
@@ -168,9 +201,6 @@ instance (KnownNat p, KnownNat q, KnownNat r)
 newtype VGA (n :: Nat) = VGA (CA n 0 0)
   deriving ( Show, Num, Eq, Fractional, Floating
            , LinSpace, CliffAlgebra)
-
-type instance Basis (VGA n) = [Int]
-type instance Generator (VGA n) = Int
 
 -- | Dual affine vector geometric algebra of given dimension.
 type VGA' n = Dual (VGA n)
@@ -183,9 +213,7 @@ deriving via Outer n instance KnownNat n => GeomAlgebra (VGA n)
 newtype PGA (n :: Nat) = PGA (CA n 1 0)
   deriving ( Show, Num, Eq, Fractional, Floating
            , LinSpace, CliffAlgebra)
-
-type instance Basis (PGA n) = [Int]
-type instance Generator (PGA n) = Int
+    via GeometricNum (CA n 1 0)
 
 -- | Dual projective geometric algebra of given dimension.
 type PGA' n = Dual (PGA n)
@@ -203,11 +231,11 @@ instance KnownNat n => GeomAlgebra (PGA n) where
 -- tabulated instance
 ------------------------------------------------------------
 
-newtype Table a i = Table (A.Array i (Maybe ([Generator a], Double)))
-newtype IndexMap a = IndexMap (M.Map [Generator a] Int)
+newtype Table a i = Table (A.Array i (Maybe ([Generator], Double)))
+newtype IndexMap a = IndexMap (M.Map [Generator] Int)
 
 class CliffAlgebra a => Tabulated a where
-  squareT     :: a -> Generator a -> Double
+  squareT     :: a -> Generator -> Double
   signatureT  :: a -> (Int,Int,Int)
   generatorsT :: [a]
   indexT      :: IndexMap a
@@ -223,7 +251,7 @@ class CliffAlgebra a => Tabulated a where
   rcomplT     :: Table a Int
   lcomplT     :: Table a Int
   
-mkTable2 :: (Generator b ~ Generator a, CliffAlgebra a)
+mkTable2 :: CliffAlgebra a
          => (a -> a -> a) -> [a] -> Table b (Int, Int)
 mkTable2 op b = mkArray $ f <$> b <*> b
   where
@@ -231,7 +259,7 @@ mkTable2 op b = mkArray $ f <$> b <*> b
     f x = listToMaybe . assoc . op x
     n = length b
 
-mkTable :: (Generator b ~ Generator a, CliffAlgebra a)
+mkTable :: CliffAlgebra a
         => (a -> a) -> [a] -> Table b Int
 mkTable op b = mkArray $ f <$> b
   where
@@ -239,7 +267,7 @@ mkTable op b = mkArray $ f <$> b
     f = listToMaybe . assoc . op
     n = length b
 
-mkIndexMap :: (Ord (Basis a), CliffAlgebra a) => [a] -> IndexMap a
+mkIndexMap :: CliffAlgebra a => [a] -> IndexMap a
 mkIndexMap b = IndexMap $ M.fromList $ zip (b >>= elems) [0..]
 
 lookup1 :: CliffAlgebra a
@@ -255,13 +283,14 @@ lookup2 (Table tbl) (IndexMap ix) =
 ---------------------------------------------------------------------
 
 newtype TabulatedGA a = TabulatedGA a
-  deriving (Eq, LinSpace)
+  deriving GeomAlgebra
+  deriving (Eq, LinSpace) via GeometricNum a
+  deriving (Num, Floating, Fractional) via GeometricNum (TabulatedGA a)
 
-type instance Basis (TabulatedGA a) = Basis a
-type instance Generator (TabulatedGA a) = Generator a
+instance Show a => Show (TabulatedGA a) where
+  show (TabulatedGA a) = show a
 
-instance (CliffAlgebra a, Tabulated a ) =>
-         CliffAlgebra (TabulatedGA a) where
+instance Tabulated a => CliffAlgebra (TabulatedGA a) where
   algebraSignature (TabulatedGA a) = signatureT a
   square (TabulatedGA x) = squareT x
   generators = TabulatedGA <$> generatorsT
@@ -287,9 +316,9 @@ tab2 f (TabulatedGA a) (TabulatedGA b) = TabulatedGA $ f a b
 ------------------------------------------------------------
 
 -- | Template which generates aliases for given basis of Clifford algebra. 
-defineElements :: (Generator a ~ Int, CliffAlgebra a)
+defineElements :: CliffAlgebra a
                => [a] -> Q [Dec]
-defineElements b = concat <$> (mapM go $ tail $ b >>= elems)
+defineElements b = concat <$> mapM go (tail $ b >>= elems)
   where
     go lst = do
       let name = mkName $ "e"++ foldMap show lst
@@ -297,13 +326,10 @@ defineElements b = concat <$> (mapM go $ tail $ b >>= elems)
           t = mkName "CliffAlgebra"
       expr <- [| e_ lst |]
       int <- [t| Int |]
-      gen <- [t| Generator |]
-      return $
+      return 
         [ SigD name
           (ForallT []
-            [ AppT (ConT t) (VarT a)
-            , AppT (AppT EqualityT (AppT gen (VarT a))) int ]
-            (VarT a))
+            [AppT (ConT t) (VarT a)] (VarT a))
         , ValD (VarP name) (NormalB expr) []]
 
 newtypeGA :: Name -> Q [Dec]
@@ -313,22 +339,20 @@ newtypeGA name =
     name [] Nothing
     [normalC name
      [bangType (bang noSourceUnpackedness noSourceStrictness)
-      [t| MapLS |]]]
+      [t| ListLS |]]]
     []
 
 -- | Template which generates instanses for tabulated geometric algebra. 
 tabulateGA :: String -> Integer -> String -> Q Decs
 tabulateGA ga n tga = let
   o = mkName ga
-  t = mkName $ tga
+  t = mkName tga
   tt = conT t
   ot = appT (conT o) (litT (numTyLit n))
-  in [d|type instance Basis $tt = [Int]
-        type instance Generator $tt = Int
-        deriving via $ot instance Eq $tt 
-        deriving via $ot instance Num $tt
-        deriving via $ot instance Fractional $tt
-        deriving via $ot instance Floating $tt
+  in [d|deriving via $ot instance Eq $tt 
+        deriving via TabulatedGA $tt instance Num $tt
+        deriving via TabulatedGA $tt instance Fractional $tt
+        deriving via TabulatedGA $tt instance Floating $tt
         deriving via $ot instance Show $tt
         deriving via $ot instance LinSpace $tt
         deriving via $ot instance GeomAlgebra $tt
@@ -349,3 +373,5 @@ tabulateGA ga n tga = let
           dualT = mkTable dual (basis :: [$ot])
           rcomplT = mkTable rcompl (basis :: [$ot])
           lcomplT = mkTable lcompl (basis :: [$ot]) |] 
+
+

@@ -15,19 +15,17 @@ Stability   : experimental
 
 module Algeometry.GeometricNum
   ( GeometricNum (..)
-  , expSeries ) where
+  , expSeries
+  , halleysMethod ) where
 
 import Algeometry.GeometricAlgebra
-import Data.List
-import Data.Maybe
+import Data.List ( stripPrefix, sortOn, tails )
+import Data.Maybe ( catMaybes, fromMaybe, listToMaybe )
 
 {- | This newtype implements various classes for arbitrary Clifford algebra.
 It may be used to derive numeric classes for exact Geometric algebra implementation using @deriving via@ mechanics.
 -}
 newtype GeometricNum a = GeometricNum a
-
-type instance Basis (GeometricNum a) = Basis a
-type instance Generator (GeometricNum a) = Generator a
 
 deriving instance LinSpace a => LinSpace (GeometricNum a)
 
@@ -51,7 +49,7 @@ instance CliffAlgebra a => Fractional (GeometricNum a) where
   fromRational = scalar . fromRational 
   recip  = reciprocal
 
-instance (Generator a ~ Int, CliffAlgebra a) => Show (GeometricNum a) where
+instance (CliffAlgebra a) => Show (GeometricNum a) where
   show m = if isZero m then "0" else strip $ sscal <> svecs
     where
       trms mv = sortOn (length . fst) $ assoc mv
@@ -70,7 +68,7 @@ instance (Generator a ~ Int, CliffAlgebra a) => Show (GeometricNum a) where
                    | otherwise = index k
           index k = ["₀₁₂₃₄₅₆₇₈₉" !! k]
 
-instance (Generator a ~ Int, CliffAlgebra a) => Floating (GeometricNum a) where
+instance CliffAlgebra a => Floating (GeometricNum a) where
   pi = scalar pi
 
   exp x
@@ -181,3 +179,11 @@ sinS x = zipWith (*) (cycle [1,-1]) $ sinhS x
 
 thinOut (x:y:t) = x: thinOut t
 thinOut x = x
+
+halleysMethod :: Fractional a
+              => (a -> a) -> (a -> a) -> (a -> a) -> a -> [a]
+halleysMethod f f' f'' = iterate update where
+    update x = x - (2*fx*dfx)/(2*dfx*dfx - fx*ddfx) where
+        fx = f x
+        dfx = f' x
+        ddfx = f'' x

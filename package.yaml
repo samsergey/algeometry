@@ -30,11 +30,12 @@ dependencies:
 - tasty-quickcheck >= 0.10 && < 0.12
 - QuickCheck >= 2.14.2 && < 2.15
 - array >= 0.5.4
-- template-haskell >= 2.19
-- ghc-prim >= 0.9
+- template-haskell
+- ghc-prim
 - MonadRandom
     
 ghc-options:
+  - -O2
   - -Wdefault
   - -Wincomplete-uni-patterns
   - -Wredundant-constraints

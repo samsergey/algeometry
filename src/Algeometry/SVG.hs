@@ -81,7 +81,7 @@ import Data.Coerce
 ------------------------------------------------------------
 
 instance With [Attribute] where
-  with as bs = foldl add as bs
+  with = foldl add
     where
       add res att@(Attribute a v) = case res of
         Attribute b _ : r | a == b -> att : r
@@ -123,7 +123,7 @@ instance Eq a => Monoid (Figure a b) where
   mempty = Figure (mempty, undefined)
 
 instance With (Figure a b) where
-  with (Figure !([(a, attr)], b)) as = 
+  with (Figure ([(a, attr)], b)) as = 
         Figure ([(a, attr `with` as)], b)
     
 -- | Returns list of graphic objects with attributes.
@@ -136,7 +136,7 @@ getResult (Figure p) = snd p
 
 -- | Applies transformation to objects, stored in Figure type.
 mapFig :: (a1 -> a2) -> Figure a1 b -> Figure a2 b
-mapFig f (Figure !(s, r)) = Figure (map (\(x, a) -> (map f x, a)) s, r)
+mapFig f (Figure (s, r)) = Figure (map (\(x, a) -> (map f x, a)) s, r)
 
 -- | Adds multivector as graphic object to Figure.
 put :: a -> Figure a a
@@ -195,7 +195,7 @@ polygon pts = res `with` [class_ "polygon"]
       h:_:_ | isPoint h -> puts pts
             | isLine h ->
               let pts' = zipWith outer pts (tail pts ++ [h])
-              in const pts <$> puts pts'
+              in pts <$ puts pts'
       _ -> puts pts
 
 -- | Returns a graphic object, which represents a polyline.
@@ -204,7 +204,7 @@ polyline pts = polygon pts `with` [class_ "polyline"]
 
 -- | Returns a graphic object, which represents a regular polygon.
 regularPoly :: GeomAlgebra a => Double -> Figure a [a]
-regularPoly n = polygon [ point ([cos (2*pi*t), sin (2*pi*t)])
+regularPoly n = polygon [ point [cos (2*pi*t), sin (2*pi*t)]
                         | t <- [0, 1/n .. n-1/n] ]
 
 -- | Returns a graphic object, which represents a segment? given by two points.
@@ -225,10 +225,10 @@ plane a b c = point a `join` point b `join` point c
 -- | Returns graphic object, which represents a plane passing through a point and a line.
 plane2 :: GeomAlgebra a => a -> a -> (Double, Double) -> Figure a a
 plane2 p l (a, b) = do
-  polygon [ shiftAlong' l' (b) $ shiftAlong' l (a) p
-          , shiftAlong' l' (b) $ shiftAlong' l (-a) p 
+  polygon [ shiftAlong' l' b $ shiftAlong' l a p
+          , shiftAlong' l' b $ shiftAlong' l (-a) p 
           , shiftAlong' l' (-b) $ shiftAlong' l (-a) p'
-          , shiftAlong' l' (-b) $ shiftAlong' l (a) p' ] 
+          , shiftAlong' l' (-b) $ shiftAlong' l a p' ] 
   return (p ∨ l)
   where
     p' = p ->| l 
@@ -475,7 +475,7 @@ animateList frs = Animation (figure <$> frs, ())
 animate :: Int -> (Double, Double) -> (Double -> Figure PGA2 a) -> Animation ()
 animate n (a, b) mkFrame = mapM_ frame ts
   where
-    ts = [ a + fromIntegral i * (b-a)/fromIntegral (n)
+    ts = [ a + fromIntegral i * (b-a)/fromIntegral n
          | i <- [0..n-1] ]
     frame t = Animation ([figure (mkFrame t)], ())
 
@@ -484,3 +484,5 @@ transform :: Int -> (Double -> Figure PGA2 a) -> Animation ()
 transform n f = animate n (0,1) go
   where
     go t = f $ 1/(1+exp(6/tan(pi*t)))
+
+logistic x = 3.6*x*(1-x)

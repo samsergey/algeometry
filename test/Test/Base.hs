@@ -1,7 +1,7 @@
 module Test.Base (testSuite) where
 
 import Test.Tasty
-import Test.QuickCheck ( (==>) )
+import Test.QuickCheck ( (==>), Positive (..) )
 import Test.Tasty.QuickCheck ( testProperty )
 import Algeometry.GeometricAlgebra
 import Algeometry.GeometricNum 
@@ -177,6 +177,14 @@ numericTests = testGroup "Numeric tests"
       \(Homogeneous x) -> let x' = weight x
                           in exp x' == expSeries x'
     ]
+  , testGroup "Log"
+    [ testProperty "scalar values" $ 
+      \(Positive x) -> let x0 = scalar (abs x) :: Multivector
+            in trace (log x0) == log (trace x)
+    , testProperty "inverse with exp" $ 
+      \(Vector x) a -> let x' = scalar a + bulk x
+                          in nonScalar (log (exp x')) == nonScalar x'
+    ]
   ]
 
 testSuite :: TestTree
@@ -189,3 +197,5 @@ scalout (Homogeneous a) (Homogeneous b) =
   a `inner` dual b == -(-1)^(grade a `div` 2)*dual (a `outer` b)
 
 main = defaultMain numericTests
+
+

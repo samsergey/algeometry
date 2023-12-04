@@ -1,5 +1,6 @@
-{-# LANGUAGE OverloadedStrings #-}
-module Main (main) where
+{-# LANGUAGE OverloadedStrings
+, TypeFamilies, DataKinds #-}
+module Main (main, caleidoscope) where
 
 import Algeometry
 import Algeometry.SVG
@@ -11,6 +12,8 @@ reflectFig m = mapFig (\x -> m*x/m)
 
 reflections mirrors = iterate $ foldMap reflectFig mirrors
 
+caleidoscope :: (Eq a, Foldable t, Fractional a)
+             => Int -> t a -> Figure a b -> Figure a b
 caleidoscope n mirrors = fold . take n . reflections mirrors
 
 caleidoscope1 :: Figure PGA2 PGA2
@@ -43,7 +46,7 @@ randomPolygon = do
   return $
     polygon pts <@ [fill_ col, stroke_ "none", opacity_ "0.5"]
 
--- система зекркал
+-- система зеркал
 threeMirrors =
   take 3 $ iterate (rotateAt e12 (2*pi/3)) $ line [0,-4] [1,-4]
 
@@ -66,5 +69,13 @@ animateCaleidoscope m n = do
 
 main :: IO ()
 main = do
-  cal <- evalRandIO (animateCaleidoscope 25 4)
-  runAnimation "caleidoscope.gif" cal
+  print $ product $ fst $ sequence $ getFigure $ caleidoscope 20 mrs (put (point [1,1,2,3,4] :: PGA2))
+--  cal <- evalRandIO (animateCaleidoscope 25 4)
+--  runAnimation "caleidoscope.gif" cal
+
+mrs :: GeomAlgebra a => [a]
+mrs = let
+  m1 = line [0,-2] [1,-2]
+  m2 = rotateAt e12 (2*pi/3) m1
+  m3 = rotateAt e12 (2*pi/3) m2
+  in [m1, m2 ,m3]

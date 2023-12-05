@@ -203,11 +203,11 @@ composeBlades g h x y = foldM f (y, (-1)^(length x `div` 2)) x
         if g i == 0
         then Nothing
         else pure (l <> r, p*(-1)^length l * g i)
-      (l, r) ->
+      (l, r) -> 
         if h i == 0
         then Nothing
         else pure (l <> (i:r), p*(-1)^length l * h i)
-
+        
 ------------------------------------------------------------
 
 -- | The class representing Clifford algebra that have geometric representation.

@@ -39,7 +39,8 @@ library
       src
   ghc-options: -O2 -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports
   build-depends:
-      MonadRandom
+      MemoTrie
+    , MonadRandom
     , QuickCheck >=2.14.2 && <2.15
     , array >=0.5.4
     , base >=4.15 && <5
@@ -64,7 +65,8 @@ executable caleidoscope
       examples
   ghc-options: -O2 -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      MonadRandom
+      MemoTrie
+    , MonadRandom
     , QuickCheck >=2.14.2 && <2.15
     , algeometry
     , array >=0.5.4
@@ -90,7 +92,8 @@ executable duals
       examples
   ghc-options: -O2 -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      MonadRandom
+      MemoTrie
+    , MonadRandom
     , QuickCheck >=2.14.2 && <2.15
     , algeometry
     , array >=0.5.4
@@ -116,7 +119,8 @@ executable menelaus
       examples
   ghc-options: -O2 -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      MonadRandom
+      MemoTrie
+    , MonadRandom
     , QuickCheck >=2.14.2 && <2.15
     , algeometry
     , array >=0.5.4
@@ -142,7 +146,8 @@ executable moebius
       examples
   ghc-options: -O2 -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      MonadRandom
+      MemoTrie
+    , MonadRandom
     , QuickCheck >=2.14.2 && <2.15
     , algeometry
     , array >=0.5.4
@@ -168,7 +173,8 @@ executable sphere4d
       examples
   ghc-options: -O2 -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      MonadRandom
+      MemoTrie
+    , MonadRandom
     , QuickCheck >=2.14.2 && <2.15
     , algeometry
     , array >=0.5.4
@@ -196,7 +202,8 @@ test-suite algeometry-test
       test
   ghc-options: -O2 -Wdefault -Wincomplete-uni-patterns -Wredundant-constraints -Wunused-imports -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      MonadRandom
+      MemoTrie
+    , MonadRandom
     , QuickCheck >=2.14.2 && <2.15
     , algeometry
     , array >=0.5.4

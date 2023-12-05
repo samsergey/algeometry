@@ -37,7 +37,6 @@ import GHC.TypeLits ( KnownNat, Nat, natVal )
 import Data.Coerce ( coerce )
 import Language.Haskell.TH
 import Language.Haskell.TH.Lib.Internal (Decs)
-
        
 ------------------------------------------------------------
 -- map-based linear space
@@ -82,14 +81,13 @@ clean = M.filter (\x -> abs x >= 1e-10)
 type ListLS = [([Int],Double)]
 
 instance LinSpace ListLS where
-  zero = mempty
-  isZero m = null m
+  zero = []
+  isZero = null
   monom b c = [(b,c)]
   coeff k = fromMaybe 0 . lookup k
   assoc = id
 
-  {-# INLINE add #-}
-  add !l !m = filter (\(_,x) -> abs x >= 1e-10) $ foldr add' l m
+  add l m = filter (\(_,x) -> abs x >= 1e-10) $ foldr add' l m
     where
       add' (k,v) lst = case lst of
         [] -> [(k,v)]
@@ -98,15 +96,12 @@ instance LinSpace ListLS where
           EQ -> (k, v+u) : r
           GT -> (x, u) : add' (k,v) r
 
-  {-# INLINE lfilter #-}
   lfilter p = filter (uncurry p)
 
-  {-# INLINE lmap #-}
   lmap f m = add [] $ do
     (x, a) <- m
     maybeToList (fmap (a *) <$> f x)
 
-  {-# INLINE lapp #-}
   lapp f m1 m2 = add [] $ do
     (x, a) <- m1
     (y, b) <- m2
@@ -182,7 +177,7 @@ instance (KnownNat p, KnownNat q, KnownNat r)
     , fromIntegral $ natVal (Proxy :: Proxy r))
 
   square _ = fromIntegral . signum
-
+  
   generators = res
     where
       res = (\x -> monom [x] 1) <$> (reverse negs <> zeros <> pos)

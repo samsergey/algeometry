@@ -33,6 +33,7 @@ dependencies:
 - template-haskell
 - ghc-prim
 - MonadRandom
+- MemoTrie
     
 ghc-options:
   - -O2

@@ -69,7 +69,7 @@ animateCaleidoscope m n = do
 
 main :: IO ()
 main = do
-  print $ product $ fst $ sequence $ getFigure $ caleidoscope 20 mrs (put (point [1,1,2,3,4] :: PGA2))
+  print $ product $ fst $ sequence $ getFigure $ caleidoscope 20 mrs (put (point [1,1,2,3,4] :: PGA3))
 --  cal <- evalRandIO (animateCaleidoscope 25 4)
 --  runAnimation "caleidoscope.gif" cal
 
